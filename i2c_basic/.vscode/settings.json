@@ -1,0 +1,6 @@
+{
+  "C_Cpp.intelliSenseEngine": "default",
+  "idf.espIdfPath": "/Users/coleluba/esp/esp-idf",
+  "idf.toolsPath": "/Users/coleluba/.espressif",
+  "idf.pythonInstallPath": "/opt/homebrew/bin/python3"
+}
