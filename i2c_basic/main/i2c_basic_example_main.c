@@ -28,9 +28,11 @@ static const char *TAG = "example";
 #define I2C_MASTER_TIMEOUT_MS       1000
 
 #define MPU9250_SENSOR_ADDR         0x68        /*!< Address of the MPU9250 sensor */
-#define MPU9250_WHO_AM_I_REG_ADDR   0x75        /*!< Register addresses of the "who am I" register */
+#define MPU9250_WHO_AM_I_REG_ADDR   0x00        /*!< Register addresses of the "who am I" register */
 #define MPU9250_PWR_MGMT_1_REG_ADDR 0x6B        /*!< Register addresses of the power management register */
 #define MPU9250_RESET_BIT           7
+#define GYRO_XOUT_H                 0x1D
+#define GYRO_XOUT_L                 0x1E
 
 /**
  * @brief Read a sequence of bytes from a MPU9250 sensor registers
@@ -79,15 +81,23 @@ void app_main(void)
     i2c_master_dev_handle_t dev_handle;
     i2c_master_init(&bus_handle, &dev_handle);
     ESP_LOGI(TAG, "I2C initialized successfully");
-
+    while(1 == 1)
+    {
+     mpu9250_register_read(dev_handle, GYRO_XOUT_H, &data[0], 1);
+     mpu9250_register_read(dev_handle, GYRO_XOUT_L, &data[1], 1);
+    int speed = (int)(data[0] << 8 | data[1]);
+    ESP_LOGI(TAG, "Speed = %d", speed); 
+    vTaskDelay(pdMS_TO_TICKS(100));
+    }
     /* Read the MPU9250 WHO_AM_I register, on power up the register should have the value 0x71 */
     ESP_ERROR_CHECK(mpu9250_register_read(dev_handle, MPU9250_WHO_AM_I_REG_ADDR, data, 1));
     ESP_LOGI(TAG, "WHO_AM_I = %X", data[0]);
+    
 
     /* Demonstrate writing by resetting the MPU9250 */
-    ESP_ERROR_CHECK(mpu9250_register_write_byte(dev_handle, MPU9250_PWR_MGMT_1_REG_ADDR, 1 << MPU9250_RESET_BIT));
+    //ESP_ERROR_CHECK(mpu9250_register_write_byte(dev_handle, MPU9250_PWR_MGMT_1_REG_ADDR, 1 << MPU9250_RESET_BIT));
 
     ESP_ERROR_CHECK(i2c_master_bus_rm_device(dev_handle));
-    ESP_ERROR_CHECK(i2c_del_master_bus(bus_handle));
-    ESP_LOGI(TAG, "I2C de-initialized successfully");
+    //ESP_ERROR_CHECK(i2c_del_master_bus(bus_handle));
+    //ESP_LOGI(TAG, "I2C de-initialized successfully");
 }

@@ -2,5 +2,20 @@
   "C_Cpp.intelliSenseEngine": "default",
   "idf.espIdfPath": "/Users/coleluba/esp/esp-idf",
   "idf.toolsPath": "/Users/coleluba/.espressif",
-  "idf.pythonInstallPath": "/opt/homebrew/bin/python3"
+  "idf.pythonInstallPath": "/opt/homebrew/bin/python3",
+  "idf.port": "/dev/tty.usbserial-10",
+  "idf.monitorPort": "/dev/tty.usbserial-10",
+  "idf.flashType": "UART",
+  "idf.openOcdConfigs": [
+    "board/esp32s3-builtin.cfg"
+  ],
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32s3"
+  },
+  "clangd.path": "/Users/coleluba/.espressif/tools/esp-clang/esp-19.1.2_20250312/esp-clang/bin/clangd",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=/Users/coleluba/.espressif/tools/xtensa-esp-elf/esp-15.1.0_20250607/xtensa-esp-elf/bin/xtensa-esp32s3-elf-gcc",
+    "--compile-commands-dir=/Users/coleluba/Documents/GitHub/ESP32S3_25-26/i2c_basic/build"
+  ]
 }
