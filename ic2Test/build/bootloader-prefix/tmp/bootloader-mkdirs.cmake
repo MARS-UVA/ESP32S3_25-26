@@ -10,18 +10,18 @@ if(NOT EXISTS "C:/Users/jkitz/esp/v5.5/esp-idf/components/bootloader/subproject"
   file(MAKE_DIRECTORY "C:/Users/jkitz/esp/v5.5/esp-idf/components/bootloader/subproject")
 endif()
 file(MAKE_DIRECTORY
-  "C:/Users/jkitz/esp/v5.5/project-name/build/bootloader"
-  "C:/Users/jkitz/esp/v5.5/project-name/build/bootloader-prefix"
-  "C:/Users/jkitz/esp/v5.5/project-name/build/bootloader-prefix/tmp"
-  "C:/Users/jkitz/esp/v5.5/project-name/build/bootloader-prefix/src/bootloader-stamp"
-  "C:/Users/jkitz/esp/v5.5/project-name/build/bootloader-prefix/src"
-  "C:/Users/jkitz/esp/v5.5/project-name/build/bootloader-prefix/src/bootloader-stamp"
+  "C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader"
+  "C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader-prefix"
+  "C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader-prefix/tmp"
+  "C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader-prefix/src/bootloader-stamp"
+  "C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader-prefix/src"
+  "C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader-prefix/src/bootloader-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "C:/Users/jkitz/esp/v5.5/project-name/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
+    file(MAKE_DIRECTORY "C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "C:/Users/jkitz/esp/v5.5/project-name/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
 endif()

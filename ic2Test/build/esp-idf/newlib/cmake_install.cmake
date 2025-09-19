@@ -39,6 +39,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/jkitz/esp/v5.5/project-name/build/esp-idf/newlib/src/port/cmake_install.cmake")
+  include("C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/esp-idf/newlib/src/port/cmake_install.cmake")
 endif()
 

@@ -13,8 +13,8 @@ end
 
 # Load bootloader symbols
 set confirm off
-    add-symbol-file C:/Users/jkitz/esp/v5.5/project-name/build/bootloader/bootloader.elf
+    add-symbol-file C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/bootloader/bootloader.elf
 set confirm on
 
 # Load application symbols
-file C:/Users/jkitz/esp/v5.5/project-name/build/project-name.elf
+file C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/project-name.elf

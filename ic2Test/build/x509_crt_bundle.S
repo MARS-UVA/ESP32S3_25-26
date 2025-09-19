@@ -1,4 +1,4 @@
-/* * Data converted from C:/Users/jkitz/esp/v5.5/project-name/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from C:/Users/jkitz/esp/v5.5/ESP_Project/ESP32S3_25-26/ic2Test/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 #if !defined (__APPLE__) && !defined (__linux__)
