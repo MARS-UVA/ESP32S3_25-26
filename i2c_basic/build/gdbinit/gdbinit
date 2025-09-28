@@ -1,0 +1,2 @@
+source /Users/coleluba/Documents/GitHub/ESP32S3_25-26/i2c_basic/build/gdbinit/symbols
+source /Users/coleluba/Documents/GitHub/ESP32S3_25-26/i2c_basic/build/gdbinit/connect
