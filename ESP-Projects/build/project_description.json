@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "ESP-Projects",
-    "project_version":    "66a2517c-dirty",
+    "project_version":    "083f65dc-dirty",
     "project_path":       "/Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects",
     "idf_path":           "/Users/carlosgiron/VScode_Work/ESP32/v5.5/esp-idf",
     "build_dir":          "/Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects/build",

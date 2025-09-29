@@ -85,7 +85,8 @@ void app_main(void)
     ESP_ERROR_CHECK(imu3000_register_read(dev_handle, IMU3000_WHO_AM_I_REG_ADDR, data, 1));
     printf("WHO_AM_I = %x\n", data[0]);
     printf("It should be 69 or 68.\n");
-    for (uint8_t i = 3; i > 0; i--)
+
+    for (uint8_t i = 1; i > 0; i--) // can change countdown
     {
         printf("Will start reading IMU gyro data in:\t%d seconds\n", i);
         vTaskDelay(pdMS_TO_TICKS(1000));
@@ -94,15 +95,15 @@ void app_main(void)
 
     while (1)
     {
-        for (uint8_t dims = 0; dims < 1; dims++)
+        for (uint8_t dims = 0; dims < 3; dims++)
         {
             ESP_ERROR_CHECK(i2c_master_transmit_receive(dev_handle, &gyros[dims], 1, &data[0], 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS));
             ESP_ERROR_CHECK(i2c_master_transmit_receive(dev_handle, &gyros[dims + 1], 1, &data[1], 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS));
 
             printf("%s\t-\t%d\n", dimensions[dims], ((int16_t)(data[0] << 8) | data[1]) / 0xFF);
-            vTaskDelay(5);
         }
         printf("\n");
+        vTaskDelay(20);
     }
 
     ESP_ERROR_CHECK(i2c_master_bus_rm_device(dev_handle));
