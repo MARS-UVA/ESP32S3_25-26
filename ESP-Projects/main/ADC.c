@@ -4,6 +4,8 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
+// NOT DONE YET
+
 #define EXAMPLE_ADC_UNIT ADC_UNIT_2
 #define _EXAMPLE_ADC_UNIT_STR(unit) #unit
 #define EXAMPLE_ADC_UNIT_STR(unit) _EXAMPLE_ADC_UNIT_STR(unit)
