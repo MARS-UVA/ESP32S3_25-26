@@ -25,8 +25,6 @@ static const char *TAG = "example";
 #define I2C_MASTER_SDA_IO GPIO_NUM_42 /*!< GPIO number used for I2C master data  */
 #define I2C_MASTER_NUM I2C_NUM_0      /*!< I2C port number for master dev */
 #define I2C_MASTER_FREQ_HZ 100000     /*!< I2C master clock frequency */
-#define I2C_MASTER_TX_BUF_DISABLE 0   /*!< I2C master doesn't need buffer */
-#define I2C_MASTER_RX_BUF_DISABLE 0   /*!< I2C master doesn't need buffer */
 #define I2C_MASTER_TIMEOUT_MS 1000
 
 // IMU centered constants
@@ -40,7 +38,7 @@ static const char *TAG = "example";
 #define IMU3000_WHO_AM_I_REG_ADDR 0x0 /*!< Register addresses of the "who am I" register */
 
 /**
- * @brief Read a sequence of bytes from a register
+ * @brief function made to read from a register, simplifiees long master_trasmit call
  */
 static esp_err_t imu3000_register_read(i2c_master_dev_handle_t dev_handle, uint8_t reg_addr, uint8_t *data, size_t len)
 {
@@ -101,9 +99,17 @@ void app_main(void)
     {
         for (uint8_t dims = 0; dims < 3; dims++)
         {
-            // instead of using your own register read, you could use master transmit recieve directly
+            // instead of using your own register read, you could use master transmit recieve directly, but it's a lot of inputs
             ESP_ERROR_CHECK(i2c_master_transmit_receive(dev_handle, &gyros[dims], 1, &data[0], 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS));
             ESP_ERROR_CHECK(i2c_master_transmit_receive(dev_handle, &gyros[dims + 1], 1, &data[1], 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS));
+            /* master transmit args
+                i2c dev      - Device added to i2c master bus (IMU)
+                write buffer - Used here to specify the gyro register we want to read from
+                write size   - Size of data we're writing, not important now, default 1
+                read buffer  - Buffer we are sending read data to
+                read size    - Size of read data
+                Timout(ms)   - How long we have to try reading til we give up
+            */
 
             printf("%s\t-\t%d\n", dimensions[dims], ((int16_t)(data[0] << 8) | data[1]) / 0xFF); // Gyro data is interpretted as 16bit signed int, but split across high and low registers
                                                                                                  // so we need to use bit shifting to properly represent data

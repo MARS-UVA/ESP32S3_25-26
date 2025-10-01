@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "ESP-Projects",
-    "project_version":    "083f65dc-dirty",
+    "project_version":    "40247015-dirty",
     "project_path":       "/Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects",
     "idf_path":           "/Users/carlosgiron/VScode_Work/ESP32/v5.5/esp-idf",
     "build_dir":          "/Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects/build",
@@ -1225,7 +1225,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects/build/esp-idf/main/libmain.a",
-            "sources": [ "/Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects/main/i2c_example.c", "/Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects/main/hello_world.c" ],
+            "sources": [ "/Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects/main/Pot_Motor.c" ],
             "include_dirs": [ "." ]
         },
         "mbedtls": {

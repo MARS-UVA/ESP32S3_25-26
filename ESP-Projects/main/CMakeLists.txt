@@ -1,2 +1,2 @@
-idf_component_register(SRCS "ADC.c" "can_ramp.c" "i2c_example.c" "hello_world.c"
+idf_component_register(SRCS "Pot_Motor.c" 
                        INCLUDE_DIRS ".")
