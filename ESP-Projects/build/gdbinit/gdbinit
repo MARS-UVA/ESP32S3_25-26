@@ -1,0 +1,2 @@
+source /Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects/build/gdbinit/symbols
+source /Users/carlosgiron/Documents/GitHub/ESP32S3_25-26/ESP-Projects/build/gdbinit/connect
