@@ -95,6 +95,7 @@ twai_message_t drive_msg = {
     .data_length_code = 8,
     .data = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 };
+
 void talonPercentOut(int16_t speed)
 {
     ESP_ERROR_CHECK(twai_transmit(&enable_msg, portMAX_DELAY));
