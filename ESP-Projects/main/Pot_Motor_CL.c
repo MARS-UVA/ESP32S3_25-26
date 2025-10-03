@@ -160,43 +160,49 @@ void app_main()
 
     // Enable the motor controller and set Coast Mode
     twai_transmit(&enable_msg, portMAX_DELAY);
-    twai_transmit(&coast_msg, portMAX_DELAY);
-    twai_transmit(&coast_msg, portMAX_DELAY);
+    //twai_transmit(&coast_msg, portMAX_DELAY);
+    //twai_transmit(&coast_msg, portMAX_DELAY);
 
     while (1)
     {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait for conversion done callback
 
+        int numSamples = 6; //Number of samples to average
+        int frames = 0; //Curent sample number
+        int32_t sum = 0; //Sum of samples
         while (1)
         {
-            uint32_t data = 0;
             ret = adc_continuous_read(handle, result, 256, &ret_num, 0);
-            
+
             if (ret == ESP_OK)
             {
                 for (int i = 0; i < ret_num; i += SOC_ADC_DIGI_RESULT_BYTES)
                 {
                     adc_digi_output_data_t *p = (adc_digi_output_data_t *)&result[i];
-                    data = p->type2.data;
-                    data -= 2048; // Center around 0
-                    printf("Value Before:\t%ld\n", data);
-                }
-                printf("\n");
-                //Scale down data to 0-1024
-                data /= 8;
-                // Send data to Talon
-                if(!errQUEUE_FULL)
-                {
-                    if((int16_t)data < 0)
+                    int32_t raw = (int32_t)p->type2.data;
+                    //Ranging the sample from -2048 to 2048
+                    int32_t sample = (raw * 4096) / 4095 - 2048;
+
+                    //Adding the sample to the sum and increasing the frame count
+                    sum += sample;
+                    frames++;
+                    printf("Sample %d:\t%ld\n", frames, (long)sample);
+
+                    if (frames >= numSamples)
                     {
-                        data = ~data + 1;
+                        //Scales down the sum so we are not giving the motor 200% output
+                        //Max is 66.667%
+                        sum /= 3;
+                        int32_t average = sum / frames;
+                        printf("Average:\t%ld\n", (long)average);
+                        talonPercentOut((int16_t)average); // Send speed and direction
+                        /* Reset for next averaging window */
+                        sum = 0;
+                        frames = 0;
                     }
-                     printf("Value After:\t%ld\n", data);
-
-                    talonPercentOut((uint16_t)data); // Send speed and direction
                 }
 
-                vTaskDelay(pdMS_TO_TICKS(100)); // Add delay between reads
+                vTaskDelay(1); // Add small delay between reads
             }
             else if (ret == ESP_ERR_INVALID_STATE)
             {
