@@ -1,2 +1,2 @@
-idf_component_register(SRCS "Pot_Motor_CL.c" "betterADC.c" 
+idf_component_register(SRCS "hello_world.c" 
                        INCLUDE_DIRS ".")
