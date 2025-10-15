@@ -9,8 +9,9 @@ void app_main(){
     setPIDValues();
     
     while (1) {
-        setTargetVelocity(512); // Set target velocity to 100%
-        vTaskDelay(5);
+        talonPercentOut(112); // %50 of motor output
+        vTaskDelay(5); // watchdog -> way to know if microcontroller still works fine by feeding it code
+            // if we don't feed the watchdog for a certain amount of time, the code crashes
     }
 
 }
