@@ -12,6 +12,8 @@
 
 //FUNCTIONS
 void talonPercentOut(int16_t speed);
+void setPIDValues();
+void setTargetVelocity(int16_t velocity);
 void canSetup();
 
 #endif // CL_CAN_H

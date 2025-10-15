@@ -1,13 +1,15 @@
-#include "LO_CAN.h"
+//#include "LO_CAN.h"
+#include "CL_CAN.h"
 
 
 
 void app_main(){
 
-    canSetUp();
+    canSetup();
+    setPIDValues();
     
     while (1) {
-        talonPercentOut(112); // %50 of motor output
+        setTargetVelocity(512); // Set target velocity to 100%
         vTaskDelay(5);
     }
 
