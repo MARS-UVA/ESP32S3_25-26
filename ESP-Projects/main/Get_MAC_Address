@@ -1,0 +1,35 @@
+// Simple test app to print the ESP MAC address
+#include <stdio.h>
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_mac.h"
+#include "esp_err.h"
+#include "esp_log.h"
+
+#define TAG "test_mac"
+
+static void print_mac_address(void)
+{
+    uint8_t mac[6];
+    esp_err_t err = esp_read_mac(mac, ESP_MAC_WIFI_STA);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "esp_read_mac failed: %d", err);
+        return;
+    }
+
+    // Print MAC in the usual hex format
+    ESP_LOGI(TAG, "MAC address: %02x:%02x:%02x:%02x:%02x:%02x",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+}
+
+void app_main(void)
+{
+    print_mac_address();
+
+    // Keep the task alive so logs are visible on the monitor
+    while (1) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
