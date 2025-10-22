@@ -72,7 +72,7 @@ twai_message_t set_PID_msg = {
     .dlc_non_comp = 0, // DLC is less than 8
 
     // Message ID and payload for CAN set Output frame
-    .identifier = 0x2047c00,
+    .identifier = 0x2047c00 | 0x1b,
     .data_length_code = 8,
     .data = {0x21, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0xAA},
 
@@ -106,37 +106,57 @@ twai_message_t set_Target_Velocity_msg = {
 
 };
 
-void setPIDValues()
+// Template for PID set messages; bytes you want to remain persistent
+static const uint8_t pid_template[8] = { 0x21, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0xAA };
+
+// Helper: pack a float value and send a PID set followed by apply.
+// The wire format for the 4-byte value is little-endian (LSB first).
+static void send_pid_param(uint8_t param_id, float value)
 {
-    set_PID_msg.data[1] = 0x53; // kP
-    //kP = 3dcccccd = 0.1
-    set_PID_msg.data[3] = 0x3d;
-    set_PID_msg.data[4] = 0xcc;
-    set_PID_msg.data[5] = 0xcc;
-    set_PID_msg.data[6] = 0xcd;
-    twai_transmit(&set_PID_msg, portMAX_DELAY);
-    twai_transmit(&apply_PID_msg, portMAX_DELAY);
+    twai_message_t msg = {
+        .extd = 1,
+        .rtr = 0,
+        .ss = 0,
+        .self = 0,
+        .dlc_non_comp = 0,
+        .identifier = 0x2047c00 | 0x1b,
+        .data_length_code = 8,
+        .data = {0}
+    };
 
-    set_PID_msg.data[1] = 0x54; // kI
-    //kI = 3dcccccd = 0.1
-    set_PID_msg.data[3] = 0x3d;
-    set_PID_msg.data[4] = 0xcc;
-    set_PID_msg.data[5] = 0xcc;
-    set_PID_msg.data[6] = 0xcd;
-    twai_transmit(&set_PID_msg, portMAX_DELAY);
-    twai_transmit(&apply_PID_msg, portMAX_DELAY);
+    // start from template to preserve bytes you intentionally keep
+    memcpy(msg.data, pid_template, sizeof(msg.data));
+    msg.data[1] = param_id;
 
+    // pack float into 4 bytes (native endianness; typically little-endian)
+    uint8_t bytes[4];
+    memcpy(bytes, &value, sizeof(float));
 
-    set_PID_msg.data[1] = 0x55; // kD
-    //kD = 0 
-    twai_transmit(&set_PID_msg, portMAX_DELAY);
-    twai_transmit(&apply_PID_msg, portMAX_DELAY);
+    // place bytes on the wire as little-endian (LSB first)
+    msg.data[3] = bytes[0];
+    msg.data[4] = bytes[1];
+    msg.data[5] = bytes[2];
+    msg.data[6] = bytes[3];
 
-        ESP_LOGI(EXAMPLE_TAG, "PID set");
-
-
+    ESP_ERROR_CHECK(twai_transmit(&msg, portMAX_DELAY));
+    ESP_ERROR_CHECK(twai_transmit(&apply_PID_msg, portMAX_DELAY));
 }
 
+void setPIDValues()
+{
+    // Set kP = 0.1
+    send_pid_param(0x53, 0.1f);
+
+    // Set kI = 0.1
+    send_pid_param(0x54, 0.1f);
+
+    // Set kD = 0.0
+    send_pid_param(0x55, 0.0f);
+
+    ESP_LOGI(EXAMPLE_TAG, "PID set (little-endian)");
+}
+
+//function to set target velocity of motor
 void setTargetVelocity(int16_t velocity)
 {
     ESP_ERROR_CHECK(twai_transmit(&enable_msg, portMAX_DELAY));
