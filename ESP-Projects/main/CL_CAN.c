@@ -8,6 +8,9 @@
 #include "esp_log.h"
 #include "driver/twai.h"
 #include "CL_CAN.h"
+#include "driver/gpio.h"
+#include "led_strip.h"
+#include "sdkconfig.h"
 
 /* --------------------- Definitions and static variables ------------------ */
 
