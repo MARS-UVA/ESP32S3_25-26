@@ -7,12 +7,14 @@
 #include <string.h>
 #include "esp_log.h"
 #include "driver/twai.h"
+#include "driver/gpio.h"
 
 #ifndef CL_CAN_H
+#define CL_CAN_H
 
 //FUNCTIONS
 void talonPercentOut(int16_t speed);
-void setPIDValues();
+void setPIDValues(float kP, float kI, float kD);
 void setTargetVelocity(int16_t velocity);
 void canSetup();
 

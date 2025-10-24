@@ -9,7 +9,6 @@
 #include "driver/twai.h"
 #include "CL_CAN.h"
 #include "driver/gpio.h"
-#include "led_strip.h"
 #include "sdkconfig.h"
 
 /* --------------------- Definitions and static variables ------------------ */
@@ -142,26 +141,35 @@ static void send_pid_param(uint8_t param_id, float value)
     msg.data[6] = bytes[3];
 
     ESP_ERROR_CHECK(twai_transmit(&msg, portMAX_DELAY));
-    ESP_ERROR_CHECK(twai_transmit(&apply_PID_msg, portMAX_DELAY));
 }
 
-void setPIDValues()
+void setPIDValues(float kP, float kI, float kD)
 {
     // Set kP = 0.1
-    send_pid_param(0x53, 0.1f);
+    send_pid_param(0x53, kP);
+    ESP_LOGI("NOLOCK1", "1111111111111");
 
     // Set kI = 0.1
-    send_pid_param(0x54, 0.1f);
+    send_pid_param(0x54, kI);
+    ESP_LOGI("NOLOCK2", "22222222222");
+
 
     // Set kD = 0.0
-    send_pid_param(0x55, 0.0f);
+    send_pid_param(0x55, kD);
+    ESP_LOGI("NOLOCK3", "3333333333333");
+
+    ESP_ERROR_CHECK(twai_transmit(&apply_PID_msg, portMAX_DELAY));
+
 
     ESP_LOGI(EXAMPLE_TAG, "PID set (little-endian)");
+    ESP_LOGI("NOLOCK4", "4444444444444");
+
 }
 
 //function to set target velocity of motor
 void setTargetVelocity(int16_t velocity)
 {
+    ESP_LOGI(EXAMPLE_TAG, "Attempting to set to velocity: %d", velocity);
     ESP_ERROR_CHECK(twai_transmit(&enable_msg, portMAX_DELAY));
 
     set_Target_Velocity_msg.data[2] = (velocity >> 8) & 0xff; // high byte
@@ -173,6 +181,8 @@ void setTargetVelocity(int16_t velocity)
 // function to drive a motor at speed/1024 percent output
 void talonPercentOut(int16_t speed)
 {
+    ESP_LOGI(EXAMPLE_TAG, "Attempting to set to velocity: %d", speed);
+
     ESP_ERROR_CHECK(twai_transmit(&enable_msg, portMAX_DELAY));
 
     uint8_t spBytes[2];
