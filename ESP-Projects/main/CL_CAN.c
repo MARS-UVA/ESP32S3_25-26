@@ -137,12 +137,27 @@ void setPIDValues()
 
 }
 
-void setTargetVelocity(int16_t velocity)
+void setTargetVelocity(int velocity)
 {
     ESP_ERROR_CHECK(twai_transmit(&enable_msg, portMAX_DELAY));
 
-    set_Target_Velocity_msg.data[2] = (velocity >> 8) & 0xff; // high byte
-    set_Target_Velocity_msg.data[3] = (velocity & 0xff); // low byte
+    if (velocity >= 0) 
+    {
+    velocity *= 2;
+    velocity *= 16;
+    }
+    else
+    {
+    velocity *= 2;
+    velocity = 0x40000 - (-16 * velocity);
+    }
+    set_Target_Velocity_msg.data[2] = velocity & 0xFF; // high byte
+    set_Target_Velocity_msg.data[3] = (velocity >> 8) & 0xFF; // low byte
+    set_Target_Velocity_msg.data[4] = (velocity >> 16) & 0xFF;
+    set_Target_Velocity_msg.data[6] = (velocity >> 16) & 0x0a;
+    set_Target_Velocity_msg.data[7] = (velocity >> 16) & 0x00;
+
+
     twai_transmit(&set_Target_Velocity_msg, portMAX_DELAY);   
     twai_clear_receive_queue();
 }

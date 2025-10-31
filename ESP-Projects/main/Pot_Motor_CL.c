@@ -110,7 +110,6 @@ twai_message_t coast_msg = {
     .identifier = 0x2047c00 | 0x1b,
     .data_length_code = 8,
     .data = {0x21, 0x6E, 0x08, 0x00, 0x00, 0x00, 0x00, 0xAA},
-
 };
 
 //direction, True = forward, False = reverse
