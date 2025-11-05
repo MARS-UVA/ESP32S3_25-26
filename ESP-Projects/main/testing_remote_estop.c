@@ -32,8 +32,8 @@ canSetup();
         ESP_LOGI("LOOP RUN", "LOOP RUN");
         if (readButton()) {
             canStop();
-            break;
             ESP_LOGI("cut_loop", "cut_loop");
+            break;
         }
         
         talonPercentOut(512);

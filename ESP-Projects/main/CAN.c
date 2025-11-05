@@ -176,8 +176,8 @@ void talonPercentOut(int16_t speed)
 
     drive_msg.data[7] = spBytes[0]; // flipping endianness
     drive_msg.data[6] = spBytes[1];
-
     ESP_ERROR_CHECK(twai_transmit(&drive_msg, portMAX_DELAY));
+    vTaskDelay(1);
 }
 
 void canSetup(void){
