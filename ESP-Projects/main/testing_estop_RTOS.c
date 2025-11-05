@@ -3,30 +3,27 @@
 
 #define BUTTONPIN 5
 
-TaskHandle_t myTaskHandle = NULL;
+TaskHandle_t myTaskHandle1 = NULL;
 TaskHandle_t myTaskHandle2 = NULL;
 
-void canRunRTOS(void *arg)
-{
-talonPercentOut(100);   
+void canRunRTOS(void *arg){
+    while (1)  {
+    talonPercentOut(100);   
+    ESP_LOGI("motor running", "motor running");
+    }
 }
 
-int readButton(){
+void readButton(){
 
-return gpio_get_level(BUTTONPIN);
-
-}
-
-void canStopRTOS(void *arg){
-
-        while (true){
-
-            ESP_LOGI("LOOP RUN", "LOOP RUN");{
-            if (readButton()) {
-              canStop();
-              break;
-              ESP_LOGI("cut_loop", "cut_loop");
+    while (true){
+        ESP_LOGI("LOOP RUN", "LOOP RUN");{
+        if (gpio_get_level(BUTTONPIN)) {
+            vTaskSuspend(myTaskHandle1);
+            ESP_LOGI("cut_loop", "cut_loop");
             }
+        else {
+            vTaskResume(myTaskHandle1);
+        }
         }
     }
 }
@@ -34,8 +31,9 @@ void canStopRTOS(void *arg){
 void app_main(){
 
     gpio_set_direction(BUTTONPIN, GPIO_MODE_INPUT);
+    canSetup();
 
-    xTaskCreate(canRunRTOS, "canRunRTOS", 1024, NULL, 1, &myTaskHandle);
-    // xTaskCreatePinnedToCore(canStopRTOS, "canStopRTOS", 1024, NULL, 1, &myTaskHandle2)
+    xTaskCreatePinnedToCore(canRunRTOS, "canRunRTOS", 4096, NULL, 7, &myTaskHandle1, 1);
+    xTaskCreatePinnedToCore(readButton, "readButton", 4096, NULL, 1, &myTaskHandle2, 1);
 }
 
