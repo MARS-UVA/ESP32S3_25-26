@@ -12,6 +12,7 @@
 #define LO_CAN_H
 
 void talonPercentOut(int16_t speed);
+void supplyCurrentLimit(float f_limit);
 void canSetUp(void);
 
 #endif
