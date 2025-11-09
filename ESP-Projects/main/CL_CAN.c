@@ -21,7 +21,11 @@
 // sets conifigs for our twai driver to send messages
 static const twai_timing_config_t t_config = TWAI_TIMING_CONFIG_1MBITS();     // CAN bus timing on our talon fx
 static const twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL(); // Accept all incoming messages for the driver
-static const twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(TX_GPIO_NUM, RX_GPIO_NUM, TWAI_MODE_NORMAL);
+static const twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(TX_GPIO_NUM, RX_GPIO_NUM, TWAI_MODE_NO_ACK);
+
+const int CANID = 27;
+
+//PID_configs[] = {0x53, 0x54, 0x55}; // kP, kI, kD
 
 twai_message_t enable_msg = {
     // Message type and format settings
@@ -46,7 +50,7 @@ twai_message_t drive_msg = {
     .dlc_non_comp = 0, // DLC is less than 8
 
     // Message ID and payload for CAN set Output frame
-    .identifier = 0x204b540 | 0x1b,
+    .identifier = 0x204b540 | CANID,
     .data_length_code = 8,
     .data = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 };
@@ -60,7 +64,7 @@ twai_message_t neutral_mode_msg = {
     .dlc_non_comp = 0, // DLC is less than 8
 
     // Message ID and payload for CAN set Output frame
-    .identifier = 0x2047c00 | 0x1b,
+    .identifier = 0x2047c00 | CANID,
     .data_length_code = 8,
     .data = {0x21, 0x6E, 0x08, 0x00, 0x00, 0x00, 0x00, 0xAA},
 
@@ -74,7 +78,7 @@ twai_message_t set_PID_msg = {
     .dlc_non_comp = 0, // DLC is less than 8
 
     // Message ID and payload for CAN set Output frame
-    .identifier = 0x2047c00 | 0x1b,
+    .identifier = 0x2047c00 | CANID,
     .data_length_code = 8,
     .data = {0x21, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0xAA},
 
@@ -88,7 +92,7 @@ twai_message_t apply_PID_msg = {
     .dlc_non_comp = 0, // DLC is less than 8
 
     // Message ID and payload for CAN set Output frame
-    .identifier = 0x2047c00 | 0x1b,
+    .identifier = 0x2047c00 | CANID,
     .data_length_code = 8,
     .data = {0x10, 0x0c, 0xc5, 0x06, 0x0d, 0x00, 0x00, 0x00},
 
@@ -102,7 +106,7 @@ twai_message_t set_Target_Velocity_msg = {
     .dlc_non_comp = 0, // DLC is less than 8
 
     // Message ID and payload for CAN set Output frame
-    .identifier = 0x2043700 | 0x1b,
+    .identifier = 0x2043700 | CANID,
     .data_length_code = 8,
     .data = { 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
 
@@ -121,7 +125,7 @@ static void send_pid_param(uint8_t param_id, float value)
         .ss = 0,
         .self = 0,
         .dlc_non_comp = 0,
-        .identifier = 0x2047c00 | 0x1b,
+        .identifier = 0x2047c00 | CANID,
         .data_length_code = 8,
         .data = {0}
     };
@@ -140,30 +144,35 @@ static void send_pid_param(uint8_t param_id, float value)
     msg.data[5] = bytes[2];
     msg.data[6] = bytes[3];
 
+    ESP_LOGI(EXAMPLE_TAG, "Setting param 0x%02x to %.3f [bytes: %02x %02x %02x %02x]", 
+             param_id, value, bytes[0], bytes[1], bytes[2], bytes[3]);
+
+    twai_transmit(&enable_msg, portMAX_DELAY);
+
     ESP_ERROR_CHECK(twai_transmit(&msg, portMAX_DELAY));
+    ESP_LOGI(EXAMPLE_TAG, "Parameter set message sent");
+    
+    ESP_ERROR_CHECK(twai_transmit(&apply_PID_msg, portMAX_DELAY));
+    ESP_LOGI(EXAMPLE_TAG, "Apply message sent");
+    
+    ESP_ERROR_CHECK(twai_transmit(&apply_PID_msg, portMAX_DELAY));
+    ESP_LOGI(EXAMPLE_TAG, "Second apply message sent");
 }
 
-void setPIDValues(float kP, float kI, float kD)
+void setPIDValues(const float *configs)
 {
-    // Set kP = 0.1
-    send_pid_param(0x53, kP);
-    ESP_LOGI("NOLOCK1", "1111111111111");
+    float default_configs[7] = {0,0,0,0,0,0,0};
+    
+    if (configs == NULL) {
+        configs = default_configs;
+    }
 
-    // Set kI = 0.1
-    send_pid_param(0x54, kI);
-    ESP_LOGI("NOLOCK2", "22222222222");
-
-
-    // Set kD = 0.0
-    send_pid_param(0x55, kD);
-    ESP_LOGI("NOLOCK3", "3333333333333");
-
-    ESP_ERROR_CHECK(twai_transmit(&apply_PID_msg, portMAX_DELAY));
-
-
-    ESP_LOGI(EXAMPLE_TAG, "PID set (little-endian)");
-    ESP_LOGI("NOLOCK4", "4444444444444");
-
+    for(int i = 0; i < 7; i++)
+    {
+        send_pid_param(0x53 + i, configs[i]);
+        ESP_LOGI("Debug", "PID set");
+        vTaskDelay(1);
+    }
 }
 
 //function to set target velocity of motor
@@ -172,11 +181,14 @@ void setTargetVelocity(int16_t velocity)
     ESP_LOGI(EXAMPLE_TAG, "Attempting to set to velocity: %d", velocity);
     ESP_ERROR_CHECK(twai_transmit(&enable_msg, portMAX_DELAY));
 
-    set_Target_Velocity_msg.data[2] = (velocity >> 8) & 0xff; // high byte
+    set_Target_Velocity_msg.data[2] = (velocity >> 8) & 0x0f; // high byte
     set_Target_Velocity_msg.data[3] = (velocity & 0xff); // low byte
+
     twai_transmit(&set_Target_Velocity_msg, portMAX_DELAY);   
     twai_clear_receive_queue();
 }
+
+
 
 // function to drive a motor at speed/1024 percent output
 void talonPercentOut(int16_t speed)
@@ -193,6 +205,7 @@ void talonPercentOut(int16_t speed)
     drive_msg.data[6] = spBytes[1];
 
     ESP_ERROR_CHECK(twai_transmit(&drive_msg, portMAX_DELAY));
+    vTaskDelay(5);
 }
 
 void canSetup(void){

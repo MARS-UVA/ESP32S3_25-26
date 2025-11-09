@@ -14,7 +14,7 @@
 
 //FUNCTIONS
 void talonPercentOut(int16_t speed);
-void setPIDValues(float kP, float kI, float kD);
+void setPIDValues(const float *configs);
 void setTargetVelocity(int16_t velocity);
 void canSetup();
 

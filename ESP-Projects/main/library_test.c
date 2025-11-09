@@ -6,7 +6,8 @@
 void app_main(){
 
     canSetup();
-    setPIDValues();
+    float pid_configs[7] = {0.1, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0}; // kP, kI, kD
+    setPIDValues(pid_configs);
     
     while (1) {
         talonPercentOut(112); // %50 of motor output
