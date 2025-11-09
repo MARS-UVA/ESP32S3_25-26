@@ -197,4 +197,3 @@ void canStop(void){
     ESP_LOGI(CAN_LOG, "CAN drivers stopped");
 
 }
-
