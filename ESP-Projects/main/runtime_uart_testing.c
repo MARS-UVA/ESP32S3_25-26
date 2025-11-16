@@ -59,31 +59,21 @@
 //     }
 // }
 
-void supernintendo(SerialPacket packet, void* userdata1, void* userdata2) {
+void test_callback(SerialPacket packet, void* userdata1, void* userdata2) {
 
     ESP_LOGI("responding", "THIS IS DATA RECIEVED FROM UART!!!: %x",  packet.back_right_wheel);
 
 }
 
-void app_main(){
-    // init();
-    // gpio_set_direction(BUTTONPIN, GPIO_MODE_INPUT);
-    // canSetup();
+void app_main(){   
 
     UART_setup();
 
     while (true) {
 
-        UART_callback(0x32, supernintendo, 0, 0);
+        UART_callback(0x32, test_callback, 0, 0);
 
     }
 
-
-    // if(uart_read_bytes(UART_NUM, NULL, RX_BUF_SIZE, 1000 / portTICK_PERIOD_MS) > 0){
-    //     vTaskSuspend(myTaskHandle1);
-    // }
-
-    // xTaskCreatePinnedToCore(canRunRTOS, "canRunRTOS", 4096, NULL, 7, &myTaskHandle1, 1);
-    // xTaskCreatePinnedToCore(readButton, "readButton", 4096, NULL, 1, &myTaskHandle2, 1);
 }
 
