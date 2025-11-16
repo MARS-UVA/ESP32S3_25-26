@@ -1,3 +1,6 @@
+#ifndef CAN_H
+#define CAN_H
+
 #include <esp_adc/adc_continuous.h>
 #include <esp_err.h>
 #include "freertos/FreeRTOS.h"
@@ -7,15 +10,24 @@
 #include <string.h>
 #include "esp_log.h"
 #include "driver/twai.h"
-#include "driver/gpio.h"
 
-#ifndef CL_CAN_H
-#define CL_CAN_H
+
+//LIBRARY CONSTANTS
+
+#define CAN_LOG "CAN_LOG"
+
+// setting rx and tx pins into can transciever
+#define RX_GPIO_NUM GPIO_NUM_1
+#define TX_GPIO_NUM GPIO_NUM_2
+
+
 
 //FUNCTIONS
 void talonPercentOut(int16_t speed);
-void setPIDValues(const float *configs);
-void setTargetVelocity(int16_t velocity);
+void setPIDValues();
+void setTargetVelocity(int velocity);
 void canSetup();
+void canStop();
 
-#endif // CL_CAN_H
+
+#endif // CAN_H

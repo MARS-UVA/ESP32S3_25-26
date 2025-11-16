@@ -1,3 +1,3 @@
-idf_component_register(SRCS "hello_world.c" "Pot_Motor_CL.c" "freeRTOS_interrupt.c" "freeRTOS_testing.c" "library_test.c" "CL_CAN.c" "LO_CAN.c" "LO_CAN.h" "library_test.c, "CL_CAN.h"
+idf_component_register(SRCS  "runtime_uart_testing.c" "./packs/can/can.c" "./packs/uart/uart.c" "./packs/can/can.h" "./packs/uart/uart.h"
                        INCLUDE_DIRS ".")
 
