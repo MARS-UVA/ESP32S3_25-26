@@ -1,6 +1,7 @@
-#include "CAN.h"
 #include <driver/gpio.h>
-#include "Serial_Comms_UART_library.c"
+#include "./packs/uart/uart.h"
+#include "./packs/can/can.h"
+
 
 //uart goals
 
@@ -58,6 +59,12 @@
 //     }
 // }
 
+void supernintendo(SerialPacket packet, void* userdata1, void* userdata2) {
+
+    ESP_LOGI("responding", "THIS IS DATA RECIEVED FROM UART!!!: %x",  packet.back_right_wheel);
+
+}
+
 void app_main(){
     // init();
     // gpio_set_direction(BUTTONPIN, GPIO_MODE_INPUT);
@@ -67,7 +74,7 @@ void app_main(){
 
     while (true) {
 
-        UART_write();
+        UART_callback(0x32, supernintendo, 0, 0);
 
     }
 
