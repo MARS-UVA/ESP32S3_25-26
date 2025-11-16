@@ -11,7 +11,7 @@ uart_config_t uart_config = {
     .data_bits = UART_DATA_8_BITS,
     .parity = UART_PARITY_DISABLE,
     .stop_bits = UART_STOP_BITS_1,
-    .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
+    .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
     .rx_flow_ctrl_thresh = 122,
 
 };
@@ -35,6 +35,7 @@ typedef struct serialPacket {
   uint8_t back_right_wheel;
   uint8_t drum;
   uint8_t actuator;
+
 } SerialPacket;
 
 
@@ -90,4 +91,5 @@ void UART_write() // writes a single packet to Jetson on UART
 {
     char* test_str = "This is a test string.\n";
     uart_write_bytes(uart_num, (const char*)test_str, strlen(test_str));
+
 }
