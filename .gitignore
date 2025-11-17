@@ -57,3 +57,5 @@ dkms.conf
 build/
 .vscode/
 ESP-Projects/main/CMakeLists.txt
+ESP-Projects/main/CMakeLists.txt
+ESP-Projects/main/.DS_Store
