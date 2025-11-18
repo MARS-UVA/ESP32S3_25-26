@@ -3,16 +3,15 @@
 
 void app_main()
 {
-    twai_node_handle_t node_hdl = NULL;
-    TalonFX fx = talonFXInit(&node_hdl, 27);
-    TalonSRX srx = talonSRXInit(&node_hdl, 4, false);
+    TalonFX fx = talonFXInit(27);
+    TalonSRX srx = talonSRXInit(4, false);
     printf("Can Setup\n");
-    canSetup(&node_hdl);
+    canSetup();
     // ESP_ERROR_CHECK(twai_node_register_event_callbacks(node_hdl, &user_cbs, NULL));
     printf("Can Setup Done\n");
     for (;;)
     {
-        sendEn(&node_hdl);
+        sendEn();
         setSRX(&srx, 0);
     }
 }
