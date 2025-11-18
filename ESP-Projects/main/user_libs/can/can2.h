@@ -14,7 +14,6 @@
 #define TIMEOUT -1
 
 // ENUMS & STRUCTS
-
 typedef enum
 {
     CAN_ID_SET_FX = 0x204b540,
@@ -27,6 +26,7 @@ typedef enum
 
 typedef struct
 {
+    twai_node_handle_t *node_hdl;
     uint8_t id;
     float currentLimit;
     float kP;
@@ -37,24 +37,26 @@ typedef struct
 
 typedef struct
 {
+    twai_node_handle_t *node_hdl;
     uint8_t id;
     bool inverted;
 } TalonSRX;
 
 // INITS
-TalonFX talonFXInit(uint8_t id);
-TalonSRX TalonSRXInit(uint8_t id, bool inv);
+TalonFX talonFXInit(twai_node_handle_t *node_hdl, uint8_t id);
+TalonSRX talonSRXInit(twai_node_handle_t *node_hdl, uint8_t id, bool inv);
+extern twai_node_handle_t g_can_node;
 
-// FX FUNCS
-void setFX(twai_node_handle_t *node_hdl, TalonFX *fx, float speed);
-void setTargetFX(twai_node_handle_t *node_hdl, TalonFX *fx, int velocity);
-
-// SRX FUNCS
-void setSRX(twai_node_handle_t *node_hdl, TalonSRX *srx, double value);
-
-// CAN FUNCS
+// GENERAL CAN FUNCS
 void canSetup(twai_node_handle_t *node_hdl);
 void sendEn(twai_node_handle_t *node_hdl);
 void sendMsg(twai_node_handle_t *node_hdl, can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, uint8_t len);
+
+// FX FUNCS
+void setFX(TalonFX *fx, float speed);
+void setTargetFX(TalonFX *fx, int velocity);
+
+// SRX FUNCS
+void setSRX(TalonSRX *srx, double value);
 
 #endif

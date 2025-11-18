@@ -2,9 +2,23 @@
 #include "can2.h"
 
 // inits
-TalonFX talonFXInit(uint8_t n_id)
+void canSetup(twai_node_handle_t *node_hdl)
+{
+    twai_onchip_node_config_t node_config = {
+        .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
+        .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
+        .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
+        .tx_queue_depth = 32,                // Transmit queue depth set to 32
+    };
+    ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, node_hdl));
+    // ESP_ERROR_CHECK(twai_node_register_event_callbacks(node_hdl, &user_cbs, NULL));
+    ESP_ERROR_CHECK(twai_node_enable(*node_hdl));
+}
+
+TalonFX talonFXInit(twai_node_handle_t *n_node_hdl, uint8_t n_id)
 {
     return (TalonFX){
+        .node_hdl = n_node_hdl,
         .id = n_id,
         .currentLimit = 0.0f,
         .kP = 0.0f,
@@ -14,9 +28,10 @@ TalonFX talonFXInit(uint8_t n_id)
     };
 }
 
-TalonSRX TalonSRXInit(uint8_t n_id, bool inv)
+TalonSRX talonSRXInit(twai_node_handle_t *n_node_hdl, uint8_t n_id, bool inv)
 {
     return (TalonSRX){
+        .node_hdl = n_node_hdl,
         .id = n_id,
         .inverted = inv,
     };
@@ -48,21 +63,8 @@ void sendMsg(twai_node_handle_t *node_hdl, can_id_t msg_id, uint8_t d_id, uint8_
     ESP_ERROR_CHECK(twai_node_transmit(*node_hdl, &msg, TIMEOUT));
 }
 
-void canSetup(twai_node_handle_t *node_hdl)
-{
-    twai_onchip_node_config_t node_config = {
-        .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
-        .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
-        .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
-        .tx_queue_depth = 32,                // Transmit queue depth set to 32
-    };
-    ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, node_hdl));
-    // ESP_ERROR_CHECK(twai_node_register_event_callbacks(node_hdl, &user_cbs, NULL));
-    ESP_ERROR_CHECK(twai_node_enable(*node_hdl));
-}
-
 // FX CAN FUNCS
-void setFX(twai_node_handle_t *node_hdl, TalonFX *fx, float speed)
+void setFX(TalonFX *fx, float speed)
 {
     uint8_t buff[] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
@@ -72,10 +74,10 @@ void setFX(twai_node_handle_t *node_hdl, TalonFX *fx, float speed)
         valueInt = 0xfff - (-1 * valueInt);
     }
     writeToBuffInd(buff, (uint8_t *)&valueInt, 6, 2);
-    sendMsg(node_hdl, CAN_ID_SET_FX, (*fx).id, buff, 8);
+    sendMsg(fx->node_hdl, CAN_ID_SET_FX, (*fx).id, buff, 8);
 }
 
-void setTargetFX(twai_node_handle_t *node_hdl, TalonFX *fx, int velocity)
+void setTargetFX(TalonFX *fx, int velocity)
 {
     // Get velocity value (3 bytes)
     if (velocity >= 0)
@@ -93,20 +95,20 @@ void setTargetFX(twai_node_handle_t *node_hdl, TalonFX *fx, int velocity)
         feedforwardInt = (~(feedforwardInt * -1)) + 1;
 
     uint8_t buff[] = {0, 1, velocity & 0xff, (velocity >> 8) & 0xff, velocity >> 16 & 0xff, 0, feedforwardInt & 0xff, (feedforwardInt >> 8) & 0xff};
-    sendMsg(node_hdl, CAN_ID_SET_TARGET, (*fx).id, buff, 8);
+    sendMsg(fx->node_hdl, CAN_ID_SET_TARGET, (*fx).id, buff, 8);
 }
 
 // SRX CAN FUNCS
-void setInvertedSRX(twai_node_handle_t *node_hdl, TalonSRX *talonSRX, bool invert)
+void setInvertedSRX(TalonSRX *srx, bool invert)
 {
-    talonSRX->inverted = invert;
+    srx->inverted = invert;
 }
 
 // set the output magnitude of a Talon SRX
-void setSRX(twai_node_handle_t *node_hdl, TalonSRX *srx, double value)
+void setSRX(TalonSRX *srx, double value)
 {
     // set the direction of a Talon SRX to be inverted
     int valueInt = (int)(value * 1023);
     uint8_t buff[] = {(valueInt >> 16) & 255, (valueInt >> 8) & 255, valueInt & 255, 0, 0, 0, 0x0b, srx->inverted ? 0x40 : 0x00};
-    sendMsg(node_hdl, CAN_ID_SET_SRX, (*srx).id, buff, 8);
+    sendMsg(srx->node_hdl, CAN_ID_SET_SRX, srx->id, buff, 8);
 }
