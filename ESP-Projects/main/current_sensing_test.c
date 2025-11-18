@@ -10,7 +10,7 @@ uint8_t prompt_buff[6] = {0x00, 0x00, 0x00, 0x00, 0x20, 0x00};
 twai_onchip_node_config_t node_config = {
     .io_cfg.tx = 2,                // TWAI TX GPIO pin
     .io_cfg.rx = 1,                // TWAI RX GPIO pin
-    .bit_timing.bitrate = 1000000, // 200 kbps bitrate
+    .bit_timing.bitrate = 1000000, // 1Mbps bitrate
     .tx_queue_depth = 32,          // Transmit queue depth set to 16
 };
 
@@ -127,7 +127,7 @@ float getChannelCurrentPDP(PDP *pdp, int channelID)
 // process CAN packets received from the PDP (either current or voltage readings)
 void receiveCANPDP(PDP *pdp, twai_frame_t *msg, uint64_t *data)
 {
-    // not correct pdp id
+    // if not correct pdp id
     if ((msg->header.id & pdp->identifier) != pdp->identifier)
         return;
 
