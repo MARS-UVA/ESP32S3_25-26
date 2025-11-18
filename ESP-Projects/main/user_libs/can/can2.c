@@ -36,6 +36,7 @@ void sendEn(twai_node_handle_t *node_hdl)
 {
     ESP_ERROR_CHECK(twai_node_transmit(*node_hdl, &en_msg, TIMEOUT)); // Timeout = 0: returns immediately if queue is full
 }
+
 void sendMsg(twai_node_handle_t *node_hdl, can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, uint8_t len)
 {
     twai_frame_t msg = {
@@ -46,6 +47,7 @@ void sendMsg(twai_node_handle_t *node_hdl, can_id_t msg_id, uint8_t d_id, uint8_
     };
     ESP_ERROR_CHECK(twai_node_transmit(*node_hdl, &msg, TIMEOUT));
 }
+
 void canSetup(twai_node_handle_t *node_hdl)
 {
     twai_onchip_node_config_t node_config = {
@@ -72,6 +74,7 @@ void setFX(twai_node_handle_t *node_hdl, TalonFX *fx, float speed)
     writeToBuffInd(buff, (uint8_t *)&valueInt, 6, 2);
     sendMsg(node_hdl, CAN_ID_SET_FX, (*fx).id, buff, 8);
 }
+
 void setTargetFX(twai_node_handle_t *node_hdl, TalonFX *fx, int velocity)
 {
     // Get velocity value (3 bytes)

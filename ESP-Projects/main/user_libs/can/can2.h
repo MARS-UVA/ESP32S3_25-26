@@ -19,10 +19,10 @@ typedef enum
 {
     CAN_ID_SET_FX = 0x204b540,
     CAN_ID_SET_TARGET = 0x2043700,
-    CAN_ID_SET_SRX = 0x2040200,
     CAN_ID_PID = 0x2047c00,
     CAN_ID_CURRENT_LIMIT = 0x2047c00,
     CAN_ID_NEUTRAL_MODE = 0x2047c00,
+    CAN_ID_SET_SRX = 0x2040200,
 } can_id_t;
 
 typedef struct
