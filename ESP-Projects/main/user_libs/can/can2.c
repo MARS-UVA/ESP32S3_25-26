@@ -49,10 +49,10 @@ void sendMsg(twai_node_handle_t *node_hdl, can_id_t msg_id, uint8_t d_id, uint8_
 void canSetup(twai_node_handle_t *node_hdl)
 {
     twai_onchip_node_config_t node_config = {
-        .io_cfg.tx = 2,                // TWAI TX GPIO pin
-        .io_cfg.rx = 1,                // TWAI RX GPIO pin
-        .bit_timing.bitrate = 1000000, // 1Mbps bitrate
-        .tx_queue_depth = 32,          // Transmit queue depth set to 16
+        .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
+        .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
+        .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
+        .tx_queue_depth = 32,                // Transmit queue depth set to 32
     };
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, node_hdl));
     // ESP_ERROR_CHECK(twai_node_register_event_callbacks(node_hdl, &user_cbs, NULL));
