@@ -66,14 +66,14 @@ void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
 // FX CAN FUNCS
 void setFX(TalonFX *fx, float speed)
 {
-    uint8_t buff[] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+    uint8_t buff[] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     short valueInt = (short)(speed * 1024);
     if (valueInt < 0)
     {
         valueInt = 0xfff - (-1 * valueInt);
     }
-    // writeToBuffInd(buff, (uint8_t *)&valueInt, 6, 2);
+    writeToBuffInd(buff, (uint8_t *)&valueInt, 6, 2);
     sendMsg(CAN_ID_SET_FX, fx->id, buff, 8);
 }
 
