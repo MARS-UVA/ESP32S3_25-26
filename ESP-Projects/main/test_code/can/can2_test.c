@@ -9,9 +9,9 @@ void app_main()
     canSetup();
     // ESP_ERROR_CHECK(twai_node_register_event_callbacks(node_hdl, &user_cbs, NULL));
     printf("Can Setup Done\n");
-    for (;;)
+    while (1)
     {
-        sendEn();
-        setSRX(&srx, 0);
+        // setTargetFX(&fx, 100);
+        // setSRX(&srx, .5);
     }
 }

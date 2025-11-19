@@ -41,14 +41,14 @@ typedef struct
 } TalonSRX;
 
 // INITS
-extern twai_node_handle_t g_can_node;
+extern twai_node_handle_t g_node_hdl;
 TalonFX talonFXInit(uint8_t id);
 TalonSRX talonSRXInit(uint8_t id, bool inv);
 
 // GENERAL CAN FUNCS
 void canSetup();
 void sendEn();
-void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, uint8_t len);
+void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len);
 
 // FX FUNCS
 void setFX(TalonFX *fx, float speed);

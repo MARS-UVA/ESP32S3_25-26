@@ -51,7 +51,7 @@ void sendEn()
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &en_msg, TIMEOUT)); // Timeout = 0: returns immediately if queue is full
 }
 
-void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, uint8_t len)
+void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
 {
     twai_frame_t msg = {
         .header.id = msg_id | d_id,
@@ -59,20 +59,21 @@ void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, uint8_t len)
         .buffer = data_buff,
         .buffer_len = len,
     };
+    sendEn();
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &msg, TIMEOUT));
 }
 
 // FX CAN FUNCS
 void setFX(TalonFX *fx, float speed)
 {
-    uint8_t buff[] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    uint8_t buff[] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 
     short valueInt = (short)(speed * 1024);
     if (valueInt < 0)
     {
         valueInt = 0xfff - (-1 * valueInt);
     }
-    writeToBuffInd(buff, (uint8_t *)&valueInt, 6, 2);
+    // writeToBuffInd(buff, (uint8_t *)&valueInt, 6, 2);
     sendMsg(CAN_ID_SET_FX, fx->id, buff, 8);
 }
 
