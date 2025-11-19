@@ -26,7 +26,6 @@ typedef enum
 
 typedef struct
 {
-    twai_node_handle_t *node_hdl;
     uint8_t id;
     float currentLimit;
     float kP;
@@ -37,7 +36,6 @@ typedef struct
 
 typedef struct
 {
-    twai_node_handle_t *node_hdl;
     uint8_t id;
     bool inverted;
 } TalonSRX;
