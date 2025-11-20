@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "can2.h"
+#include "pdp.h"
 
 // inits
 twai_node_handle_t g_node_hdl = NULL;
@@ -12,7 +13,7 @@ void canSetup()
         .tx_queue_depth = 32,                // Transmit queue depth set to 32
     };
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-    // ESP_ERROR_CHECK(twai_node_register_event_callbacks(node_hdl, &user_cbs, NULL));
+    //ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &user_cbs, NULL));
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 
@@ -37,7 +38,7 @@ TalonSRX talonSRXInit(uint8_t n_id, bool inv)
 }
 
 // ENABLE CAN FRAME
-uint8_t en_buff[] = {0x01, 0x00};
+uint8_t en_buff[] = {0x01, 0x00};       // Enable message data buffer
 twai_frame_t en_msg = {
     .header.id = 0x401bf, // Message ID
     .header.ide = true,   // Use 29-bit extended ID format

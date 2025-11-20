@@ -41,7 +41,7 @@ typedef struct
 } TalonSRX;
 
 // INITS
-extern twai_node_handle_t g_can_node;
+extern twai_node_handle_t g_node_hdl;
 TalonFX talonFXInit(uint8_t id);
 TalonSRX talonSRXInit(uint8_t id, bool inv);
 
