@@ -22,7 +22,7 @@ twai_frame_t en_msg = {
 };
 
 twai_frame_t forward_msg = {
-    .header.id = 0x204b540 | 37,     // Message ID
+    .header.id = 0x204b540 | 27,     // Message ID
     .header.ide = true,              // Use 29-bit extended ID format
     .buffer = send_buff,             // Pointer to data to transmit
     .buffer_len = sizeof(send_buff), // Length of data to transmit
@@ -189,7 +189,7 @@ twai_event_callbacks_t user_cbs = {
 
 void app_main()
 {
-    panel = PDPInit(62);
+    panel = PDPInit(10);
     float current;
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &node_hdl));
     ESP_ERROR_CHECK(twai_node_register_event_callbacks(node_hdl, &user_cbs, NULL));
@@ -199,7 +199,7 @@ void app_main()
         ESP_ERROR_CHECK(twai_node_transmit(node_hdl, &en_msg, -1));            // Timeout = 0: returns immediately if queue is full
         ESP_ERROR_CHECK(twai_node_transmit(node_hdl, &forward_msg, -1));       // Timeout = 0: returns immediately if queue is full
         ESP_ERROR_CHECK(twai_node_transmit(node_hdl, &promptChannel_msg, -1)); // Timeout = 0: returns immediately if queue is full
-        current = getChannelCurrentPDP(&panel, 13);
-        printf("\nCurrent read at channel %d -\t %.3f", 13, current);
+        current = getChannelCurrentPDP(&panel, 14);
+        printf("\nCurrent read at channel %d -\t %.3f", 14, current);
     }
 }

@@ -48,7 +48,7 @@ TalonSRX talonSRXInit(uint8_t id, bool inv);
 // GENERAL CAN FUNCS
 void canSetup();
 void sendEn();
-void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, uint8_t len);
+void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len);
 
 // FX FUNCS
 void setFX(TalonFX *fx, float speed);
