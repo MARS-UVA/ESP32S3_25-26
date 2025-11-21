@@ -1,5 +1,5 @@
-#include "can2.c"
-#include "uart.c"
+#include "can2.h"
+#include "uart.h"
 
 // Define CAN IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_ID 36
@@ -21,7 +21,8 @@ TalonSRX leftActuator;
 TalonSRX rightActuator;
 
 // Initialize Talon "objects"
-void initializeTalons() {   
+void initializeTalons()
+{
     frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID);
     backLeft = talonFXInit(BACK_LEFT_WHEEL_ID);
     frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID);
@@ -31,6 +32,15 @@ void initializeTalons() {
 
     leftActuator = TalonSRXInit(LEFT_ACTUATOR_ID, bool 0);
     rightActuator = TalonSRXInit(RIGHT_ACTUATOR_ID, bool 1);
-
 }
 
+void directControl(SerialPacket pkt)
+{
+    int8_t leftSpeed = pkt.top_left_wheel;
+    setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1, 0);
+    setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1, 0);
+
+    int8_t rightSpeed = packet.top_right_wheel;
+    frontRight.setControl(&frontRight, ((int8_t)(rightSpeed - 127)), 0);
+    backRight.setControl(&backRight, ((int8_t)(rightSpeed - 127)), 0);
+}
