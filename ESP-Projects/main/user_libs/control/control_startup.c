@@ -1,5 +1,4 @@
-#include "can2.h"
-#include "uart.h"
+#include "./control_startup.h"
 
 // Define CAN IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_ID 36
@@ -30,17 +29,16 @@ void initializeTalons()
     bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID);
     bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID);
 
-    leftActuator = TalonSRXInit(LEFT_ACTUATOR_ID, bool 0);
-    rightActuator = TalonSRXInit(RIGHT_ACTUATOR_ID, bool 1);
+    leftActuator = TalonSRXInit(LEFT_ACTUATOR_ID, false);
+    rightActuator = TalonSRXInit(RIGHT_ACTUATOR_ID, true);
 }
 
-void directControl(SerialPacket pkt)
-{
+void directControl(SerialPacket pkt) {
     int8_t leftSpeed = pkt.top_left_wheel;
-    setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1, 0);
-    setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1, 0);
+    setTargetFX(g_node_hdl, &frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
+    setTargetFX(g_node_hdl, &backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
-    int8_t rightSpeed = packet.top_right_wheel;
-    frontRight.setControl(&frontRight, ((int8_t)(rightSpeed - 127)), 0);
-    backRight.setControl(&backRight, ((int8_t)(rightSpeed - 127)), 0);
+    int8_t rightSpeed = pkt.top_right_wheel;
+    setTargetFX(g_node_hdl, &frontRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(g_node_hdl, &backRight, ((int8_t)(rightSpeed - 127)) * -1);
 }
