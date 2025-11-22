@@ -29,16 +29,17 @@ void initializeTalons()
     bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID);
     bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID);
 
-    leftActuator = TalonSRXInit(LEFT_ACTUATOR_ID, false);
-    rightActuator = TalonSRXInit(RIGHT_ACTUATOR_ID, true);
+    leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, false);
+    rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, true);
 }
 
-void directControl(SerialPacket pkt) {
+void directControl(SerialPacket pkt)
+{
     int8_t leftSpeed = pkt.top_left_wheel;
-    setTargetFX(g_node_hdl, &frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
-    setTargetFX(g_node_hdl, &backLeft, ((int8_t)(leftSpeed - 127)) * -1);
+    setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
+    setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
     int8_t rightSpeed = pkt.top_right_wheel;
-    setTargetFX(g_node_hdl, &frontRight, ((int8_t)(rightSpeed - 127)) * -1);
-    setTargetFX(g_node_hdl, &backRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
 }
