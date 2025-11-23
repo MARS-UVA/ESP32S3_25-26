@@ -1,7 +1,6 @@
 #include "./uart.h"
 
-
-
+int uart_priority = 10;
 
 /* --------------------- Functions ------------------ */
 
@@ -12,13 +11,16 @@ void UART_setup()
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
         .rx_flow_ctrl_thresh = 122,
-
+        .rx_fifo_full_thrhd = 110,
+        .intr_enable_mask = UART_INTR_RXFIFO_FULL | UART_INTR_RXFIFO_TOUT | UART_RXFIFO_OVF_INT,
     };
     
     QueueHandle_t uart_queue;
-    const int uart_buffer_size = (1024 * 2); // setup UART buffered IO with event queue
+    const int uart_buffer_size_rx = (1024 * 16); // setup UART buffered RX IO with event queue
+    const int uart_buffer_size_tx = (1024 * 2); // setup UART buffered TX IO with event queue
+
 
 
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config)); // apply config
@@ -32,9 +34,11 @@ void UART_setup()
         0                 // no flags
     )); 
 
+    ESP_ERROR_CHECK(uart_enable_rx_intr()); // enables interrupts
+
 }
 
-SerialPacket UART_read()
+SerialPacket UART_read(void *arg)
 {
     SerialPacket packet = {0};
     packet.invalid = 1;
@@ -83,5 +87,41 @@ void UART_callback(uint8_t reg, void (*callback)(SerialPacket, void*, void*), vo
 
 }
 
+void uart_event_task()
+{
+    uart_event_t event;
+    if(xQueueReceive(uart_queue, (void * )&event, (portTickType)portMAX_DELAY)) {
+        switch(event.type) {
+            case UART_DATA:
+                // data received
+                return UART_read();
+                break;
+            case UART_FIFO_OVF:
+                // overflow detected
+                // Action: flush input buffer and reset queue
+                uart_flush_input(UART_NUM_0);
+                xQueueReset(uart_queue);
+                break;
+            case UART_BUFFER_FULL:
+                // buffer full
+                // Action: Increase buffer size or change priority of task
+                uart_priority = 11;
+                uart_flush_input(UART_NUM_0);
+                xQueueReset(uart_queue);
+                break;
+            case UART_BREAK:
+                // break detected
+                break;
+            case UART_PARITY_ERR:
+                // parity error
+                break;
+            case UART_FRAME_ERR:
+                // frame error
+                break;
+            default:
+                break;
+        }
+    }
+}
 
 
