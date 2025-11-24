@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "pdp.h"
 #include "can2.h"
+#include "pdp.h"
 
 // inits
 twai_node_handle_t g_node_hdl = NULL;
@@ -39,7 +40,7 @@ TalonSRX talonSRXInit(uint8_t n_id, bool inv)
 }
 
 // ENABLE CAN FRAME
-uint8_t en_buff[] = {0x01, 0x00};
+uint8_t en_buff[] = {0x01, 0x00}; // Enable message data buffer
 twai_frame_t en_msg = {
     .header.id = 0x401bf, // Message ID
     .header.ide = true,   // Use 29-bit extended ID format
