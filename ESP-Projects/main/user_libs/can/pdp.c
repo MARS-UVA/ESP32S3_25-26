@@ -2,8 +2,8 @@
 #include "can2.h"
 #include "pdp.h"
 
-uint8_t prompt_buff[6] = {0x00, 0x00, 0x00, 0x00, 0x20, 0x00};      // buffer to prompt PDP for current readings
-uint32_t current_request_id = 0x8041640;                     // CAN ID to request current readings from PDP
+uint8_t prompt_buff[6] = {0x00, 0x00, 0x00, 0x00, 0x20, 0x00}; // buffer to prompt PDP for current readings
+uint32_t current_request_id = 0x8041640;                       // CAN ID to request current readings from PDP
 
 // PDP struct instance
 PDP pdp = {
@@ -15,11 +15,12 @@ PDP pdp = {
     .receivedNew0 = false,
     .receivedNew40 = false,
     .receivedNew80 = false,
-    .busVoltage = 0,    
+    .busVoltage = 0,
 };
 
-void requestCurrentReadingsPDP()    // send CAN packet to PDP to request current readings
+void requestCurrentReadingsPDP() // send CAN packet to PDP to request current readings
 {
+    sendEn();
     sendMsg(current_request_id, pdp.identifier, prompt_buff, 6); // This line sends a CAN packet to the PDP
 }
 
@@ -121,7 +122,7 @@ void receiveCANPDP(twai_frame_t *msg, uint64_t *data)
 }
 
 //
-static bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx)
+bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx)
 {
     uint8_t recv_buff[8];
     twai_frame_t rx_frame = {

@@ -36,7 +36,6 @@ void requestCurrentReadingsPDP();
 float getChannelCurrentPDP(int channelID);
 
 // RX cb function
-static bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx);
- 
+bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx);
 
 #endif
