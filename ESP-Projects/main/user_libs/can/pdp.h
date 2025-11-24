@@ -24,7 +24,7 @@ typedef struct
 
 // global pdp struct
 extern PDP pdp;
-extern twai_event_callbacks_t user_cbs;
+extern twai_event_callbacks_t can_cbs;
 
 // initiate PDP struct
 void PDPInit(int identifier);
@@ -34,5 +34,8 @@ void requestCurrentReadingsPDP();
 
 // get current in amps
 float getChannelCurrentPDP(int channelID);
+
+// RX cb function
+bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx);
 
 #endif
