@@ -5,6 +5,8 @@
 #include "esp_twai_onchip.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 // LIBRARY CONSTANTS
 #define CAN_LOG "CAN_LOG"

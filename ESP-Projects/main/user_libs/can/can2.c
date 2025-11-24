@@ -1,8 +1,10 @@
 #include "utils.h"
+#include "pdp.h"
 #include "can2.h"
 
 // inits
 twai_node_handle_t g_node_hdl = NULL;
+extern twai_event_callbacks_t can_cbs;
 void canSetup()
 {
     twai_onchip_node_config_t node_config = {
@@ -12,7 +14,7 @@ void canSetup()
         .tx_queue_depth = 32,                // Transmit queue depth set to 32
     };
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-    // ESP_ERROR_CHECK(twai_node_register_event_callbacks(node_hdl, &user_cbs, NULL));
+    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, NULL));
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 
@@ -49,6 +51,7 @@ twai_frame_t en_msg = {
 void sendEn()
 {
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &en_msg, TIMEOUT)); // Timeout = 0: returns immediately if queue is full
+    vTaskDelay(1);
 }
 
 void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
