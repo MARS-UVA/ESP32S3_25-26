@@ -1,127 +1,95 @@
-#include "./uart.h"
-
-int uart_priority = 10;
+#include "uart.h"
 
 /* --------------------- Functions ------------------ */
+QueueHandle_t uart_queue; // queue stores the serial packet values
 
 void UART_setup()
 {
-    uart_config_t uart_config = {     
+    uart_config_t uart_config = {
         .baud_rate = 115200, // parameters subject to change
         .data_bits = UART_DATA_8_BITS,
         .parity = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
         .rx_flow_ctrl_thresh = 122,
-        .rx_fifo_full_thrhd = 110,
-        .intr_enable_mask = UART_INTR_RXFIFO_FULL | UART_INTR_RXFIFO_TOUT | UART_RXFIFO_OVF_INT,
     };
-    
-    QueueHandle_t uart_queue;
-    const int uart_buffer_size_rx = (1024 * 16); // setup UART buffered RX IO with event queue
+    const int uart_buffer_size_rx = (1024 * 2); // setup UART buffered RX IO with event queue
     const int uart_buffer_size_tx = (1024 * 2); // setup UART buffered TX IO with event queue
 
-
-
+    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, uart_buffer_size_rx, uart_buffer_size_tx, 0, NULL, 0));
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config)); // apply config
-    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_0, 43, 44, 18, 19)); // sets UART pins(TX: GPI04, RX: GPI05, RTS: GPI018, CTS: GPI019)
-    ESP_ERROR_CHECK(uart_driver_install(
-        UART_NUM_0, 
-        uart_buffer_size, // RX buffer size
-        uart_buffer_size, // TX buffer size
-        10,               // queue size
-        &uart_queue,      // handle to queue
-        0                 // no flags
-    )); 
-
-    ESP_ERROR_CHECK(uart_enable_rx_intr()); // enables interrupts
-
+    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_0, 1, 3, 18, 19));      // [tx, rx] - board -> [43, 44] - esp32s3 | [1, 3] - esp32 devkit v1
+    uart_queue = xQueueCreate(1, sizeof(SerialPacket));
 }
 
-SerialPacket UART_read(void *arg)
+SerialPacket UART_read(void)
 {
     SerialPacket packet = {0};
     packet.invalid = 1;
 
-    const uint8_t packetLength = 8; // expected packet length (1 header plus 1 byte for each motor/actuator)
-    uint8_t RxBuffer[8] = {0,0,0,0,0,0,0,0}; // zeroinit this so it doesn't have garbage data
+    const uint8_t packetLength = 8;                 // expected packet length (1 header plus 1 byte for each motor/actuator)
+    uint8_t RxBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // zeroinit this so it doesn't have garbage data
 
     uart_read_bytes(
-        UART_NUM_0, 
-        RxBuffer, 
-        packetLength, 
-        50 // this is timeout
+        UART_NUM_0,
+        RxBuffer,
+        packetLength,
+        0 // this is timeout
     );
-    
-    if (RxBuffer[0] == 0xFF){
-	    packet.invalid = 0;
-	    packet.header = RxBuffer[1];
-	    packet.top_left_wheel = RxBuffer[2];
-	    packet.back_left_wheel = RxBuffer[3];
-	    packet.top_right_wheel  = RxBuffer[4];
-		packet.back_right_wheel = RxBuffer[5];
-		packet.drum  = RxBuffer[6];
-		packet.actuator  = RxBuffer[7];
+
+    if (RxBuffer[0] == 0xFF)
+    {
+        packet.invalid = 0;
+        packet.header = RxBuffer[1];
+        packet.top_left_wheel = RxBuffer[2];
+        packet.back_left_wheel = RxBuffer[3];
+        packet.top_right_wheel = RxBuffer[4];
+        packet.back_right_wheel = RxBuffer[5];
+        packet.drum = RxBuffer[6];
+        packet.actuator = RxBuffer[7];
     }
 
     return packet;
 }
 
-
-
-// change back to 
+// change back to
 void UART_write() // writes a single packet to Jetson on UART
 {
-    char* test_str = "This is a test string.\n";
-    uart_write_bytes(UART_NUM_0, (const char*)test_str, strlen(test_str));
-
+    char *test_str = "This is a test string.\n";
+    uart_write_bytes(UART_NUM_0, (const char *)test_str, strlen(test_str));
 }
 
-void UART_callback(uint8_t reg, void (*callback)(SerialPacket, void*, void*), void* userdata1, void* userdata2) {
+void UART_callback(uint8_t reg, void (*callback)(SerialPacket, void *, void *), void *userdata1, void *userdata2)
+{
 
     SerialPacket packet = UART_read();
-
-    if (packet.invalid == false && packet.header == reg) {
+    if (packet.invalid == false && packet.header == reg)
+    {
         callback(packet, userdata1, userdata2);
     }
-
 }
 
-void uart_event_task()
+void UART_rx_task()
 {
-    uart_event_t event;
-    if(xQueueReceive(uart_queue, (void * )&event, (portTickType)portMAX_DELAY)) {
-        switch(event.type) {
-            case UART_DATA:
-                // data received
-                return UART_read();
-                break;
-            case UART_FIFO_OVF:
-                // overflow detected
-                // Action: flush input buffer and reset queue
-                uart_flush_input(UART_NUM_0);
-                xQueueReset(uart_queue);
-                break;
-            case UART_BUFFER_FULL:
-                // buffer full
-                // Action: Increase buffer size or change priority of task
-                uart_priority = 11;
-                uart_flush_input(UART_NUM_0);
-                xQueueReset(uart_queue);
-                break;
-            case UART_BREAK:
-                // break detected
-                break;
-            case UART_PARITY_ERR:
-                // parity error
-                break;
-            case UART_FRAME_ERR:
-                // frame error
-                break;
-            default:
-                break;
+    SerialPacket pkt = {0};
+    size_t buffered_size;
+
+    int led_R = 27;
+    bool state = false;
+
+    while (1)
+    {
+        ESP_ERROR_CHECK(uart_get_buffered_data_len(UART_NUM_0, &buffered_size));
+        while (buffered_size >= 8)
+        {
+            pkt = UART_read();
+            if (pkt.invalid == 0)
+            {
+                xQueueOverwrite(uart_queue, &pkt);
+            }
+            ESP_ERROR_CHECK(uart_get_buffered_data_len(UART_NUM_0, &buffered_size));
         }
+        ledToggle(led_R, &state);
+        vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
-
-

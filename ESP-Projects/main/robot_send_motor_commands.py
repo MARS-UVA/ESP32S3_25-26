@@ -1,7 +1,7 @@
-import serial # type: ignore
+import serial 
 from time import sleep
 
-COM_Port = 'COM12'  # Change this to your actual COM port
+COM_Port = '/dev/tty.usbserial-0001'  # Change this to your actual COM port
 BAUD_Rate = 115200    # Set the baud rate
 
 # Open the serial port
