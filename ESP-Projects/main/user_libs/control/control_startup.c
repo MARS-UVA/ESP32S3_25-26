@@ -26,11 +26,11 @@ void initializeTalons()
     backLeft = talonFXInit(BACK_LEFT_WHEEL_ID);
     frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID);
     backRight = talonFXInit(BACK_RIGHT_WHEEL_ID);
-    bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID);
-    bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID);
+    // bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID);
+    // bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID);
 
-    leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, false);
-    rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, true);
+    // leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, false);
+    // rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, true);
 }
 
 void directControl(SerialPacket pkt)
@@ -46,20 +46,16 @@ void directControl(SerialPacket pkt)
 
 void UART_can_task()
 {
-    SerialPacket motor_state = {1, 0x0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    SerialPacket motor_state = {0, 0x00, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
     SerialPacket new_data;
-
-    int led_B = 12;
-    bool state = false;
 
     while (1)
     {
         if (xQueueReceive(uart_queue, &new_data, 0) == pdTRUE)
         {
             motor_state = new_data;
-            ledToggle(led_B, &state);
         }
-        // directControl lol
+        directControl(motor_state);
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }

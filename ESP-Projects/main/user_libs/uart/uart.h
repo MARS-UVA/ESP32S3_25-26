@@ -27,7 +27,7 @@ typedef struct
 /* --------------------- Functions ------------------ */
 
 void UART_setup();
-SerialPacket UART_read();
+void UART_read(SerialPacket *packet);
 void UART_write();
 void UART_callback(uint8_t reg, void (*callback)(SerialPacket, void *, void *), void *userdata1, void *userdata2);
 void UART_rx_task();

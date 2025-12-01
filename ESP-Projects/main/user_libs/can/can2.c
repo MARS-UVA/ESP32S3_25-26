@@ -3,7 +3,8 @@
 
 // inits
 twai_node_handle_t g_node_hdl = NULL;
-extern twai_event_callbacks_t can_cbs;
+// extern twai_event_callbacks_t can_cbs;
+
 void canSetup()
 {
     twai_onchip_node_config_t node_config = {
@@ -13,7 +14,7 @@ void canSetup()
         .tx_queue_depth = 32,                // Transmit queue depth set to 32
     };
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, NULL));
+    // ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, NULL));
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 

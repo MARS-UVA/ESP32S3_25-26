@@ -18,15 +18,12 @@ void UART_setup()
 
     ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, uart_buffer_size_rx, uart_buffer_size_tx, 0, NULL, 0));
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config)); // apply config
-    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_0, 1, 3, 18, 19));      // [tx, rx] - board -> [43, 44] - esp32s3 | [1, 3] - esp32 devkit v1
+    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_0, 43, 44, 18, 19));    // [tx, rx] - board -> [43, 44] - esp32s3 | [1, 3] - esp32 devkit v1
     uart_queue = xQueueCreate(1, sizeof(SerialPacket));
 }
 
-SerialPacket UART_read(void)
+void UART_read(SerialPacket *packet)
 {
-    SerialPacket packet = {0};
-    packet.invalid = 1;
-
     const uint8_t packetLength = 8;                 // expected packet length (1 header plus 1 byte for each motor/actuator)
     uint8_t RxBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // zeroinit this so it doesn't have garbage data
 
@@ -39,17 +36,15 @@ SerialPacket UART_read(void)
 
     if (RxBuffer[0] == 0xFF)
     {
-        packet.invalid = 0;
-        packet.header = RxBuffer[1];
-        packet.top_left_wheel = RxBuffer[2];
-        packet.back_left_wheel = RxBuffer[3];
-        packet.top_right_wheel = RxBuffer[4];
-        packet.back_right_wheel = RxBuffer[5];
-        packet.drum = RxBuffer[6];
-        packet.actuator = RxBuffer[7];
+        packet->invalid = 0;
+        packet->header = RxBuffer[1];
+        packet->top_left_wheel = RxBuffer[2];
+        packet->back_left_wheel = RxBuffer[3];
+        packet->top_right_wheel = RxBuffer[4];
+        packet->back_right_wheel = RxBuffer[5];
+        packet->drum = RxBuffer[6];
+        packet->actuator = RxBuffer[7];
     }
-
-    return packet;
 }
 
 // change back to
@@ -62,34 +57,24 @@ void UART_write() // writes a single packet to Jetson on UART
 void UART_callback(uint8_t reg, void (*callback)(SerialPacket, void *, void *), void *userdata1, void *userdata2)
 {
 
-    SerialPacket packet = UART_read();
-    if (packet.invalid == false && packet.header == reg)
-    {
-        callback(packet, userdata1, userdata2);
-    }
+    // SerialPacket packet = UART_read();
+    // if (packet.invalid == false && packet.header == reg)
+    //{
+    //  callback(packet, userdata1, userdata2);
+    //}
 }
 
 void UART_rx_task()
 {
-    SerialPacket pkt = {0};
-    size_t buffered_size;
-
-    int led_R = 27;
-    bool state = false;
+    SerialPacket pkt = {1, 0, 0, 0, 0, 0, 0, 0};
 
     while (1)
     {
-        ESP_ERROR_CHECK(uart_get_buffered_data_len(UART_NUM_0, &buffered_size));
-        while (buffered_size >= 8)
+        UART_read(&pkt);
+        if (pkt.invalid == 0)
         {
-            pkt = UART_read();
-            if (pkt.invalid == 0)
-            {
-                xQueueOverwrite(uart_queue, &pkt);
-            }
-            ESP_ERROR_CHECK(uart_get_buffered_data_len(UART_NUM_0, &buffered_size));
+            xQueueOverwrite(uart_queue, &pkt);
         }
-        ledToggle(led_R, &state);
-        vTaskDelay(pdMS_TO_TICKS(20));
+        vTaskDelay(1);
     }
 }
