@@ -1,4 +1,4 @@
-#include "./control_startup.h"
+#include "control_startup.h"
 
 // Define CAN IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_ID 36
@@ -26,11 +26,11 @@ void initializeTalons()
     backLeft = talonFXInit(BACK_LEFT_WHEEL_ID);
     frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID);
     backRight = talonFXInit(BACK_RIGHT_WHEEL_ID);
-    bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID);
-    bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID);
+    // bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID);
+    // bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID);
 
-    leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, false);
-    rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, true);
+    // leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, false);
+    // rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, true);
 }
 
 void directControl(SerialPacket pkt)
@@ -42,4 +42,20 @@ void directControl(SerialPacket pkt)
     int8_t rightSpeed = pkt.top_right_wheel;
     setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
+}
+
+void UART_can_task()
+{
+    SerialPacket motor_state = {0, 0x00, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    SerialPacket new_data;
+
+    while (1)
+    {
+        if (xQueueReceive(uart_queue, &new_data, 0) == pdTRUE)
+        {
+            motor_state = new_data;
+        }
+        directControl(motor_state);
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
 }

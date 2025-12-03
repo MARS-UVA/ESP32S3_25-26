@@ -1,7 +1,7 @@
-import serial # type: ignore
+import serial 
 from time import sleep
 
-COM_Port = 'COM12'  # Change this to your actual COM port
+COM_Port = '/dev/tty.usbserial-210'  # Change this to your actual COM port
 BAUD_Rate = 115200    # Set the baud rate
 
 # Open the serial port
@@ -10,7 +10,7 @@ try:
     ser = serial.Serial(COM_Port, baudrate=BAUD_Rate, timeout=1) 
     print(f"Opened port: {ser.name}")
 
-    motor_data = bytearray([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0x0, 0xFF, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F])  # Example motor command data
+    motor_data = bytearray([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0x0, 0x9F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F])  # Example motor command data
     # full speed forward for top left motor, neutral speed for all others
 
     while (True):

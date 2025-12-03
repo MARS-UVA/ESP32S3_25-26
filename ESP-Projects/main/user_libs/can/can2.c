@@ -5,7 +5,8 @@
 
 // inits
 twai_node_handle_t g_node_hdl = NULL;
-extern twai_event_callbacks_t can_cbs;
+// extern twai_event_callbacks_t can_cbs;
+
 void canSetup()
 {
     twai_onchip_node_config_t node_config = {

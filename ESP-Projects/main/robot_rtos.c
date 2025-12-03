@@ -5,19 +5,12 @@
 #include "control_startup.c"
 #include "can2.h"
 
-TaskHandle_t readTaskHandle = NULL;
-
 void app_main()
 {
     initializeTalons();
     UART_setup();
     canSetup(g_node_hdl);
-    SerialPacket packet = {0, 0x0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
-    packet.invalid = 1;
-    for (;;)
-    {
-        UART_read(&packet);
-        directControl(packet);
-    }
-    return;
+
+    xTaskCreate(UART_rx_task, "uart_rx", 4096, NULL, 7, NULL);
+    xTaskCreate(UART_can_task, "uart_can", 4096, NULL, 8, NULL);
 }
