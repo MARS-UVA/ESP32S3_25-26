@@ -3,6 +3,7 @@
 
 #include "can2.h"
 #include "uart.h"
+#include "wifi.h"
 
 void initializeTalons();
 

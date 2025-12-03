@@ -1,17 +1,10 @@
-#include "control_startup.c"
+#include "uart.h"
+#include "wifi.h"
+#include "nvs_flash.h"
 
 void app_main()
-{
-    initializeTalons();
-    UART_setup();
-    canSetup();
-
-    SerialPacket packet;
-
-    while (true)
-    {
-        packet = UART_read();
-        directControl(packet);
-        // setTargetFX(&frontLeft, 200);
-    }
+{       nvs_flash_init();
+    
+        setupWifi();
+    
 }
