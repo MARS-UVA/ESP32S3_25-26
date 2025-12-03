@@ -24,7 +24,7 @@ void app_main(void)
     {
         setTargetFX(&motor, 60);
         requestCurrentReadingsPDP();
-        current = getChannelCurrentPDP(14);
+        current = getChannelCurrentPDP(0);
         printf("\nCurrent Reading from PDP Channel 14: %.3f Amps", current);
     }
 }
