@@ -3,8 +3,8 @@
 #include "nvs_flash.h"
 
 void app_main()
-{       nvs_flash_init();
-    
+{     
         setupWifi();
+        print_IP();
     
 }
