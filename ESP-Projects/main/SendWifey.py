@@ -5,8 +5,8 @@ import socket
 server_addr = sys.argv[1]
 server_port = sys.argv[2]
 
-udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-udp_socket.bind((server_addr, int(server_port)))
+#udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#udp_socket.bind((server_addr, int(server_port)))
 
 print(f"UDP socket bound to port {server_port}, ready to send motor commands.")
 
@@ -16,7 +16,7 @@ try:
     # second byte: header byte (just 0x0)
     # the next 6 bytes set neutral speed for all 6 motors and 2 actuators
 
-    data, addr = udp_socket.recvfrom(1024) # You must receive something first to get the client's address
+    #data, addr = udp_socket.recvfrom(1024) # You must receive something first to get the client's address
     while (True):
         udp_socket.sendto(motor_data, addr)
         sleep(0.05)

@@ -6,5 +6,5 @@
 /* --------------------- Functions ------------------ */
 void setupWifi(void);
 void print_IP(void);
-
+void sendWifiPacket(void *pvParameters);
 #endif // WIFI_H

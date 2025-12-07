@@ -5,6 +5,9 @@
 void app_main()
 {     
         setupWifi();
+        vTaskDelay(500);
         print_IP();
+        vTaskDelay(500);
+        sendWifiPacket(NULL);
     
 }
