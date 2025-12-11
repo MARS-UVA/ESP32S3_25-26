@@ -34,18 +34,22 @@ typedef struct
     float kI;
     float kD;
     bool breakMode;
+    uint8_t channel;
+    float current;
 } TalonFX;
 
 typedef struct
 {
     uint8_t id;
     bool inverted;
+    uint8_t channel;
+    float current;
 } TalonSRX;
 
 // INITS
 extern twai_node_handle_t g_node_hdl;
-TalonFX talonFXInit(uint8_t id);
-TalonSRX talonSRXInit(uint8_t id, bool inv);
+TalonFX talonFXInit(uint8_t n_id, uint8_t c_id);
+TalonSRX talonSRXInit(uint8_t n_id, uint8_t c_id, bool inv);
 
 // GENERAL CAN FUNCS
 void canSetup();

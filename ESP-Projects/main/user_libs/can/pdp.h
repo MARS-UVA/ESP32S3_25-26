@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "can2.h"
+#include "control_startup.h"
 
 // defined PDP struct
 typedef struct
@@ -23,8 +24,10 @@ typedef struct
 } PDP;
 
 // global pdp struct
-extern PDP pdp;
 extern twai_event_callbacks_t can_cbs;
+
+extern TalonFX *fxMotors[];
+extern TalonSRX *srxMotors[];
 
 // initiate PDP struct
 void PDPInit(int identifier);
@@ -37,5 +40,7 @@ float getChannelCurrentPDP(int channelID);
 
 // RX cb function
 bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx);
+
+void current_update_task();
 
 #endif

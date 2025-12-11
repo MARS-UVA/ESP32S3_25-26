@@ -5,6 +5,7 @@
 #include <memory.h>
 #include <stdint.h>
 #include <string.h>
+#include "esp_log.h"
 #include "driver/gpio.h"
 #include <stdbool.h>
 #include <esp_err.h>

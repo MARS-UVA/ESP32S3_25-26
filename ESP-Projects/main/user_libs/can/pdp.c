@@ -1,6 +1,9 @@
 #include "utils.h"
 #include "can2.h"
 #include "pdp.h"
+#include "control_startup.h"
+
+QueueHandle_t current_uart_queue;
 
 uint8_t prompt_buff[6] = {0x00, 0x00, 0x00, 0x00, 0x20, 0x00}; // buffer to prompt PDP for current readings
 uint32_t current_request_id = 0x8041640;                       // CAN ID to request current readings from PDP
@@ -141,8 +144,30 @@ twai_event_callbacks_t can_cbs = {
     .on_rx_done = twai_rx_cb,
 };
 
+void current_update_task()
+{
+
+    while (1)
+    {
+        for (uint8_t i = 0; i < 6; i++)
+        {
+            requestCurrentReadingsPDP();
+            fxMotors[i]->current = getChannelCurrentPDP(fxMotors[i]->channel);
+            vTaskDelay(1);
+        }
+        for (uint8_t i = 0; i < 2; i++)
+        {
+            requestCurrentReadingsPDP();
+            srxMotors[i]->current = getChannelCurrentPDP(srxMotors[i]->channel);
+            vTaskDelay(1);
+        }
+        ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
+    }
+}
+
 // initiate PDP struct
 void PDPInit(int identifier)
 {
     pdp.identifier = identifier;
+    current_uart_queue = xQueueCreate(1, sizeof(SerialPacket));
 }
