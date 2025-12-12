@@ -1,13 +1,23 @@
-#include "uart.h"
-#include "wifi.h"
-#include "nvs_flash.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <stdio.h>
+#include <uart.h>
+#include "control_startup.c"
+#include "can2.h"
+
+TaskHandle_t readTaskHandle = NULL;
 
 void app_main()
-{     
-        setupWifi();
-        vTaskDelay(500);
-        print_IP();
-        vTaskDelay(500);
-        sendWifiPacket(NULL);
-    
+{
+    initializeTalons();
+    UART_setup();
+    canSetup(g_node_hdl);
+    SerialPacket packet = {0, 0x0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    packet.invalid = 1;
+    for (;;)
+    {
+        UART_read(&packet);
+        directControl(packet);
+    }
+    return;
 }

@@ -1,11 +1,11 @@
 #include "utils.h"
 #include "pdp.h"
 #include "can2.h"
-#include "pdp.h"
 
 // inits
 twai_node_handle_t g_node_hdl = NULL;
 extern twai_event_callbacks_t can_cbs;
+
 void canSetup()
 {
     twai_onchip_node_config_t node_config = {
@@ -19,7 +19,7 @@ void canSetup()
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 
-TalonFX talonFXInit(uint8_t n_id)
+TalonFX talonFXInit(uint8_t n_id, uint8_t c_id)
 {
     return (TalonFX){
         .id = n_id,
@@ -28,14 +28,18 @@ TalonFX talonFXInit(uint8_t n_id)
         .kI = 0.0f,
         .kD = 0.0f,
         .breakMode = false,
+        .channel = c_id,
+        .current = 0.0f,
     };
 }
 
-TalonSRX talonSRXInit(uint8_t n_id, bool inv)
+TalonSRX talonSRXInit(uint8_t n_id, uint8_t c_id, bool inv)
 {
     return (TalonSRX){
         .id = n_id,
         .inverted = inv,
+        .channel = c_id,
+        .current = 0.0f,
     };
 }
 

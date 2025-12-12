@@ -1,15 +1,10 @@
-#include <stdio.h>
-#include <memory.h>
-#include <stdint.h>
-#include <string.h>
-
 /*
  * util.c
  *
  *  Created on: Nov 2025
  *      Author: diana, carlos
  */
-#include "./utils.h"
+#include "utils.h"
 
 // convert a float to an array of 4 bytes
 void floatToByteArray(float f, char *arr)
@@ -47,4 +42,16 @@ void showData(uint8_t *arr, uint8_t len)
         printf("0x%02x, ", *(arr + i));
     }
     printf("0x%02x}\n", *(arr + len - 1));
+}
+
+void ledSetup(uint8_t gpio)
+{
+    gpio_reset_pin(gpio);
+    gpio_set_direction(gpio, GPIO_MODE_OUTPUT);
+}
+
+void ledToggle(uint8_t gpio, bool *state)
+{
+    gpio_set_level(gpio, *state);
+    *state = !(*state);
 }

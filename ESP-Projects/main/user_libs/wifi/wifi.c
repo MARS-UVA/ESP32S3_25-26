@@ -6,23 +6,26 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 #include "lwip/sockets.h"
+#include "control_startup.h"
+#include "uart.h"
+#include "freertos/queue.h"
 
 static const char *TAG = "wifi";
 
 #define PORT 25000
 #define HOST_IP_ADDR "172.20.10.13"
 
-void udp_server_task(void *pvParameters) {
-    char rx_buffer[128];
-    int addr_family = AF_INET;
-    int ip_protocol = IPPROTO_IP;
-    struct sockaddr_in dest_addr;
+extern QueueHandle_t uart_queue;
+
+/*void udp_server_task_setup(void *pvParameters) {
+    addr_family = AF_INET;
+    ip_protocol = IPPROTO_IP;
 
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(PORT);
     dest_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    int sock = socket(addr_family, SOCK_DGRAM, ip_protocol);
+    sock = socket(addr_family, SOCK_DGRAM, ip_protocol);
     if (sock < 0) {
         ESP_LOGE(TAG, "Unable to create socket: errno %d", errno);
         vTaskDelete(NULL);
@@ -61,9 +64,71 @@ void udp_server_task(void *pvParameters) {
         close(sock);
     }
     vTaskDelete(NULL);
+}*/
+
+void udp_receive_task(void *pvParameters) 
+{
+    char RxBuffer[128];
+    int addr_family = AF_INET;
+    int ip_protocol = IPPROTO_IP;
+    struct sockaddr_in dest_addr;
+
+    dest_addr.sin_family = AF_INET;
+    dest_addr.sin_port = htons(PORT);
+    dest_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    int sock = socket(addr_family, SOCK_DGRAM, ip_protocol);
+    if (sock < 0) {
+        ESP_LOGE(TAG, "Unable to create socket: errno %d", errno);
+        vTaskDelete(NULL);
+        return;
+    }
+    ESP_LOGI(TAG, "Socket created");
+
+    int err = bind(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+    if (err < 0) {
+        ESP_LOGE(TAG, "Socket unable to bind: errno %d", errno);
+        close(sock);
+        vTaskDelete(NULL);
+        return;
+    }
+    ESP_LOGI(TAG, "Socket bound, port %d", PORT);
+
+
+    SerialPacket pkt[8] = {0};
+    while (1) {
+        ESP_LOGI(TAG, "Waiting for data");
+        struct sockaddr_in source_addr;
+        socklen_t socklen = sizeof(source_addr);
+        int len = recvfrom(sock, RxBuffer, sizeof(RxBuffer) - 1, 0,
+                           (struct sockaddr *)&source_addr, &socklen);
+
+        if (len < 0) {
+            ESP_LOGE(TAG, "recvfrom failed: errno %d", errno);
+            break;
+        } else 
+        {
+            ESP_LOGI("Wifi", "Got packet");
+            RxBuffer[len] = 0;  // Null-terminate whatever is received and treat it like a string
+            ESP_LOGI("Wifi", "%x\n", RxBuffer[2]);
+            pkt->invalid = 0;
+            pkt->header = RxBuffer[1];
+            pkt->top_left_wheel = RxBuffer[2];
+            pkt->back_left_wheel = RxBuffer[3];
+            pkt->top_right_wheel = RxBuffer[4];
+            pkt->back_right_wheel = RxBuffer[5];
+            pkt->drum = RxBuffer[6];
+            pkt->actuator = RxBuffer[7];
+            xQueueOverwrite(uart_queue, &pkt);
+        }
+    }
+
+    if (sock != -1) {
+        ESP_LOGE(TAG, "Shutting down socket and restarting...");
+        close(sock);
+    }
+    vTaskDelete(NULL);
 }
-
-
 
 void sendWifiPacket(void *pvParameters) 
 {
@@ -107,8 +172,8 @@ void setupWifi() {
     wifi_mode_t mode = WIFI_MODE_STA;
     wifi_config_t wifi_config = {
         .sta = {
-            .ssid = "Boeing 777-300ER",
-            .password = "CheeseMilk",
+            .ssid = "Team_02",
+            .password = "marsuva!",
             //.ssid = "Team_02",
             //.password = "marsuva!",
         }
@@ -142,9 +207,7 @@ void setupWifi() {
         ESP_LOGI(TAG, "esp_wifi_connect ok");
     }
 
-    vTaskDelay(50);
-    xTaskCreate(udp_server_task, "udp_server_task", 4096, NULL, 5, NULL);
-}
+    vTaskDelay(50);}
 void print_IP(void)
 {
     esp_netif_ip_info_t ip_info;
