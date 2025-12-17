@@ -45,7 +45,7 @@ twai_message_t drive_msg = {
     .dlc_non_comp = 0, // DLC is less than 8
 
     // Message ID and payload for CAN set Output frame
-    .identifier = 0x204b540 | 0x1b,
+    .identifier = 0x204b540 | 36,
     .data_length_code = 8,
     .data = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 };

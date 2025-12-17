@@ -50,8 +50,10 @@ void UART_read(SerialPacket *packet)
 // change back to
 void UART_write(OutPacket *packet) // writes a single packet to Jetson on UART
 {
-    char *cPacket = (char *)packet;
-    uart_write_bytes(UART_NUM_0, (const char *)cPacket, strlen(cPacket));
+    /*char *cPacket = (char *)packet;
+    uart_write_bytes(UART_NUM_0, (const char *)cPacket, strlen(cPacket));*/
+    char *test_str = "This is a test string.\n";
+    uart_write_bytes(UART_NUM_0, (const char *)test_str, strlen(test_str));
 }
 
 void UART_callback(uint8_t reg, void (*callback)(SerialPacket, void *, void *), void *userdata1, void *userdata2)

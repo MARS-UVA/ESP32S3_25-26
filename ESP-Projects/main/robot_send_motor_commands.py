@@ -10,17 +10,18 @@ try:
     ser = serial.Serial(COM_Port, baudrate=BAUD_Rate, timeout=1) 
     print(f"Opened port: {ser.name}")
 
-    motor_data = bytearray([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0x0, 0xBF, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F])  # Example motor command data
+    motor_data = bytearray([0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFF, 0x0, 0x9F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F])  # Example motor command data
     # full speed forward for top left motor, neutral speed for all others
 
     while (True):
         ser.write(motor_data)
         sleep(0.1)  # Send data every 100ms
+        
         data = ser.read(16)
         if len(data) > 0:
             print(f"Received: {data}")
         else:
-            print("No data received")
+             print("No data received")
 
 except serial.SerialException as e:
     print(f"Error opening or communicating with serial port: {e}")

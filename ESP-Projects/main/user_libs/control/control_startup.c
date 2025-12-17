@@ -61,9 +61,8 @@ void directControl(SerialPacket pkt)
 
 void UART_can_task()
 {
-    SerialPacket motor_state = {0, 0x00, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    SerialPacket motor_state = {0, 0x00, 0x9F, 0x7F, 0x9F, 0x7F, 0x7F, 0x7F};
     SerialPacket new_data;
-    // ESP_LOGI("HELLO", "HELLO AGAIN");
 
     while (1)
     {
@@ -73,7 +72,7 @@ void UART_can_task()
         }
         directControl(motor_state);
 
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(2));
     }
 }
 
@@ -83,7 +82,7 @@ void UART_tx_task() //
 
     while (1)
     {
-        packet.invalid = 0;
+        /*packet.invalid = 0;
         packet.header = 0x0;
 
         packet.top_left_wheel = fxMotors[0]->current;
@@ -94,9 +93,9 @@ void UART_tx_task() //
         packet.bucket_right = fxMotors[5]->current;
 
         packet.left_actuator = srxMotors[0]->current;
-        packet.right_actuator = srxMotors[1]->current;
+        packet.right_actuator = srxMotors[1]->current;*/
 
         UART_write(&packet);
-        vTaskDelay(1);
+        vTaskDelay(100);
     }
 }

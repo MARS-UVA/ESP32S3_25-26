@@ -149,19 +149,23 @@ void current_update_task()
 
     while (1)
     {
+        requestCurrentReadingsPDP();
         for (uint8_t i = 0; i < 6; i++)
         {
-            requestCurrentReadingsPDP();
-            fxMotors[i]->current = getChannelCurrentPDP(fxMotors[i]->channel);
-            vTaskDelay(1);
+            // requestCurrentReadingsPDP();
+            // fxMotors[i]->current = getChannelCurrentPDP(fxMotors[i]->channel);
+            fxMotors[i]->current = 1.0;
+            // vTaskDelay(1);
         }
         for (uint8_t i = 0; i < 2; i++)
         {
-            requestCurrentReadingsPDP();
-            srxMotors[i]->current = getChannelCurrentPDP(srxMotors[i]->channel);
-            vTaskDelay(1);
+            // requestCurrentReadingsPDP();
+            // srxMotors[i]->current = getChannelCurrentPDP(srxMotors[i]->channel);
+            srxMotors[i]->current = 2.0;
+            // vTaskDelay(1);
         }
-        ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
+        vTaskDelay(1000);
+        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
     }
 }
 
