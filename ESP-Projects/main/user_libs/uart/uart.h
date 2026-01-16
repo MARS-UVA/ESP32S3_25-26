@@ -23,7 +23,7 @@ typedef struct
   uint8_t actuator;
 } SerialPacket;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
   uint8_t invalid;
   uint8_t header;
