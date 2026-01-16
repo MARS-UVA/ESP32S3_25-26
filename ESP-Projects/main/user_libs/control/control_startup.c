@@ -78,7 +78,7 @@ void UART_can_task()
 
 void UART_tx_task() //
 {
-    OutPacket packet = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    OutPacket packet = {0, 1, 0, 1, 0, 0, 1, 0, 0, 0};
 
     while (1)
     {
@@ -93,7 +93,8 @@ void UART_tx_task() //
         packet.bucket_right = fxMotors[5]->current;
 
         packet.left_actuator = srxMotors[0]->current;
-        packet.right_actuator = srxMotors[1]->current;*/
+        packet.right_actuator = srxMotors[1]->current;
+        */
 
         UART_write(&packet);
         vTaskDelay(100);

@@ -153,15 +153,15 @@ void current_update_task()
         for (uint8_t i = 0; i < 6; i++)
         {
             // requestCurrentReadingsPDP();
-            // fxMotors[i]->current = getChannelCurrentPDP(fxMotors[i]->channel);
-            fxMotors[i]->current = 1.0;
+            fxMotors[i]->current = getChannelCurrentPDP(fxMotors[i]->channel);
+            // fxMotors[i]->current = 1.0;
             // vTaskDelay(1);
         }
         for (uint8_t i = 0; i < 2; i++)
         {
             // requestCurrentReadingsPDP();
-            // srxMotors[i]->current = getChannelCurrentPDP(srxMotors[i]->channel);
-            srxMotors[i]->current = 2.0;
+            srxMotors[i]->current = getChannelCurrentPDP(srxMotors[i]->channel);
+            // srxMotors[i]->current = 2.0;
             // vTaskDelay(1);
         }
         vTaskDelay(1000);
