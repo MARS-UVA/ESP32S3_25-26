@@ -10,25 +10,25 @@
 #include "freertos/semphr.h"
 #include "esp_adc/adc_continuous.h"
 
-
-typedef struct pot {
+typedef struct pot
+{
 	adc_continuous_handle_t handle;
-	//float(*read)(struct pot*);
-	//float(*readCm)(struct pot*);
+	// float(*read)(struct pot*);
+	// float(*readCm)(struct pot*);
 	uint32_t actuatorOffset;
-	int minPos;				// minimum ADC reading
-	int maxPos;				// maximum ADC reading
+	int minPos; // minimum ADC reading
+	int maxPos; // maximum ADC reading
 	float pos;
 } Pot;
 
 extern Pot pot;
 
-void PotInit(adc_channel_t channel);
+void PotInit(adc_unit_t unit, adc_channel_t channel);
 
 void readPot();
 
-//void calibrateYourMom(Pot *leftPot, Pot *rightPot);
+// void calibrateYourMom(Pot *leftPot, Pot *rightPot);
 
-void PotDeInit(Pot* pot);
+void PotDeInit(Pot *pot);
 
 #endif
