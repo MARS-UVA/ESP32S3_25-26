@@ -55,7 +55,6 @@ void readPot()
 
     while (1)
     {
-        // ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait for conversion done callback
 
         while (1)
         {
