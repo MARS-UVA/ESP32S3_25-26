@@ -54,9 +54,5 @@ dkms.conf
 # debug information files
 *.dwo
 
-build/
 .vscode/
-ESP-Projects/main/CMakeLists.txt
-ESP-Projects/main/CMakeLists.txt
-ESP-Projects/main/.DS_Store
-ESP-Projects/main/.DS_Store
+.DS_Store
