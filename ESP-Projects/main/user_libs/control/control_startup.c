@@ -7,7 +7,7 @@
 #define BACK_RIGHT_WHEEL_ID 13
 #define BUCKET_DRUM_RIGHT_ID 25
 #define BUCKET_DRUM_LEFT_ID 60
-#define LEFT_ACTUATOR_ID 0
+#define LEFT_ACTUATOR_ID 12
 #define RIGHT_ACTUATOR_ID 1
 
 // Define channel IDs of each motor/actuator
@@ -44,8 +44,8 @@ void initializeTalons()
     // bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID, BUCKET_DRUM_RIGHT_CHANNEL_ID);
     // bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID, BUCKET_DRUM_LEFT_CHANNEL_ID);
 
-    // leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, LEFT_ACTUATOR_CHANNEL_ID, false);
-    // rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, RIGHT_ACTUATOR_CHANNEL_ID, true);
+    leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, LEFT_ACTUATOR_CHANNEL_ID, false);
+    rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, RIGHT_ACTUATOR_CHANNEL_ID, true);
 }
 
 void directControl(SerialPacket pkt)
@@ -57,11 +57,15 @@ void directControl(SerialPacket pkt)
     int8_t rightSpeed = pkt.top_right_wheel;
     setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
+
+    float actuatorSpeed = (pkt.actuator - 127) / 127.0;
+    setSRX(&leftActuator, actuatorSpeed);
+    setSRX(&rightActuator, actuatorSpeed);
 }
 
 void UART_can_task()
 {
-    SerialPacket motor_state = {0, 0x00, 0x9F, 0x7F, 0x9F, 0x7F, 0x7F, 0x7F};
+    SerialPacket motor_state = {0, 0x00, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0};
     SerialPacket new_data;
 
     while (1)

@@ -8,13 +8,10 @@
 #include "esp_err.h"
 #include "driver/gpio.h"
 
-Pot pot = {
-    .handle = NULL,
-    .actuatorOffset = 0,
-    .minPos = 1190, // minimum ADC reading
-    .maxPos = 3153,
-    .pos = 0,
-};
+Pot leftPot;
+Pot rightPot;
+
+Pot *pots[] = {&leftPot, &rightPot};
 
 TaskHandle_t s_task_handle;
 
@@ -45,7 +42,6 @@ adc_continuous_evt_cbs_t cbs = {
 // read a decimal value between 0 and 1 indicating position of potentiometer
 void readPot()
 {
-
     esp_err_t ret;
     uint32_t ret_num = 0;      // this variable will hold the number of bytes read from the ADC
     uint8_t result[256] = {0}; // this line makes a new array called 'result' of size 256 bytes
@@ -57,20 +53,20 @@ void readPot()
     {
         // ulTaskNotifyTake(pdTRUE, portMAX_DELAY); // Wait for conversion done callback
 
-        while (1)
+        for (uint8_t i = 0; i < 2; i++) 
         {
-            ret = adc_continuous_read(pot.handle, result, 256, &ret_num, 0);
+            ret = adc_continuous_read(pots[i]->handle, result, 256, &ret_num, 0);
             if (ret == ESP_OK)
             {
                 for (int i = 0; i < ret_num; i += SOC_ADC_DIGI_RESULT_BYTES)
                 {
                     adc_digi_output_data_t *p = (adc_digi_output_data_t *)&result[i];
                     data_samples = p->type2.data;
-                    printf("Value:\t%ld\n", data_samples);
+                    printf("Value for %d:\t%ld\n", i, data_samples);
                 }
-                vTaskDelay(pdMS_TO_TICKS(100)); // Add delay between reads
+                vTaskDelay(pdMS_TO_TICKS(200)); // Add delay between reads
 
-                // pot.pos = map(pot.minPos, pot.maxPos, data_samples + pot.actuatorOffset);
+                pots[i]->pos = map(pots[i]->minPos, pots[i]->maxPos, data_samples);
             }
             else if (ret == ESP_ERR_INVALID_STATE)
             {
@@ -81,9 +77,8 @@ void readPot()
 }
 
 // this function initializes a Potentiometer struct and its ADC handle
-void PotInit(adc_unit_t unit, adc_channel_t channel)
+Pot potInit(adc_unit_t unit, adc_channel_t channel, uint32_t offset, int minPos, int maxPos)
 {
-
     adc_continuous_handle_t handle;
 
     s_task_handle = xTaskGetCurrentTaskHandle(); // FIX: Set the task handle before initializing ADC
@@ -104,10 +99,21 @@ void PotInit(adc_unit_t unit, adc_channel_t channel)
 
     ESP_ERROR_CHECK(adc_continuous_config(handle, &digi_config));
 
-    pot.handle = handle;
+    ESP_ERROR_CHECK(adc_continuous_register_event_callbacks(handle, &cbs, NULL));
+    ESP_ERROR_CHECK(adc_continuous_start(handle));
 
-    ESP_ERROR_CHECK(adc_continuous_register_event_callbacks(pot.handle, &cbs, NULL));
-    ESP_ERROR_CHECK(adc_continuous_start(pot.handle));
+    return (Pot) {
+        .handle = handle,
+        .minPos = minPos, // minimum ADC reading
+        .maxPos = maxPos,
+        .pos = 0,
+    }
+}
+
+void initalizePots()
+{
+    leftPot = potInit(ADC_UNIT_ONE, ADC_CHANNEL_THREE, 1190, 3153);
+    rightPot = potInit(ADC_UNIT_ONE, ADC_CHANNEL_FOUR, 1190, 3153);
 }
 
 // Deinitialize the Potentiometer's ADC handle --> Helpers to avoid memory leaks

@@ -13,17 +13,14 @@
 typedef struct pot
 {
 	adc_continuous_handle_t handle;
-	// float(*read)(struct pot*);
-	// float(*readCm)(struct pot*);
-	uint32_t actuatorOffset;
 	int minPos; // minimum ADC reading
 	int maxPos; // maximum ADC reading
 	float pos;
 } Pot;
 
-extern Pot pot;
+Pot potInit(adc_unit_t unit, adc_channel_t channel, uint32_t offset, int minPos, int maxPos);
 
-void PotInit(adc_unit_t unit, adc_channel_t channel);
+void initalizePots();
 
 void readPot();
 

@@ -21,9 +21,9 @@ void debug_task()
 
 void app_main()
 {
-    // initializeTalons();
+    initializeTalons();
     UART_setup();
-    // canSetup();
+    canSetup();
     // PDPInit(62);
     //  setupWifi();
     //  vTaskDelay(50);
@@ -31,9 +31,10 @@ void app_main()
 
     // xTaskCreate((void *)(udp_receive_task), "udp_receive", 4096, NULL, 7, NULL);
     // xTaskCreate((void *)(UART_rx_task), "uart_rx", 4096, NULL, 7, NULL);
-    // xTaskCreate((void *)(UART_can_task), "uart_can", 4096, NULL, 8, NULL);
+    xTaskCreate((void *)(UART_can_task), "uart_can", 4096, NULL, 8, NULL);
+    xTaskCreate(readPot, "readPot", 4096, NULL, 7, NULL);
     // xTaskCreate((void *)(current_update_task), "current_update", 4096, NULL, 8, NULL);
-    xTaskCreate(UART_tx_task, "uart_tx", 4096, NULL, 9, NULL);
+    // xTaskCreate(UART_tx_task, "uart_tx", 4096, NULL, 9, NULL);
 
     // xTaskCreate(debug_task, "debug", 4096, NULL, 9, NULL);
 }
