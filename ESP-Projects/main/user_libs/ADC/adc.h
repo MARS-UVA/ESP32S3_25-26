@@ -12,19 +12,16 @@
 
 typedef struct pot
 {
-	adc_continuous_handle_t handle;
 	int minPos; // minimum ADC reading
 	int maxPos; // maximum ADC reading
 	float pos;
 } Pot;
 
-Pot potInit(adc_unit_t unit, adc_channel_t channel, uint32_t offset, int minPos, int maxPos);
+Pot potInit(adc_unit_t unit, adc_channel_t channel, int minPos, int maxPos);
 
 void initalizePots();
 
 void readPot();
-
-// void calibrateYourMom(Pot *leftPot, Pot *rightPot);
 
 void PotDeInit(Pot *pot);
 

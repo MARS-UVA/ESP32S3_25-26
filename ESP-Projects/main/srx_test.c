@@ -3,26 +3,26 @@
 #include <stdio.h>
 #include <uart.h>
 #include "can2.h"
+#include "adc.h"
 
 TalonSRX motor;
 TalonSRX motor2;
 
-void runSRX() 
+void runSRX()
 {
-    while (1) 
+    while (1)
     {
         setSRX(&motor, 0.25);
-        setSRC(&motor2, 0.25);
+        // setSRC(&motor2, 0.25);
     }
 }
 
 void app_main()
 {
-    canSetup(g_node_hdl);
+    canSetup();
     initalizePots();
-    motor = talonSRXInit(12, 0, false);
-    motor2 = talonSRXInit(12, 0, true);
-
+    motor = talonSRXInit(3, 0, false);
+    motor.inverted = false;
     xTaskCreate(runSRX, "runSRX", 4096, NULL, 8, NULL);
-    xTaskCreate(readPot, "readPot", 4096, NULL, 7, NULL);
+    // xTaskCreate(readPot, "readPot", 4096, NULL, 7, NULL);
 }
