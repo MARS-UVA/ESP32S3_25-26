@@ -1,8 +1,16 @@
 #include "can2.h"
+#include <freertos/FreeRTOS.h>
 
 #include <stdio.h>
 
 void app_main()
 {
-    printf("hello\n");
+    TalonFX motor = talonFXInit(36, 0);
+    canSetup();
+
+    for (int i = 0; i < 60; i++)
+    {
+        printf("%d\n", i);
+        setTargetFX(&motor, 100);
+    }
 }
