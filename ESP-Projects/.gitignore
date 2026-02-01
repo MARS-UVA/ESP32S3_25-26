@@ -3,3 +3,7 @@
 CMakeCache.txt
 CMakeFiles/
 build/
+.cache/
+compile_commands.json
+sdkconfig
+sdkconfig.old
