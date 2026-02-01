@@ -90,7 +90,7 @@ Pot potInit(adc_unit_t unit, adc_channel_t channel, int minPos, int maxPos)
         .atten = ADC_ATTEN_DB_12,
     };
 
-    digi_config.pattern_num = 1;
+    digi_config.pattern_num = 2;
     digi_config.adc_pattern = &adc_pattern;
 
     ESP_ERROR_CHECK(adc_continuous_config(g_adc_hdl, &digi_config));

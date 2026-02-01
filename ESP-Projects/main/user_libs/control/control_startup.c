@@ -27,11 +27,18 @@ TalonFX backRight;
 TalonFX bucketDrumRight;
 TalonFX bucketDrumLeft;
 
-TalonSRX leftActuator;
-TalonSRX rightActuator;
+Actuator leftActuator;
+TalonSRX leftActuatorSRX;
+Pot leftActuatorPot;
+PIDController leftActuatorPID;
+
+Actuator rightActuator;
+TalonSRX rightActuatorSRX;
+Pot rightActuatorPot;
+PIDController rightActuatorPID;
 
 TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &bucketDrumLeft, &bucketDrumRight};
-TalonSRX *srxMotors[] = {&leftActuator, &rightActuator};
+// TalonSRX *srxMotors[] = {&leftActuator, &rightActuator};
 
 // Initialize Talon "objects"
 void initializeTalons()
@@ -44,23 +51,30 @@ void initializeTalons()
     // bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID, BUCKET_DRUM_RIGHT_CHANNEL_ID);
     // bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID, BUCKET_DRUM_LEFT_CHANNEL_ID);
 
-    leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, LEFT_ACTUATOR_CHANNEL_ID, false);
-    rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, RIGHT_ACTUATOR_CHANNEL_ID, true);
+    leftActuatorSRX = talonSRXInit(LEFT_ACTUATOR_ID, LEFT_ACTUATOR_CHANNEL_ID, false);
+    rightActuatorSRX = talonSRXInit(RIGHT_ACTUATOR_ID, RIGHT_ACTUATOR_CHANNEL_ID, true);
+    leftActuatorPot = (Pot){.actuatorOffset = 0, .minPos = 100, .maxPos = 3900, .pos = 0.0f};
+    rightActuatorPot = (Pot){.actuatorOffset = 0, .minPos = 100, .maxPos = 3900, .pos = 0.0f};
+    leftActuatorPID = initPID(0.1f, 0.01f, 0.005f);
+    rightActuatorPID = initPID(0.1f, 0.01f, 0.005f);
+
+    leftActuator = initActuator(&leftActuatorSRX, &leftActuatorPot, &leftActuatorPID);
+    rightActuator = initActuator(&rightActuatorSRX, &rightActuatorPot, &rightActuatorPID);
 }
 
 void directControl(SerialPacket pkt)
 {
-    int8_t leftSpeed = pkt.top_left_wheel;
-    setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
-    setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
+    // int8_t leftSpeed = pkt.top_left_wheel;
+    // setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
+    // setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
-    int8_t rightSpeed = pkt.top_right_wheel;
-    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
-    setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
+    // int8_t rightSpeed = pkt.top_right_wheel;
+    // setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
+    // setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
 
-    float actuatorSpeed = (pkt.actuator - 127) / 127.0;
-    setSRX(&leftActuator, actuatorSpeed);
-    setSRX(&rightActuator, actuatorSpeed);
+    double targetPosition = ((int8_t)pkt.actuator - 127) / 128.0;
+    moveSyncActuatorsToPosition(&leftActuator, &rightActuator, targetPosition);
+    // moveSyncActuatorsToVelocity(&leftActuator, &rightActuator, 1.0);
 }
 
 void UART_can_task()
