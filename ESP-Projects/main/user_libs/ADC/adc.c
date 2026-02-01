@@ -40,10 +40,6 @@ adc_continuous_evt_cbs_t cbs = {
     .on_conv_done = s_conv_done_cb,
 };
 
-adc_init()
-{
-}
-
 // read a decimal value between 0 and 1 indicating position of potentiometer
 void readPot()
 {
@@ -56,7 +52,7 @@ void readPot()
 
     while (1)
     {
-        for (uint8_t i = 0; i < 2; i++)
+        for (uint8_t i = 0; i < 1; i++)
         {
             ret = adc_continuous_read(g_adc_hdl, result, 256, &ret_num, 0);
             if (ret == ESP_OK)
@@ -65,16 +61,15 @@ void readPot()
                 {
                     adc_digi_output_data_t *p = (adc_digi_output_data_t *)&result[i];
                     data_samples = p->type2.data;
-                    printf("Value for %d:\t%ld\n", i, data_samples);
                 }
-                vTaskDelay(pdMS_TO_TICKS(200)); // Add delay between reads
-
-                pots[i]->pos = map(pots[i]->minPos, pots[i]->maxPos, data_samples);
+                // pots[i]->pos = map(pots[i]->minPos, pots[i]->maxPos, data_samples);
             }
             else if (ret == ESP_ERR_INVALID_STATE)
             {
                 break; // No more data available, wait for next conversion
             }
+            printf("Value: \t%lu\n", data_samples);
+            vTaskDelay(1);
         }
     }
 }
@@ -86,7 +81,7 @@ Pot potInit(adc_unit_t unit, adc_channel_t channel, int minPos, int maxPos)
 
     // this is how you intialize  the ADC Continous Driver mode
 
-    ESP_ERROR_CHECK(adc_continuous_new_handle(&adc_config, &hdl));
+    ESP_ERROR_CHECK(adc_continuous_new_handle(&adc_config, &g_adc_hdl));
 
     adc_digi_pattern_config_t adc_pattern = {
         .unit = unit,
@@ -98,12 +93,11 @@ Pot potInit(adc_unit_t unit, adc_channel_t channel, int minPos, int maxPos)
     digi_config.pattern_num = 1;
     digi_config.adc_pattern = &adc_pattern;
 
-    ESP_ERROR_CHECK(adc_continuous_config(hdl, &digi_config));
-    ESP_ERROR_CHECK(adc_continuous_register_event_callbacks(hdl, &cbs, NULL));
-    ESP_ERROR_CHECK(adc_continuous_start(hdl));
+    ESP_ERROR_CHECK(adc_continuous_config(g_adc_hdl, &digi_config));
+    ESP_ERROR_CHECK(adc_continuous_register_event_callbacks(g_adc_hdl, &cbs, NULL));
+    ESP_ERROR_CHECK(adc_continuous_start(g_adc_hdl));
 
     return (Pot){
-        .handle = hdl,
         .minPos = minPos, // minimum ADC reading
         .maxPos = maxPos,
         .pos = 0,
@@ -119,11 +113,11 @@ void initalizePots()
 // Deinitialize the Potentiometer's ADC handle --> Helpers to avoid memory leaks
 void PotDeInit(Pot *pot)
 {
-    if (pot != NULL && pot->handle != NULL)
+    if (pot != NULL && g_adc_hdl != NULL)
     {
-        adc_continuous_stop(pot->handle);   // Stop ADC continuous reading
-        adc_continuous_deinit(pot->handle); // Delete ADC handle to allow free memory
-        pot->handle = NULL;
+        adc_continuous_stop(g_adc_hdl);   // Stop ADC continuous reading
+        adc_continuous_deinit(g_adc_hdl); // Delete ADC handle to allow free memory
+        g_adc_hdl = NULL;
         ESP_LOGI("FUNC: PotDeInit", "Potentiometer ADC Deinitialized.");
     }
 }

@@ -20,9 +20,9 @@ void runSRX()
 void app_main()
 {
     canSetup();
-    initalizePots();
-    motor = talonSRXInit(3, 0, false);
-    motor.inverted = false;
+    potInit(ADC_UNIT_1, ADC_CHANNEL_3, 1190, 3153);
+    motor = talonSRXInit(4, 9, true);
     xTaskCreate(runSRX, "runSRX", 4096, NULL, 8, NULL);
-    // xTaskCreate(readPot, "readPot", 4096, NULL, 7, NULL);
+    xTaskCreate(readPot, "readPot", 4096, NULL, 9, NULL);
+    //  xTaskCreate(readPot, "readPot", 4096, NULL, 7, NULL);
 }
