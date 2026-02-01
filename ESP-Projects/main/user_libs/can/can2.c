@@ -4,9 +4,8 @@
 
 // inits
 twai_node_handle_t g_node_hdl = NULL;
-extern twai_event_callbacks_t can_cbs;
 
-void canSetup()
+void canSetup(bool (*twai_rx_cb)(twai_node_handle_t, const twai_rx_done_event_data_t *, void *), void* rx_cb_data)
 {
     twai_onchip_node_config_t node_config = {
         .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
@@ -14,8 +13,11 @@ void canSetup()
         .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
         .tx_queue_depth = 32,                // Transmit queue depth set to 32
     };
+    twai_event_callbacks_t can_cbs = {
+        .on_rx_done = twai_rx_cb,
+    };
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, NULL));
+    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, rx_cb_data));
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 

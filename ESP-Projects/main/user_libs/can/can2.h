@@ -52,7 +52,7 @@ TalonFX talonFXInit(uint8_t n_id, uint8_t c_id);
 TalonSRX talonSRXInit(uint8_t n_id, uint8_t c_id, bool inv);
 
 // GENERAL CAN FUNCS
-void canSetup();
+void canSetup(bool (*twai_rx_cb)(twai_node_handle_t, const twai_rx_done_event_data_t *, void *), void* rx_cb_data);
 void sendEn();
 void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len);
 
