@@ -118,7 +118,7 @@ bool pdp_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *
         return false;
     }
 
-    receiveCANPDP((PDP*)pdp, &rx_frame, (uint64_t *)&recv_buff);
+    receiveCANPDP((PDP *)pdp, &rx_frame, (uint64_t *)&recv_buff);
     return false;
 }
 
@@ -163,7 +163,7 @@ void PDPInit(PDP *pdp, int identifier)
     pdp->sem80 = xSemaphoreCreateBinaryStatic(&pdp->_buf80);
 }
 
-void canSetupPDP(PDP* pdp)
+void canSetupPDP(PDP *pdp)
 {
     twai_onchip_node_config_t node_config = {
         .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
