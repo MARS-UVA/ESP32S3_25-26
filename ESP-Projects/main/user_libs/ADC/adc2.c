@@ -54,13 +54,14 @@ void readPot(Pot *pot)
             adc_digi_output_data_t *p = (adc_digi_output_data_t *)&result[i];
             chan_num = p->type2.channel;
             data_samples = p->type2.data;
-                
-            if (chan_num == pot->channel) {
-                printf("channel: \t%u, min: \t%u, max: \t%u", pot->channel, pot->minPos, pot->maxPos);
-                    
-                pot->pos = (double) map(pot->minPos, pot->maxPos, data_samples);
-                ESP_LOGI("ADC", "Channel: %lu, Value: %lu, Mapped: %lf", chan_num, data_samples, pot->pos);
-                    
+
+            if (chan_num == pot->channel)
+            {
+                // printf("channel: \t%u, min: \t%u, max: \t%u", pot->channel, pot->minPos, pot->maxPos);
+
+                pot->pos = (double)map(pot->minPos, pot->maxPos, data_samples);
+                // ESP_LOGI("ADC", "Channel: %lu, Value: %lu, Mapped: %lf", chan_num, data_samples, pot->pos);
+
                 vTaskDelay(pdMS_TO_TICKS(10));
                 break;
             }
@@ -71,14 +72,15 @@ void readPot(Pot *pot)
 
 // this function initializes the Potentiometer struct and its ADC handle
 void potSetup(adc_channel_t *channel, uint8_t channel_num)
-{         
+{
     s_task_handle = xTaskGetCurrentTaskHandle(); // FIX: Set the task handle before initializing ADC
 
     ESP_ERROR_CHECK(adc_continuous_new_handle(&adc_config, &g_adc_hdl));
 
     adc_digi_pattern_config_t adc_pattern[SOC_ADC_PATT_LEN_MAX] = {0};
     digi_config.pattern_num = channel_num;
-    for (int i = 0; i < channel_num; i++) {
+    for (int i = 0; i < channel_num; i++)
+    {
         adc_pattern[i].atten = ADC_ATTEN_DB_12;
         adc_pattern[i].channel = channel[i];
         adc_pattern[i].unit = ADC_UNIT_1;
@@ -91,8 +93,9 @@ void potSetup(adc_channel_t *channel, uint8_t channel_num)
     ESP_ERROR_CHECK(adc_continuous_start(g_adc_hdl));
 }
 
-Pot potInit(int minPos, int maxPos, adc_channel_t channel) {
-    return (Pot) {
+Pot potInit(int minPos, int maxPos, adc_channel_t channel)
+{
+    return (Pot){
         .minPos = minPos,
         .maxPos = maxPos,
         .channel = channel,

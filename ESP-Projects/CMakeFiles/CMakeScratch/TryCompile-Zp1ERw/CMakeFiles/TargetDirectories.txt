@@ -1,0 +1,3 @@
+/Projects/mars/ESP32S3_25-26/ESP-Projects/CMakeFiles/CMakeScratch/TryCompile-Zp1ERw/CMakeFiles/cmTC_2c6ec.dir
+/Projects/mars/ESP32S3_25-26/ESP-Projects/CMakeFiles/CMakeScratch/TryCompile-Zp1ERw/CMakeFiles/edit_cache.dir
+/Projects/mars/ESP32S3_25-26/ESP-Projects/CMakeFiles/CMakeScratch/TryCompile-Zp1ERw/CMakeFiles/rebuild_cache.dir

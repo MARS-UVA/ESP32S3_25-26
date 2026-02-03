@@ -1,0 +1,1 @@
+/home/diana/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20251107/xtensa-esp-elf/bin/xtensa-esp32s3-elf-gcc -mlongcalls  -fno-builtin-memcpy -fno-builtin-memset -fno-builtin-bzero -fno-builtin-stpcpy -fno-builtin-strncpy  -nostartfiles  -v CMakeFiles/cmTC_2c6ec.dir/CMakeCCompilerABI.c.obj -o cmTC_2c6ec

@@ -4,7 +4,6 @@
 #include "can2.h"
 #include "uart.h"
 #include "wifi.h"
-#include "../pid/actuators.h"
 
 extern QueueHandle_t uart_queue;
 void initializeTalons();

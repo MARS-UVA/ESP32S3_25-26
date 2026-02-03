@@ -1,4 +1,6 @@
 #include "control_startup.h"
+#include "../pid/actuators.h"
+#include "../ADC/adc2.h"
 
 // Define CAN IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_ID 36
@@ -7,8 +9,8 @@
 #define BACK_RIGHT_WHEEL_ID 13
 #define BUCKET_DRUM_RIGHT_ID 25
 #define BUCKET_DRUM_LEFT_ID 60
-#define LEFT_ACTUATOR_ID 12
-#define RIGHT_ACTUATOR_ID 1
+#define LEFT_ACTUATOR_ID 3
+#define RIGHT_ACTUATOR_ID 4
 
 // Define channel IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_CHANNEL_ID 12
@@ -17,8 +19,8 @@
 #define BACK_RIGHT_WHEEL_CHANNEL_ID 14
 #define BUCKET_DRUM_RIGHT_CHANNEL_ID 4
 #define BUCKET_DRUM_LEFT_CHANNEL_ID 2
-#define LEFT_ACTUATOR_CHANNEL_ID 0
-#define RIGHT_ACTUATOR_CHANNEL_ID 1
+#define LEFT_ACTUATOR_CHANNEL_ID 10
+#define RIGHT_ACTUATOR_CHANNEL_ID 9
 
 TalonFX frontLeft;
 TalonFX backLeft;
@@ -51,12 +53,15 @@ void initializeTalons()
     // bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID, BUCKET_DRUM_RIGHT_CHANNEL_ID);
     // bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID, BUCKET_DRUM_LEFT_CHANNEL_ID);
 
-    leftActuatorSRX = talonSRXInit(LEFT_ACTUATOR_ID, LEFT_ACTUATOR_CHANNEL_ID, false);
+    leftActuatorSRX = talonSRXInit(LEFT_ACTUATOR_ID, LEFT_ACTUATOR_CHANNEL_ID, true);
     rightActuatorSRX = talonSRXInit(RIGHT_ACTUATOR_ID, RIGHT_ACTUATOR_CHANNEL_ID, true);
-    leftActuatorPot = (Pot){.actuatorOffset = 0, .minPos = 100, .maxPos = 3900, .pos = 0.0f};
-    rightActuatorPot = (Pot){.actuatorOffset = 0, .minPos = 100, .maxPos = 3900, .pos = 0.0f};
-    leftActuatorPID = initPID(0.1f, 0.01f, 0.005f);
-    rightActuatorPID = initPID(0.1f, 0.01f, 0.005f);
+
+    potSetup((adc_channel_t[]){ADC_CHANNEL_3, ADC_CHANNEL_4}, 2);
+    leftActuatorPot = potInit(100, 3900, ADC_CHANNEL_3);
+    rightActuatorPot = potInit(100, 3900, ADC_CHANNEL_4);
+
+    leftActuatorPID = initPID(0.05f, 0.001f, 0.00005f);
+    rightActuatorPID = initPID(0.05f, 0.001f, 0.00005f);
 
     leftActuator = initActuator(&leftActuatorSRX, &leftActuatorPot, &leftActuatorPID);
     rightActuator = initActuator(&rightActuatorSRX, &rightActuatorPot, &rightActuatorPID);
@@ -72,14 +77,14 @@ void directControl(SerialPacket pkt)
     // setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
     // setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
 
-    double targetPosition = ((int8_t)pkt.actuator - 127) / 128.0;
-    moveSyncActuatorsToPosition(&leftActuator, &rightActuator, targetPosition);
-    // moveSyncActuatorsToVelocity(&leftActuator, &rightActuator, 1.0);
+    double targetPosition = ((int8_t)pkt.actuator) / 255.0;
+    // moveSyncActuatorsToPosition(&leftActuator, &rightActuator, targetPosition);
+    moveSyncActuatorsToVelocity(&leftActuator, &rightActuator, -0.5);
 }
 
 void UART_can_task()
 {
-    SerialPacket motor_state = {0, 0x00, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0};
+    SerialPacket motor_state = {0, 0x00, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
     SerialPacket new_data;
 
     while (1)
