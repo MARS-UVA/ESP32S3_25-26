@@ -24,20 +24,20 @@
 // CAN ID Definitions
 
 // Mask for the lower nibble selecting which channel group is present
-#define PDH_CHANNEL_GROUP_MASK   0xF0
+#define PDH_CHANNEL_GROUP_MASK 0xF0
 
 // Values of the channel-group nibble
-#define PDH_GROUP_0_TO_5         0x00
-#define PDH_GROUP_6_TO_11        0x40
-#define PDH_GROUP_12_TO_17       0x80
-#define PDH_GROUP_18_TO_24       0xC0
+#define PDH_GROUP_0_TO_5 0x30   // 0x00
+#define PDH_GROUP_6_TO_11 0x70  // 0x40
+#define PDH_GROUP_12_TO_17 0xb0 // 0x80
+#define PDH_GROUP_18_TO_24 0xf0 // 0xC0
 
 // Each PDH current channel is encoded as a 10-bit value
-#define PDH_BITS_PER_CHANNEL     10
-#define PDH_CHANNEL_GAP_BITS     2
+#define PDH_BITS_PER_CHANNEL 10
+#define PDH_CHANNEL_GAP_BITS 2
 
 // High-current channel resolution (Amps per LSB)
-#define PDH_HIGH_CURRENT_LSB_A   0.125f
+#define PDH_HIGH_CURRENT_LSB_A 0.125f
 
 /**
  * @brief Power Distribution Hub (PDH) driver state.
@@ -80,6 +80,8 @@ float getChannelCurrentPDH(int channelID);
 
 // RX cb function
 bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx);
+
+void printstuff(void);
 
 void current_update_task();
 

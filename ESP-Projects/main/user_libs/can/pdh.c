@@ -15,7 +15,6 @@
 #include "pdh.h"
 #include "control_startup.h"
 
-
 uint8_t prompt_buff[6] = {0x00, 0x00, 0x00, 0x00, 0x20, 0x00}; // buffer to prompt PDP for current readings
 uint32_t current_request_id = 0x8041640;                       // CAN ID to request current readings from PDP
 
@@ -76,8 +75,7 @@ void decodePDHFrame(uint64_t payload,
                                        PDH_BITS_PER_CHANNEL);
 
         // Skip the inter-channel gap after the third channel
-        bitIndex += PDH_BITS_PER_CHANNEL
-                  + ((bitIndex == 30) ? PDH_CHANNEL_GAP_BITS : 0);
+        bitIndex += PDH_BITS_PER_CHANNEL + ((bitIndex == 30) ? PDH_CHANNEL_GAP_BITS : 0);
     }
 }
 
@@ -133,35 +131,35 @@ float getChannelCurrentPDH(int channel)
 void receiveCANPDH(twai_frame_t *msg, uint64_t *data)
 {
     // Match PDH device ID (upper bits of the extended ID)
-    if ((msg->header.id & 0xFFFFFF0) != (0x8051800 & pdh.identifier))
+    if ((msg->header.id & 0xFFFFF0F) != (0x8051800 | (pdh.identifier & 0x0F))) // 0x805183E
         return;
 
     // Decode which channel group this packet contains
     switch (msg->header.id & PDH_CHANNEL_GROUP_MASK)
     {
-        case PDH_GROUP_0_TO_5:
-            pdh.cacheChannels0to5 = *data;
-            pdh.receivedNew0to5 = true;
-            break;
+    case PDH_GROUP_0_TO_5:
+        pdh.cacheChannels0to5 = *data;
+        pdh.receivedNew0to5 = true;
+        break;
 
-        case PDH_GROUP_6_TO_11:
-            pdh.cacheChannels6to11 = *data;
-            pdh.receivedNew6to11 = true;
-            break;
+    case PDH_GROUP_6_TO_11:
+        pdh.cacheChannels6to11 = *data;
+        pdh.receivedNew6to11 = true;
+        break;
 
-        case PDH_GROUP_12_TO_17:
-            pdh.cacheChannels12to17 = *data;
-            pdh.receivedNew12to17 = true;
-            break;
+    case PDH_GROUP_12_TO_17:
+        pdh.cacheChannels12to17 = *data;
+        pdh.receivedNew12to17 = true;
+        break;
 
-        case PDH_GROUP_18_TO_24:
-            pdh.cacheChannels18to24 = *data;
-            pdh.receivedNew18to24 = true;
-            break;
+    case PDH_GROUP_18_TO_24:
+        pdh.cacheChannels18to24 = *data;
+        pdh.receivedNew18to24 = true;
+        break;
 
-        default:
-            // Unknown packet type — ignore
-            break;
+    default:
+        // Unknown packet type — ignore
+        break;
     }
 }
 
@@ -213,4 +211,9 @@ void current_update_task()
 void PDHInit(int identifier)
 {
     pdh.identifier = identifier;
+}
+
+void printstuff(void)
+{
+    showData((uint8_t *)&(pdh.cacheChannels6to11), 8);
 }

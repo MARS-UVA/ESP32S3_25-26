@@ -2,23 +2,22 @@
 #include "can2.h"
 #include "pdh.h"
 
-
 void app_main()
 {
-    PDHInit(2);
+    PDHInit(62);
     float current;
-    TalonFX fx = talonFXInit(1, 0);
+    TalonFX fx = talonFXInit(37, 8);
     printf("Can Setup\n");
     canSetup();
     printf("Can Setup Done\n");
 
-
     for (;;)
     {
         sendEn();
-        setFX(&fx, 0.5);
-        //ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &promptChannel_msg, -1)); // Timeout = 0: returns immediately if queue is full
-        current = getChannelCurrentPDH(0);
-        printf("\nCurrent read at channel %d -\t %.3f", 0, current);
+        setFX(&fx, 0.4);
+        // ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &promptChannel_msg, -1)); // Timeout = 0: returns immediately if queue is full
+        current = getChannelCurrentPDH(8);
+        // printstuff();
+        printf("Curret at channel %d:\t%f\n", fx.channel, current);
     }
 }
