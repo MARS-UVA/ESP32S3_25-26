@@ -3,19 +3,24 @@
 #include "pdp.h"
 #include "control_startup.h"
 
-void requestCurrentReadingsPDP(PDP *pdp, int waittime_ms) // send CAN packet to PDP to request current readings
+void requestCurrentReadingsPDP(PDP *pdp) // send CAN packet to PDP to request current readings
 {
     uint8_t prompt_buff[6] = {0x00, 0x00, 0x00, 0x00, 0x20, 0x00}; // buffer to prompt PDP for current readings
     uint32_t current_request_id = 0x8041640;                       // CAN ID to request current readings from PDP
     sendEn();
     sendMsg(current_request_id, pdp->identifier, prompt_buff, 6); // This line sends a CAN packet to the PDP
+}
 
-    if (waittime_ms != 0)
-    {
-        xSemaphoreTake(pdp->sem00, waittime_ms / portTICK_PERIOD_MS);
-        xSemaphoreTake(pdp->sem40, 1 / portTICK_PERIOD_MS);
-        xSemaphoreTake(pdp->sem80, 1 / portTICK_PERIOD_MS);
-    }
+bool awaitCurrentReadingsPDP(PDP *pdp, int waittime_ms)
+{
+    // TODO: do this better
+    if (xSemaphoreTake(pdp->sem00, waittime_ms / portTICK_PERIOD_MS) == pdFALSE)
+        return false;
+    if (xSemaphoreTake(pdp->sem40, waittime_ms / portTICK_PERIOD_MS) == pdFALSE)
+        return false;
+    if (xSemaphoreTake(pdp->sem80, waittime_ms / portTICK_PERIOD_MS) == pdFALSE)
+        return false;
+    return true;
 }
 
 void getSixParamPDP(short *cache_words, uint64_t *packet_data)
@@ -124,10 +129,17 @@ bool pdp_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *
 
 void current_update_task(PDP *pdp)
 {
+    int delaytime_ms = 1000;
     while (1)
     {
         int sem_wait_time_ms = 100;
-        requestCurrentReadingsPDP(pdp, sem_wait_time_ms);
+        requestCurrentReadingsPDP(pdp);
+        bool recvd = awaitCurrentReadingsPDP(pdp, sem_wait_time_ms);
+
+        if (!recvd) {
+            vTaskDelay(delaytime_ms);
+            continue;
+        }
 
         for (uint8_t i = 0; i < 6; i++)
         {
@@ -143,7 +155,7 @@ void current_update_task(PDP *pdp)
             // srxMotors[i]->current = 2.0;
             // vTaskDelay(1);
         }
-        vTaskDelay(1000);
+        vTaskDelay(delaytime_ms);
         // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
     }
 }
