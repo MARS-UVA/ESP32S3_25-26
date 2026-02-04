@@ -9,7 +9,7 @@ PDP pdp;
 
 void motor_task()
 {
-    motor = talonFXInit(1, 7);
+    motor = talonFXInit(59, 7);
     while (1)
     {
         setFX(&motor, 0.5);
@@ -18,14 +18,23 @@ void motor_task()
 
 void current_sensing()
 {
+    int pdp_id = 10;
+    int ch_id = 7;
+    int waittime_ms = 100;
     float cur;
-    PDPInit(&pdp, 10);
+
+    PDPInit(&pdp, pdp_id);
     canSetupPDP(&pdp);
+
     while (1)
     {
-        requestCurrentReadingsPDP(&pdp, 10);
-        cur = getChannelCurrentPDP(&pdp, 7);
-        printf("Current at channel %d is:\t %.3f\n", pdp.identifier, cur);
+        requestCurrentReadingsPDP(&pdp);
+        bool r = awaitCurrentReadingsPDP(&pdp, waittime_ms);
+        if (!r)
+            printf("Semaphores not acquired\n");
+
+        cur = getChannelCurrentPDP(&pdp, ch_id);
+        printf("Current at channel %d is:\t %.3f\n", ch_id, cur);
     }
 }
 void app_main()

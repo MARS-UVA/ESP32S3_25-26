@@ -21,11 +21,11 @@ typedef struct
     SemaphoreHandle_t sem00;
     SemaphoreHandle_t sem40;
     SemaphoreHandle_t sem80;
-    
+
     StaticSemaphore_t _buf00;
     StaticSemaphore_t _buf40;
     StaticSemaphore_t _buf80;
-    
+
     // uint64_t cache0;
     // uint64_t cache40;
     // uint64_t cache80;
@@ -46,7 +46,10 @@ extern TalonSRX *srxMotors[];
 void PDPInit(PDP *pdp, int identifier);
 
 // request packets
-void requestCurrentReadingsPDP(PDP *pdp, int waittime_ms);
+void requestCurrentReadingsPDP(PDP *pdp);
+
+// wait for current updates to be received
+bool awaitCurrentReadingsPDP(PDP *pdp, int waittime_ms);
 
 // get current in amps
 float getChannelCurrentPDP(PDP *pdp, int channelID);
@@ -54,8 +57,8 @@ float getChannelCurrentPDP(PDP *pdp, int channelID);
 // RX cb function
 // bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx);
 
-void current_update_task(PDP* pdp);
+void current_update_task(PDP *pdp);
 
-void canSetupPDP(PDP* pdp);
+void canSetupPDP(PDP *pdp);
 
 #endif
