@@ -14,6 +14,7 @@
 #ifndef PDH_H
 #define PDH_H
 
+#include <semaphore.h>
 #include "esp_twai.h"
 #include "esp_twai_onchip.h"
 #include <stdint.h>
@@ -42,39 +43,32 @@
 
 /**
  * @brief Power Distribution Hub (PDH) driver state.
- *
- * This structure stores cached CAN payloads from the PDH as well as
- * function pointers for decoding current measurements.
  */
 typedef struct
 {
     int identifier;
-
-    // Cached CAN payloads containing channel current data
-    uint64_t cacheChannels0to5;
-    uint64_t cacheChannels6to11;
-    uint64_t cacheChannels12to17;
-    uint64_t cacheChannels18to24;
-
-    // Flags indicating new data has been received for each cache
-    bool receivedNew0to5;
-    bool receivedNew6to11;
-    bool receivedNew12to17;
-    bool receivedNew18to24;
-
+    
+    uint16_t channelCurrents[25];
+    
+    // SemaphoreHandle_t sem_0_5;
+    // SemaphoreHandle_t sem_6_11;
+    // SemaphoreHandle_t sem_12_17;
+    // SemaphoreHandle_t sem_18_24;
+     
+    // StaticSemaphore_t _buf_0_5;
+    // StaticSemaphore_t _buf_6_11;
+    // StaticSemaphore_t _buf_12_17;
+    // StaticSemaphore_t _buf_18_24;
 } PDH;
-
-// global pdp struct
-extern twai_event_callbacks_t can_cbs;
 
 extern TalonFX *fxMotors[];
 extern TalonSRX *srxMotors[];
 
 // initiate PDP struct
-void PDHInit(int identifier);
+void PDHInit(PDH *pdh, int identifier);
 
-// request packets
-void requestCurrentReadingsPDH();
+// initialize CAN to interpret packets into the PDH struct
+void canSetupPDH(PDH *pdh);
 
 /**
  * @brief Get the current (in Amps) for a specific PDH channel.
@@ -83,11 +77,8 @@ void requestCurrentReadingsPDH();
  * @param channel Channel index (0–19).
  * @return Channel current in Amps, or 0.0f if unsupported.
  */
-float getChannelCurrentPDH(int channelID);
+float getChannelCurrentPDH(PDH* pdh, int channelID);
 
-// RX cb function
-bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx);
-
-void current_update_task();
+void current_update_task(PDH* pdh);
 
 #endif
