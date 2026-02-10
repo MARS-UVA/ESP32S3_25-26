@@ -39,26 +39,19 @@ void UART_setup()
 
 void UART_read(SerialPacket *packet)
 {
-    const uint8_t packetLength = 8;                 // expected packet length (1 header plus 1 byte for each motor/actuator)
-    uint8_t RxBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // zeroinit this so it doesn't have garbage data
+    const uint8_t packetLength = sizeof(SerialPacket) - 1;  // expected packet length (1 header plus 1 byte for each motor/actuator)
 
+    packet->header = 0; // Reset packet header
     uart_read_bytes(
         UART_NUM_1,
-        RxBuffer,
+        (char *)packet + 1,
         packetLength,
         0 // this is timeout
     );
 
-    if (RxBuffer[0] == 0xFF)
+    if (packet->header == 0xFF)
     {
         packet->invalid = 0;
-        packet->header = RxBuffer[1];
-        packet->top_left_wheel = RxBuffer[2];
-        packet->back_left_wheel = RxBuffer[3];
-        packet->top_right_wheel = RxBuffer[4];
-        packet->back_right_wheel = RxBuffer[5];
-        packet->drum = RxBuffer[6];
-        packet->actuator = RxBuffer[7];
     }
 }
 
@@ -71,15 +64,6 @@ void UART_write(OutPacket *packet) // writes a single packet to Jetson on UART
     // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
 }
 
-void UART_callback(uint8_t reg, void (*callback)(SerialPacket, void *, void *), void *userdata1, void *userdata2)
-{
-    // SerialPacket packet = UART_read();
-    // if (packet.invalid == false && packet.header == reg)
-    //{
-    //  callback(packet, userdata1, userdata2);
-    //}
-}
-
 void UART_rx_task()
 {
     SerialPacket pkt = {1, 0, 0, 0, 0, 0, 0, 0};
@@ -89,7 +73,10 @@ void UART_rx_task()
         UART_read(&pkt);
         if (pkt.invalid == 0)
         {
+            // OutPacket packet = {pkt.invalid, pkt.header, pkt.top_left_wheel, pkt.back_left_wheel, pkt.top_right_wheel, pkt.back_right_wheel, pkt.drum, pkt.drum, pkt.actuator, pkt.actuator};
+            // UART_write(&packet);
             xQueueOverwrite(uart_queue, &pkt);
+            pkt.invalid = 1;    // Mark invalid so packet is not reused
         }
         vTaskDelay(1);
     }

@@ -10,7 +10,7 @@
 #include "utils.h"
 /* --------------------- Types ---------------------- */
 
-typedef struct
+typedef struct __attribute__((packed))
 {
   uint8_t invalid;
   uint8_t header;
