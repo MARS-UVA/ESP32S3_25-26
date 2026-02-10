@@ -2,12 +2,13 @@
  * @file PDH.h
  * @brief Defines the structure for the Rev Power Distribution Hub (PDH).
  *
- * @author Anthony Vu <anthonyvu@email.virginia.edu>
+ * @author Carlos Giron <rdb7fq@virginia.edu>
+ * @author Anthony Vu <hsh6ff@virginia.edu>
  * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
  * @note Derivative work based on 'PDH.h' authored by Diana Lin.
  * @note Assisted by AI (GPT-5 & Gemini 3 Flash) for decoding logic and comments.
  * @version 1.1
- * @date 2026-02-02
+ * @date 2026-02-09
  */
 
 #ifndef PDH_H
@@ -24,13 +25,13 @@
 // CAN ID Definitions
 
 // Mask for the lower nibble selecting which channel group is present
-#define PDH_CHANNEL_GROUP_MASK 0xF0
+#define PDH_CHANNEL_GROUP_MASK 0xFF
 
 // Values of the channel-group nibble
-#define PDH_GROUP_0_TO_5 0x30   // 0x00
-#define PDH_GROUP_6_TO_11 0x70  // 0x40
-#define PDH_GROUP_12_TO_17 0xb0 // 0x80
-#define PDH_GROUP_18_TO_24 0xf0 // 0xC0
+#define PDH_GROUP_BASE_0_TO_5 0x00
+#define PDH_GROUP_BASE_6_TO_11 0x40
+#define PDH_GROUP_BASE_12_TO_17 0x80
+#define PDH_GROUP_BASE_18_TO_24 0xC0
 
 // Each PDH current channel is encoded as a 10-bit value
 #define PDH_BITS_PER_CHANNEL 10
@@ -75,13 +76,17 @@ void PDHInit(int identifier);
 // request packets
 void requestCurrentReadingsPDH();
 
-// get current in amps
+/**
+ * @brief Get the current (in Amps) for a specific PDH channel.
+ *
+ * @param pdh     PDH instance.
+ * @param channel Channel index (0–19).
+ * @return Channel current in Amps, or 0.0f if unsupported.
+ */
 float getChannelCurrentPDH(int channelID);
 
 // RX cb function
 bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx);
-
-void printstuff(void);
 
 void current_update_task();
 

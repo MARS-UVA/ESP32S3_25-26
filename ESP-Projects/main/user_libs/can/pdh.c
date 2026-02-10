@@ -2,21 +2,20 @@
  * @file PDH.c
  * @brief Interprets information from the Rev Power Distribution Hub (PDH).
  *
- * @author Anthony Vu <anthonyvu@email.virginia.edu>
+ * @author Carlos Giron <rdb7fq@virginia.edu>
+ * @author Cole Luba <meq2fg@virginia.edu>
+ * @author Anthony Vu <hsh6ff@email.virginia.edu>
  * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
  * @note Derivative work based on 'PDP.c' authored by Diana Lin.
  * @note Assisted by AI (GPT-5 & Gemini 3 Flash) for decoding logic and comments.
  * @version 1.1
- * @date 2026-02-01
+ * @date 2026-02-09
  */
 
 #include "utils.h"
 #include "can2.h"
 #include "pdh.h"
 #include "control_startup.h"
-
-uint8_t prompt_buff[6] = {0x00, 0x00, 0x00, 0x00, 0x20, 0x00}; // buffer to prompt PDP for current readings
-uint32_t current_request_id = 0x8041640;                       // CAN ID to request current readings from PDP
 
 // PDH struct instance
 PDH pdh = {
@@ -79,13 +78,6 @@ void decodePDHFrame(uint64_t payload,
     }
 }
 
-/**
- * @brief Get the current (in Amps) for a specific PDH channel.
- *
- * @param pdh     PDH instance.
- * @param channel Channel index (0–19).
- * @return Channel current in Amps, or 0.0f if unsupported.
- */
 float getChannelCurrentPDH(int channel)
 {
     uint16_t currents[6];
@@ -131,37 +123,29 @@ float getChannelCurrentPDH(int channel)
 void receiveCANPDH(twai_frame_t *msg, uint64_t *data)
 {
     // Match PDH device ID (upper bits of the extended ID)
-    if ((msg->header.id & 0xFFFFF0F) != (0x8051800 | (pdh.identifier & 0x0F))) // 0x805183E
+    if ((msg->header.id & 0xFFFFF00) != 0x8051800)  // 0x805183E
         return;
-
     // Decode which channel group this packet contains
-    switch (msg->header.id & PDH_CHANNEL_GROUP_MASK)
+    uint32_t channelGroup = (msg->header.id & PDH_CHANNEL_GROUP_MASK);
     {
-    case PDH_GROUP_0_TO_5:
+    if (channelGroup == (PDH_GROUP_BASE_0_TO_5 | pdh.identifier)) {
         pdh.cacheChannels0to5 = *data;
         pdh.receivedNew0to5 = true;
-        break;
-
-    case PDH_GROUP_6_TO_11:
+    }
+    else if (channelGroup == (PDH_GROUP_BASE_6_TO_11 | pdh.identifier)) {
         pdh.cacheChannels6to11 = *data;
         pdh.receivedNew6to11 = true;
-        break;
-
-    case PDH_GROUP_12_TO_17:
+    }
+    else if(channelGroup == (PDH_GROUP_BASE_12_TO_17 | pdh.identifier)) {
         pdh.cacheChannels12to17 = *data;
         pdh.receivedNew12to17 = true;
-        break;
-
-    case PDH_GROUP_18_TO_24:
+    }
+    else if(channelGroup == (PDH_GROUP_BASE_18_TO_24 | pdh.identifier)) {
         pdh.cacheChannels18to24 = *data;
         pdh.receivedNew18to24 = true;
-        break;
-
-    default:
-        // Unknown packet type — ignore
-        break;
-    }
-}
+    }       
+     // Different PDH or unknown packet type — ignore
+}}
 
 bool twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx)
 {

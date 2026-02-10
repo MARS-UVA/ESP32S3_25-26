@@ -5,7 +5,7 @@
 
 void app_main()
 {
-    TalonFX motor = talonFXInit(36, 0);
+    TalonFX motor = talonFXInit(33, 0);
     canSetup();
 
     for (int i = 0; i < 60; i++)
