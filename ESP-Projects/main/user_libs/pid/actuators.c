@@ -48,17 +48,29 @@ void moveSyncActuatorsToVelocity(Actuator *leftActuator, Actuator *rightActuator
 {
     double leftPos = leftActuator->pot->pos;
     double rightPos = rightActuator->pot->pos;
-    double syncPositionError = (leftPos - rightPos) * 0.5;
+    double syncPositionError = (leftPos - rightPos);
+
+    if (leftActuator->lastTime < 0 || rightActuator->lastTime < 0)
+    {
+        leftActuator->lastTime = esp_timer_get_time() / 1000000.0;
+        rightActuator->lastTime = esp_timer_get_time() / 1000000.0;
+
+        leftActuator->prevPosition = leftPos;
+        rightActuator->prevPosition = rightPos;
+        leftActuator->prevVelocity = 0;
+        rightActuator->prevVelocity = 0;
+        return;
+    }
 
     double leftVelocity = leftActuator->prevVelocity;
     double rightVelocity = rightActuator->prevVelocity;
 
-    double currentTime = esp_timer_get_time() / 1000.0;
+    double currentTime = esp_timer_get_time() / 1000000.0;
 
-    double leftVelocityOutput = computePID(leftActuator->pid, targetVelocity + syncPositionError, leftVelocity, currentTime - leftActuator->lastTime);
-    double rightVelocityOutput = computePID(rightActuator->pid, targetVelocity - syncPositionError, rightVelocity, currentTime - rightActuator->lastTime);
+    double leftVelocityOutput = computePID(leftActuator->pid, targetVelocity - syncPositionError, leftVelocity, currentTime - leftActuator->lastTime);
+    double rightVelocityOutput = computePID(rightActuator->pid, targetVelocity + syncPositionError, rightVelocity, currentTime - rightActuator->lastTime);
 
-    printf("Left Velocity: %f, Right Velocity: %f, Target Velocity: %f (before clamping)\n", leftVelocityOutput, rightVelocityOutput, targetVelocity);
+    // printf("Left Velocity: %f, Right Velocity: %f, Target Velocity: %f (before clamping)\n", leftVelocityOutput, rightVelocityOutput, targetVelocity);
 
     leftVelocityOutput = fmax(fmin(leftVelocityOutput, 1), -1);
     rightVelocityOutput = fmax(fmin(rightVelocityOutput, 1), -1);
@@ -66,8 +78,8 @@ void moveSyncActuatorsToVelocity(Actuator *leftActuator, Actuator *rightActuator
     setSRX(leftActuator->controller, leftVelocityOutput);
     setSRX(rightActuator->controller, rightVelocityOutput);
 
-    printf("Left Velocity: %f, Right Velocity: %f, Target Velocity: %f\n", leftVelocityOutput, rightVelocityOutput, targetVelocity);
-    printf("targetVelocity: %f, currentTime: %f\n", targetVelocity, currentTime);
+    // printf("Left Velocity: %f, Right Velocity: %f, Target Velocity: %f\n", leftVelocityOutput, rightVelocityOutput, targetVelocity);
+    // printf("targetVelocity: %f, time delta: %f\n", targetVelocity, currentTime - leftActuator->lastTime);
 
     leftActuator->prevPosition = leftPos;
     rightActuator->prevPosition = rightPos;

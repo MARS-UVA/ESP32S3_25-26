@@ -29,11 +29,13 @@ void app_main()
     packet.invalid = 1;
 
     xTaskCreate(readPots, "readPot", 4096, NULL, 9, NULL);
+    xTaskCreate(printActuatorPositions, "printActuatorPositions", 4096, NULL, 8, NULL);
 
     for (;;)
     {
         // UART_read(&packet);
         directControl(packet);
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 
     return;

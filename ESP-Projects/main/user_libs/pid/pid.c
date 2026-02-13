@@ -21,5 +21,7 @@ double computePID(PIDController *pid, float setpoint, float measured_value, floa
 
     pid->previous_error = error;
 
+    // printf("PID Compute - Setpoint: %f, Measured: %f, Error: %f, Output: %f\n", setpoint, measured_value, error, output);
+
     return output;
 }

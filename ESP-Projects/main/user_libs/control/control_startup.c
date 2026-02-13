@@ -45,10 +45,10 @@ TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &bucketDr
 // Initialize Talon "objects"
 void initializeTalons()
 {
-    frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID);
-    backLeft = talonFXInit(BACK_LEFT_WHEEL_ID, BACK_LEFT_WHEEL_CHANNEL_ID);
-    frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID);
-    backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID);
+    // frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID);
+    // backLeft = talonFXInit(BACK_LEFT_WHEEL_ID, BACK_LEFT_WHEEL_CHANNEL_ID);
+    // frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID);
+    // backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID);
 
     // bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID, BUCKET_DRUM_RIGHT_CHANNEL_ID);
     // bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID, BUCKET_DRUM_LEFT_CHANNEL_ID);
@@ -57,16 +57,15 @@ void initializeTalons()
     rightActuatorSRX = talonSRXInit(RIGHT_ACTUATOR_ID, RIGHT_ACTUATOR_CHANNEL_ID, true);
 
     potSetup((adc_channel_t[]){ADC_CHANNEL_3, ADC_CHANNEL_4}, 2);
-    leftActuatorPot = potInit(100, 3900, ADC_CHANNEL_3);
-    rightActuatorPot = potInit(100, 3900, ADC_CHANNEL_4);
+    leftActuatorPot = potInit(90, 1260, ADC_CHANNEL_3);
+    rightActuatorPot = potInit(100, 1280, ADC_CHANNEL_4);
 
-    leftActuatorPID = initPID(0.05f, 0.001f, 0.00005f);
-    rightActuatorPID = initPID(0.05f, 0.001f, 0.00005f);
+    leftActuatorPID = initPID(0.9, 0, 0);
+    rightActuatorPID = initPID(0.9, 0, 0);
 
     leftActuator = initActuator(&leftActuatorSRX, &leftActuatorPot, &leftActuatorPID);
     rightActuator = initActuator(&rightActuatorSRX, &rightActuatorPot, &rightActuatorPID);
 }
-
 void directControl(SerialPacket pkt)
 {
     // int8_t leftSpeed = pkt.top_left_wheel;
@@ -79,7 +78,21 @@ void directControl(SerialPacket pkt)
 
     double targetPosition = ((int8_t)pkt.actuator) / 255.0;
     // moveSyncActuatorsToPosition(&leftActuator, &rightActuator, targetPosition);
-    moveSyncActuatorsToVelocity(&leftActuator, &rightActuator, -0.5);
+    moveSyncActuatorsToVelocity(&leftActuator, &rightActuator, -1);
+    vTaskDelay(pdMS_TO_TICKS(1));
+}
+
+// printf for actuator positions
+void printActuatorPositions()
+{
+    while (1)
+    {
+        double leftPos = leftActuator.pot->pos;
+        double rightPos = rightActuator.pot->pos;
+        printf("%ld\t%f\t%f\n", xTaskGetTickCount(), leftPos, rightPos);
+        // printf("Left Actuator Target: %f, Right Actuator Target: %f\n", leftActuator.prevVelocity, rightActuator.prevVelocity);
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
 }
 
 void UART_can_task()
