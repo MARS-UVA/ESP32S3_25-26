@@ -66,13 +66,11 @@ void decodePDHFrame(uint64_t payload,
     }
 }
 
-float getChannelCurrentPDH(PDH *pdh, int channel)
+float getChannelCurrentPDH(PDH *pdh, uint8_t channel)
 {
-    // erm...
-    if (channel < 0)
-        return 0.0f;
+    // TODO: Implement low-current channels decoding
 
-    // TODO: Low-current channels not implemented (?)
+    // Return 0.0f for current channels that do not exist
     if (channel >= 20)
         return 0.0f;
 
@@ -80,20 +78,26 @@ float getChannelCurrentPDH(PDH *pdh, int channel)
 }
 
 /**
- * @brief Process an incoming CAN message intended for the PDH.
- *
- * Extended ID format:
- *   0x80518XY
- *     └──┬──┘└─ channel group selector
- *        └──── PDH device ID
- *
- * @param msg  CAN Rx header.
- * @param data Pointer to 64-bit payload.
+ * @brief Get the input voltage (in millivolts) of the PDH
+ * 
+ * @param pdh   PDH structure.
  */
-void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
+float getInputVoltagePDH(PDH *pdh)
 {
-    // Match PDH device ID (upper bits of the extended ID)
-    if ((msg->header.id & 0xFFFFF00) != 0x8051800) // 0x805183E
+    return pdh->totalVoltage;
+}
+
+/**
+ * @brief Process an incoming CAN message including current information.
+ * 
+ * @param pdh   PDH structure.
+ * @param msg   CAN Rx header.
+ * @param data  Pointer to a 64-bit payload.
+ */
+void receiveCurrentPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
+{
+ // Match PDH device ID (upper bits of the extended ID)
+    if ((msg->header.id & 0xFFFFF00) != 0x8051800)
         return;
 
     uint32_t channelGroup = (msg->header.id & PDH_CHANNEL_GROUP_MASK);
@@ -130,6 +134,48 @@ void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
     // xSemaphoreGive(sem);
 }
 
+/**
+ * @brief Process an incoming CAN message including voltage data.
+ * 
+ * @param pdh   PDH structure.
+ * @param msg   CAN Rx header.
+ * @param data  Pointer to a 64-bit payload.
+ */
+void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
+{
+    // Match PDH device ID
+    if ((msg->header.id) != (0x8051900 | pdh->identifier))
+        return;
+    
+    uint32_t tmp = extractBits(*data, 56, 8) | (extractBits(*data, 48, 4) << 8);
+    pdh->totalVoltage = tmp * 7.81;
+}
+
+
+
+/**
+ * @brief Process an incoming CAN message intended for the PDH.
+ *
+ * Extended ID format:
+ *   0x80518XY
+ *     └──┬──┘└─ channel group selector
+ *        └──── PDH device ID
+ *
+ * @param msg  CAN Rx header.
+ * @param data Pointer to 64-bit payload.
+ */
+void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
+{
+    receiveVoltagePDH(pdh, msg, data);
+}
+
+/**
+ * @brief Handles CAN interrupts
+ * 
+ * @param handle    TWAI node handle.
+ * @param edata     TWAI "RX done" event data.
+ * @param pdh       PDH structure.
+ */
 bool pdh_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *pdh)
 {
     uint8_t recv_buff[8];
@@ -144,6 +190,11 @@ bool pdh_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *
     return false;
 }
 
+/**
+ * @brief Setups CAN for the PDH.
+ * 
+ * @param pdh   PDH structure.
+ */
 void canSetupPDH(PDH *pdh)
 {
     twai_onchip_node_config_t node_config = {
@@ -160,6 +211,11 @@ void canSetupPDH(PDH *pdh)
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 
+/**
+ * @brief Updates fxMotors and srxMotors structures with PDH current data
+ * 
+ * @param pdh   PDH structure.
+ */
 void current_update_task(PDH *pdh)
 {
 
@@ -182,7 +238,12 @@ void current_update_task(PDH *pdh)
     }
 }
 
-// initiate PDP struct
+/**
+ * @brief Initalizes PDP structure.
+ * 
+ * @param pdh           PDH structure.
+ * @param identifier    CAN identifier.
+ */
 void PDHInit(PDH *pdh, int identifier)
 {
     pdh->identifier = identifier;
@@ -192,8 +253,3 @@ void PDHInit(PDH *pdh, int identifier)
         pdh->channelCurrents[i] = 0;
     }
 }
-
-// void printstuff(void)
-// {
-//     showData((uint8_t *)&(pdh.cacheChannels6to11), 8);
-// }

@@ -3,18 +3,18 @@
 #include "pdh.h"
 
 
-TalonFX motor;
-void motor_task()
-{
-    motor = talonFXInit(33, 1);
-    while (1)
-    {
-        setFX(&motor, 0.1);
-        vTaskDelay(pdMS_TO_TICKS(250));
-        setFX(&motor, -0.1);
-        vTaskDelay(pdMS_TO_TICKS(250));
-    }
-}
+// TalonFX motor;
+// void motor_task()
+// {
+//     motor = talonFXInit(33, 1);
+//     while (1)
+//     {
+//         setFX(&motor, 0.1);
+//         vTaskDelay(pdMS_TO_TICKS(250));
+//         setFX(&motor, -0.1);
+//         vTaskDelay(pdMS_TO_TICKS(250));
+//     }
+// }
 
 void app_main()
 {
@@ -22,21 +22,24 @@ void app_main()
     PDHInit(&pdh, 62);
 
     float current = -1;
+    float voltage;
 
     printf("Can Setup\n");
     canSetupPDH(&pdh);
     printf("Can Setup Done\n");
 
-    xTaskCreate(motor_task, "mtr", 4096, NULL, 8, NULL);
+    // xTaskCreate(motor_task, "mtr", 4096, NULL, 8, NULL);
 
     for (;;)
     {
-        for (int i = 1; i <= 1; i++)
-        {
-            current = getChannelCurrentPDH(&pdh, i);
-            printf("Current at channel %d:\t%f\n", i, current);
-        }
-        printf("\n");
+        // for (int i = 1; i <= 1; i++)
+        // {
+        //     current = getChannelCurrentPDH(&pdh, i);
+        //     printf("Current at channel %d:\t%f\n", i, current);
+        // }
+        
+        voltage = getInputVoltagePDH(&pdh);
+        printf("Total voltage is %f\n", voltage);
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

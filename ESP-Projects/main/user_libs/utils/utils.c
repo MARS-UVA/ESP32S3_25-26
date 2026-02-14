@@ -30,10 +30,12 @@ void swapEndian(uint8_t *arr, uint8_t len)
         arr[len - 1 - i] = tmp;
     }
 }
+
 void writeToBuffInd(uint8_t *dst, uint8_t *src, uint8_t ind, uint8_t len)
 {
     memcpy(dst + ind, src, len);
 }
+
 void showData(uint8_t *arr, uint8_t len)
 {
     printf("\nData = {");
