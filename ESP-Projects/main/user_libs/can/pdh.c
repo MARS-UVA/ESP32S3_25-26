@@ -82,7 +82,7 @@ float getChannelCurrentPDH(PDH *pdh, uint8_t channel)
  * 
  * @param pdh   PDH structure.
  */
-float getInputVoltagePDH(PDH *pdh)
+uint32_t getInputVoltagePDH(PDH *pdh)
 {
     return pdh->totalVoltage;
 }
@@ -147,8 +147,9 @@ void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
     if ((msg->header.id) != (0x8051900 | pdh->identifier))
         return;
     
-    uint32_t tmp = extractBits(*data, 56, 8) | (extractBits(*data, 48, 4) << 8);
-    pdh->totalVoltage = tmp * 7.81;
+    // uint32_t rawVoltage = extractBits(*data, 56, 8) | (extractBits(*data, 48, 4) << 8);
+    pdh->totalVoltage = extractBits(*data, 56, 8);
+    // pdh->totalVoltage = rawVoltage * 7.81;
 }
 
 

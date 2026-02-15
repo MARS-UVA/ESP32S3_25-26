@@ -50,7 +50,7 @@ typedef struct
     
     uint16_t channelCurrents[25];
     
-    uint16_t totalVoltage;
+    uint32_t totalVoltage;
 
     // SemaphoreHandle_t sem_0_5;
     // SemaphoreHandle_t sem_6_11;
@@ -63,18 +63,13 @@ typedef struct
     // StaticSemaphore_t _buf_18_24;
 } PDH;
 
-typedef enum {
-    SUCCESS,
-    FAILURE
-} status_t;
-
 extern TalonFX *fxMotors[];
 extern TalonSRX *srxMotors[];
 
 // initiate PDP struct
 void PDHInit(PDH *pdh, int identifier);
 
-float getInputVoltagePDH(PDH *pdh);
+uint32_t getInputVoltagePDH(PDH *pdh);
 
 // initialize CAN to interpret packets into the PDH struct
 void canSetupPDH(PDH *pdh);
