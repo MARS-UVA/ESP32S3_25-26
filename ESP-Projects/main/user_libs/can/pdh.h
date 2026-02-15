@@ -39,7 +39,10 @@
 #define PDH_CHANNEL_GAP_BITS 2
 
 // High-current channel resolution (Amps per LSB)
-#define PDH_HIGH_CURRENT_LSB_A 0.125f
+#define PDH_HIGH_CURRENT_LSB_A 0.125
+
+// Input voltage measurement resolution (Volts per LSB)
+#define PDH_VOLTAGE_RESOLUTION 0.00781
 
 /**
  * @brief Power Distribution Hub (PDH) driver state.
@@ -50,7 +53,7 @@ typedef struct
     
     uint16_t channelCurrents[25];
     
-    uint32_t totalVoltage;
+    double totalVoltage;
 
     // SemaphoreHandle_t sem_0_5;
     // SemaphoreHandle_t sem_6_11;
@@ -69,7 +72,7 @@ extern TalonSRX *srxMotors[];
 // initiate PDP struct
 void PDHInit(PDH *pdh, int identifier);
 
-uint32_t getInputVoltagePDH(PDH *pdh);
+double getInputVoltagePDH(PDH *pdh);
 
 // initialize CAN to interpret packets into the PDH struct
 void canSetupPDH(PDH *pdh);

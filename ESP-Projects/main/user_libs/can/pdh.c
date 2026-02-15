@@ -78,11 +78,11 @@ float getChannelCurrentPDH(PDH *pdh, uint8_t channel)
 }
 
 /**
- * @brief Get the input voltage (in millivolts) of the PDH
+ * @brief Get the input voltage (in volts) of the PDH
  * 
  * @param pdh   PDH structure.
  */
-uint32_t getInputVoltagePDH(PDH *pdh)
+double getInputVoltagePDH(PDH *pdh)
 {
     return pdh->totalVoltage;
 }
@@ -147,9 +147,7 @@ void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
     if ((msg->header.id) != (0x8051900 | pdh->identifier))
         return;
     
-    // uint32_t rawVoltage = extractBits(*data, 56, 8) | (extractBits(*data, 48, 4) << 8);
-    pdh->totalVoltage = extractBits(*data, 56, 8);
-    // pdh->totalVoltage = rawVoltage * 7.81;
+    pdh->totalVoltage = extractBits(*data, 0, 12) * PDH_VOLTAGE_RESOLUTION;
 }
 
 
@@ -159,7 +157,7 @@ void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
  *
  * Extended ID format:
  *   0x80518XY
- *     └──┬──┘└─ channel group selector
+ *     └──┬┘└─ channel group | CAN ID
  *        └──── PDH device ID
  *
  * @param msg  CAN Rx header.
@@ -168,6 +166,7 @@ void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 {
     receiveVoltagePDH(pdh, msg, data);
+    receiveCurrentPDH(pdh, msg, data);
 }
 
 /**

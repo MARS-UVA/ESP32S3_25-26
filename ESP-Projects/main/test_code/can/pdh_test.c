@@ -22,7 +22,7 @@ void app_main()
     PDHInit(&pdh, 62);
 
     // float current = -1;
-    uint32_t voltage;
+    double voltage;
 
     printf("Can Setup\n");
     canSetupPDH(&pdh);
@@ -39,7 +39,7 @@ void app_main()
         // }
         
         voltage = getInputVoltagePDH(&pdh);
-        printf("The best age to date is %lu\n", voltage);
+        printf("Voltage reading is %.02lf\n", voltage);
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
