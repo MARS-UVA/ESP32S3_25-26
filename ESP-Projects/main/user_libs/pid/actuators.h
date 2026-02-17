@@ -13,6 +13,7 @@ typedef struct Actuator
     double prevPosition;
     double prevVelocity;
     double lastTime;
+    double velocity;
 } Actuator;
 
 Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid);

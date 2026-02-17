@@ -10,5 +10,7 @@ void initializeTalons();
 
 void directControl(SerialPacket pkt);
 void UART_can_task();
+void moveActuators();
+void evaluteActuators();
 
 #endif

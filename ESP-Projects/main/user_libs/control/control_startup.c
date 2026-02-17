@@ -58,14 +58,19 @@ void initializeTalons()
 
     potSetup((adc_channel_t[]){ADC_CHANNEL_3, ADC_CHANNEL_4}, 2);
     leftActuatorPot = potInit(90, 1260, ADC_CHANNEL_3);
-    rightActuatorPot = potInit(100, 1280, ADC_CHANNEL_4);
+    rightActuatorPot = potInit(90, 1260, ADC_CHANNEL_4);
 
-    leftActuatorPID = initPID(0.9, 0, 0);
-    rightActuatorPID = initPID(0.9, 0, 0);
+    // velocity
+    //leftActuatorPID = initPID(0.9, 0.5, 0); 
+    //rightActuatorPID = initPID(0.9, 0.5, 0);
+
+    leftActuatorPID = initPID(2, 0.15, 0.001);
+    rightActuatorPID = initPID(2, 0.15, 0.001);
 
     leftActuator = initActuator(&leftActuatorSRX, &leftActuatorPot, &leftActuatorPID);
     rightActuator = initActuator(&rightActuatorSRX, &rightActuatorPot, &rightActuatorPID);
 }
+
 void directControl(SerialPacket pkt)
 {
     // int8_t leftSpeed = pkt.top_left_wheel;
@@ -80,6 +85,31 @@ void directControl(SerialPacket pkt)
     // moveSyncActuatorsToPosition(&leftActuator, &rightActuator, targetPosition);
     moveSyncActuatorsToVelocity(&leftActuator, &rightActuator, -1);
     vTaskDelay(pdMS_TO_TICKS(1));
+}
+
+void evaluteActuators() {
+      
+    for (int i = 0; i < 3000; i += 100) {
+        readPot(&leftActuatorPot);
+        readPot(&rightActuatorPot);
+        //moveSyncActuatorsToVelocity(&leftActuator, &rightActuator, 0);
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+    
+    while (1) {
+        readPot(&leftActuatorPot);
+        readPot(&rightActuatorPot);
+        moveSyncActuatorsToPosition(&leftActuator, &rightActuator, 0.75);
+        vTaskDelay(5);
+    }
+}
+
+void moveActuators() {
+    while (1) {
+        setSRX(rightActuator.controller, rightActuator.velocity);
+        setSRX(leftActuator.controller, leftActuator.velocity);
+        //vTaskDelay(1);
+    }
 }
 
 // printf for actuator positions

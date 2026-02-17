@@ -66,14 +66,13 @@ void readPot(Pot *pot)
                 // ESP_LOGI("ADC", "Channel: %lu, Value: %lu, Mapped: %lf", chan_num, data_samples, pot->pos);
                 // printf("%lu\t%lu\t%lu\n", chan_num, data_samples, xTaskGetTickCount());
 
-                // vTaskDelay(pdMS_TO_TICKS(10));
                 break;
             }
         }
     }
     pot->pos = (double)map(pot->minPos, pot->maxPos, (double)sample_sum / sample_num);
     // pot->pos = (double)sample_sum / sample_num;
-    vTaskDelay(1);
+    //vTaskDelay(1);
 }
 
 // this function initializes the Potentiometer struct and its ADC handle
