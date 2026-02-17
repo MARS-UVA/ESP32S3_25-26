@@ -62,7 +62,7 @@ void decodePDHFrame(uint64_t payload,
                                        PDH_BITS_PER_CHANNEL);
 
         // Skip the inter-channel gap after the third channel
-        bitIndex += PDH_BITS_PER_CHANNEL + ((bitIndex == 30) ? PDH_CHANNEL_GAP_BITS : 0);
+        bitIndex += PDH_BITS_PER_CHANNEL + ((bitIndex == 20) ? PDH_CHANNEL_GAP_BITS : 0);
     }
 }
 
