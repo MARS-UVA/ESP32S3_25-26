@@ -1,5 +1,4 @@
-#ifndef ADC_H
-#define ADC_H
+#pragma once
 
 #include "esp_adc/adc_continuous.h"
 #include <driver/adc.h>
@@ -25,5 +24,3 @@ void readPot();
 // void calibrateYourMom(Pot *leftPot, Pot *rightPot);
 
 void PotDeInit(Pot *pot);
-
-#endif

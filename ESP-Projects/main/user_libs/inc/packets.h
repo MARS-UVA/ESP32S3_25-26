@@ -1,6 +1,7 @@
 #ifndef PACKETS_H
 #define PACKETS_H
-#include "util.h"
+
+#include "utils.h"
 
 typedef struct __attribute__((packed))
 {

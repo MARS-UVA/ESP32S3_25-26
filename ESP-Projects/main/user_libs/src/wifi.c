@@ -1,3 +1,6 @@
+#ifndef WIFI_H
+#define WIFI_H
+
 #include "wifi.h"
 #include "uart.h"
 #include "control_startup.h"

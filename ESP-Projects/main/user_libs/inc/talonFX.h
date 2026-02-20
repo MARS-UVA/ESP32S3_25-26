@@ -1,3 +1,6 @@
+#ifndef TALONFX_H
+#define TALONFX_H
+
 #include "can2.h"
 
 typedef struct
@@ -18,3 +21,5 @@ TalonFX talonFXInit(uint8_t n_id, uint8_t c_id);
 // FX FUNCS
 void setFX(TalonFX *fx, float speed);
 void setTargetFX(TalonFX *fx, int velocity);
+
+#endif

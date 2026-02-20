@@ -1,3 +1,6 @@
+#ifndef TALONSRX_H
+#define TALONSRX_H
+
 #include "can2.h"
 
 typedef struct
@@ -10,3 +13,5 @@ typedef struct
 
 TalonSRX talonSRXInit(uint8_t n_id, uint8_t c_id, bool inv);
 void setSRX(TalonSRX *srx, double value);
+
+#endif

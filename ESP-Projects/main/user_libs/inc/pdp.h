@@ -48,9 +48,9 @@ bool awaitCurrentReadingsPDP(PDP *pdp, int waittime_ms);
 float getChannelCurrentPDP(PDP *pdp, int channelID);
 
 // RX cb functions
-bool pdp_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *pdp)
+bool pdp_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *pdp);
 
-    void current_update_task(PDP *pdp);
+void current_update_task(PDP *pdp);
 
 void canSetupPDP(PDP *pdp);
 
