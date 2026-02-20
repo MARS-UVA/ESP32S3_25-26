@@ -9,6 +9,8 @@
 #include "driver/gpio.h"
 #include <stdbool.h>
 #include <esp_err.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 void floatToByteArray(float f, char *arr);
 float map(int min, int max, int pos);
