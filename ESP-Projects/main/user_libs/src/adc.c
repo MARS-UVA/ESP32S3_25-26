@@ -1,12 +1,4 @@
 #include "adc.h"
-#include "utils.h"
-#include <esp_adc/adc_continuous.h>
-#include <stdio.h>
-#include <string.h>
-#include "esp_log.h"
-#include <driver/adc.h>
-#include "esp_err.h"
-#include "driver/gpio.h"
 
 Pot pot = {
     .handle = NULL,
@@ -17,7 +9,6 @@ Pot pot = {
 };
 
 TaskHandle_t s_task_handle;
-
 static bool IRAM_ATTR s_conv_done_cb(adc_continuous_handle_t handle, const adc_continuous_evt_data_t *edata, void *user_data)
 {
     BaseType_t mustYield = pdFALSE;
