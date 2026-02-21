@@ -1,7 +1,7 @@
 #ifndef TALONFX_H
 #define TALONFX_H
 
-#include "can2.h"
+#include "can.h"
 
 typedef struct
 {

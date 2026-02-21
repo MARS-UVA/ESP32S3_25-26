@@ -1,7 +1,7 @@
 #ifndef POWERLIB_CONTROL
 #define POWERLIB_CONTROL
 
-#include "can2.h"
+#include "can.h"
 #include "uart.h"
 #include "wifi.h"
 #include "packets.h"

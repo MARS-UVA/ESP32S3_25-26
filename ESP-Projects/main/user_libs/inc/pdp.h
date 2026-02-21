@@ -1,7 +1,7 @@
 #ifndef PDP_H
 #define PDP_H
 
-#include "can2.h"
+#include "can.h"
 #include "control_startup.h"
 
 // defined PDP struct

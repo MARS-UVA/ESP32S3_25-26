@@ -1,4 +1,4 @@
-#include "can2.h"
+#include "can.h"
 
 // inits
 twai_node_handle_t g_node_hdl = NULL;
