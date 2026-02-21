@@ -12,13 +12,15 @@ twai_frame_t promptChannel_msg = {
 
 void app_main()
 {
-    PDPInit(10);
+    PDHInit(2);
     float current;
     TalonFX fx = talonFXInit(27);
     TalonSRX srx = talonSRXInit(4, false);
     printf("Can Setup\n");
     canSetup();
     printf("Can Setup Done\n");
+
+
     for (;;)
     {
         sendEn();

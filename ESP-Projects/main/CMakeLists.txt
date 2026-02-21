@@ -1,3 +1,3 @@
-idf_component_register(SRCS "./PDH_test.c" "./user_libs/wifi/wifi.c" "./user_libs/can/can2.c" "./user_libs/utils/utils.c"  "./user_libs/uart/uart.c" "./user_libs/control/control_startup.c" "./user_libs/can/pdp.c"
+idf_component_register(SRCS "./test_code/can/pdh_currentvoltage_rtos_test.c" "./user_libs/can/can2.c" "./user_libs/utils/utils.c"  "./user_libs/can/pdh.c"
                        INCLUDE_DIRS "." "./user_libs/can" "./user_libs/utils" "./user_libs/uart" "./user_libs/control" "./user_libs/wifi")
 
