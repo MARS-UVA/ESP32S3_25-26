@@ -1,7 +1,6 @@
-#include "utils.h"
+#pragma once
 
-#ifndef CAN2_H
-#define CAN2_H
+#include "utils.h"
 
 #include "esp_twai.h"
 #include "esp_twai_onchip.h"
@@ -34,5 +33,3 @@ extern twai_node_handle_t g_node_hdl;
 void canSetup(bool (*twai_rx_cb)(twai_node_handle_t, const twai_rx_done_event_data_t *, void *), void *rx_cb_data);
 void sendEn();
 void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len);
-
-#endif
