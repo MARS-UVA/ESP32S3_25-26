@@ -46,3 +46,22 @@ void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
     sendEn();
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &msg, TIMEOUT));
 }
+
+/**
+ * @brief Extract a contiguous bit-field from a 64-bit value.
+ *
+ * Bits are numbered starting from bit 0 (least-significant bit).
+ *
+ * @param data      Source 64-bit value.
+ * @param startBit  Index of first bit to extract.
+ * @param bitLength Number of bits to extract.
+ * @return Extracted value, right-aligned.
+ */
+uint32_t extractBits(uint64_t data, uint8_t startBit, uint8_t bitLength)
+{
+    if (bitLength == 0 || bitLength > 32 || startBit >= 64)
+        return 0;
+
+    uint64_t mask = (1ULL << bitLength) - 1ULL;
+    return (uint32_t)((data >> startBit) & mask);
+}

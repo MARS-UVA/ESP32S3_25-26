@@ -1,3 +1,15 @@
+/**
+ * @file TalonSRX.c
+ * @brief Implements functions for controlling the Talon SRX motor controller.
+ * 
+ * @author Diana Lin
+ * @author Carlos Giron
+ * 
+ * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
+ * @version 1.0
+ * @date 2026-02-09
+ */
+
 #include "TalonSRX.h"
 
 TalonSRX talonSRXInit(uint8_t n_id, uint8_t c_id, bool inv)

@@ -1,5 +1,17 @@
-#ifndef TALONFX_H
-#define TALONFX_H
+/**
+ * @file talonFX.h
+ * @brief Header file for Talon FX motor controller functions.
+ * 
+ * @author Diana Lin
+ * @author Carlos Giron
+ * @author Anthony Vu
+ * 
+ * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
+ * @version 1.0
+ * @date 2026-02-09
+ */
+
+#pragma once
 
 #include "can.h"
 
@@ -13,6 +25,7 @@ typedef struct
     bool breakMode;
     uint8_t channel;
     float current;
+    int temperature;
 } TalonFX;
 
 // Inits
@@ -22,4 +35,4 @@ TalonFX talonFXInit(uint8_t n_id, uint8_t c_id);
 void setFX(TalonFX *fx, float speed);
 void setTargetFX(TalonFX *fx, int velocity);
 
-#endif
+void canSetupTalonFX(TalonFX *fx);

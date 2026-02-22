@@ -1,5 +1,26 @@
-#include "TalonFX.h"
+/**
+ * @file talonFX.c
+ * @brief Implements functions for controlling the Talon FX motor controller.
+ * 
+ * @author Diana Lin
+ * @author Carlos Giron
+ * @author Anthony Vu
+ * 
+ * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
+ * @version 1.0
+ * @date 2026-02-09
+ */
 
+#include "talonFX.h"
+#include "can.h"
+
+/**
+ * @brief Initializes a TalonFX structure with default values.
+ * 
+ * @param n_id  CAN ID for the Talon FX (0-63).
+ * @param c_id  Channel number for current monitoring (0-23).
+ * @return Initialized TalonFX structure.
+ */
 TalonFX talonFXInit(uint8_t n_id, uint8_t c_id)
 {
     return (TalonFX){
@@ -11,6 +32,7 @@ TalonFX talonFXInit(uint8_t n_id, uint8_t c_id)
         .breakMode = false,
         .channel = c_id,
         .current = 0.0f,
+        .temperature = 0,
     };
 }
 
@@ -46,4 +68,59 @@ void setTargetFX(TalonFX *fx, int velocity) // setting PID velocity
 
     uint8_t buff[] = {0, 1, velocity & 0xff, (velocity >> 8) & 0xff, velocity >> 16 & 0xff, 0, feedforwardInt & 0xff, (feedforwardInt >> 8) & 0xff};
     sendMsg(CAN_ID_SET_TARGET, fx->id, buff, 8);
+}
+
+/**
+ * 
+ */
+void receiveCANTalonFX(TalonFX *fx, twai_frame_t *rx_frame, uint64_t *recv_buff)
+{
+    // TODO: Get rid of hardcoded ID
+    if (rx_frame->header.id != (0x2044761 | fx->id)) {
+        return;
+    }
+
+    fx->temperature = extractBits(*recv_buff, 40, 8);
+}
+
+/**
+ * @brief 
+ *
+ * @param handle    TWAI node handle.
+ * @param edata     TWAI "RX done" event data.
+ * @param fx        TalonFX structure.
+ */
+bool talonfx_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *fx)
+{
+    uint8_t recv_buff[8];
+    twai_frame_t rx_frame = {
+        .buffer = recv_buff,
+        .buffer_len = sizeof(recv_buff)};
+
+    if (ESP_OK == twai_node_receive_from_isr(handle, &rx_frame))
+    {
+        receiveCANTalonFX((TalonFX *)fx, &rx_frame, (uint64_t *)&recv_buff);
+    }
+    return false;
+}
+
+/**
+ * @brief Setups CAN for the Talon FX.
+ *
+ * @param fx    TalonFX structure.
+ */
+void canSetupTalonFX(TalonFX *fx)
+{
+    twai_onchip_node_config_t node_config = {
+        .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
+        .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
+        .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
+        .tx_queue_depth = 32,                // Transmit queue depth set to 32
+    };
+    twai_event_callbacks_t can_cbs = {
+        .on_rx_done = talonfx_twai_rx_cb,
+    };
+    ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
+    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, fx));
+    ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }

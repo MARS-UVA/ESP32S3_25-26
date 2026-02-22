@@ -33,3 +33,15 @@ extern twai_node_handle_t g_node_hdl;
 void canSetup(bool (*twai_rx_cb)(twai_node_handle_t, const twai_rx_done_event_data_t *, void *), void *rx_cb_data);
 void sendEn();
 void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len);
+
+/**
+ * @brief Extract a contiguous bit-field from a 64-bit value.
+ *
+ * Bits are numbered starting from bit 0 (least-significant bit).
+ *
+ * @param data      Source 64-bit value.
+ * @param startBit  Index of first bit to extract.
+ * @param bitLength Number of bits to extract.
+ * @return Extracted value, right-aligned.
+ */
+uint32_t extractBits(uint64_t data, uint8_t startBit, uint8_t bitLength);
