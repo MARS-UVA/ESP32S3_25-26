@@ -75,11 +75,10 @@ void setTargetFX(TalonFX *fx, int velocity) // setting PID velocity
  */
 void receiveCANTalonFX(TalonFX *fx, twai_frame_t *rx_frame, uint64_t *recv_buff)
 {
-    // TODO: Get rid of hardcoded ID
-    if (rx_frame->header.id != (0x2044761 | fx->id)) {
+    if (rx_frame->header.id != (0x2044740 | fx->id)) {
         return;
-    }
-
+    } 
+// 0x2044761 | fx->id
     fx->temperature = extractBits(*recv_buff, 40, 8);
 }
 
