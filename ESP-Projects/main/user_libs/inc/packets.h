@@ -1,5 +1,4 @@
-#ifndef PACKETS_H
-#define PACKETS_H
+#pragma once
 
 #include "utils.h"
 
@@ -30,5 +29,3 @@ typedef struct __attribute__((packed))
     float left_actuator;
     float right_actuator;
 } CurrVoltPacket;
-
-#endif

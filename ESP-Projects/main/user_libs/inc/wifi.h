@@ -1,5 +1,4 @@
-#ifndef WIFI_H
-#define WIFI_H
+#pragma once
 
 #include "esp_wifi.h"
 #include "esp_netif.h"
@@ -12,4 +11,3 @@ void setupWifi(void);
 void print_IP(void);
 void sendWifiPacket(void *pvParameters);
 void udp_receive_task(void *pvParameters);
-#endif

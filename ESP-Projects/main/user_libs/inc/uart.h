@@ -1,5 +1,4 @@
-#ifndef POWERLIB_UART
-#define POWERLIB_UART
+#pragma once
 
 #include "driver/uart.h"
 #include "utils.h"
@@ -10,5 +9,3 @@
 void UART_setup();
 void UART_read(ControlPacket *packet);
 void UART_write(CurrVoltPacket *packet);
-
-#endif

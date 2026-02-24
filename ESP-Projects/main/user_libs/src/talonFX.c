@@ -2,9 +2,9 @@
  * @file talonFX.c
  * @brief Implements functions for controlling the Talon FX motor controller.
  * 
- * @author Diana Lin
- * @author Carlos Giron
- * @author Anthony Vu
+ * @author Diana Lin <xrc9wg@virginia.edu>
+ * @author Carlos Giron <rdb7fq@virginia.edu>
+ * @author Anthony Vu <anthonyvu@email.virginia.edu>
  * 
  * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
  * @version 1.0
@@ -13,6 +13,7 @@
 
 #include "talonFX.h"
 #include "can.h"
+#include "utils.h"
 
 /**
  * @brief Initializes a TalonFX structure with default values.
@@ -36,8 +37,7 @@ TalonFX talonFXInit(uint8_t n_id, uint8_t c_id)
     };
 }
 
-// FX CAN FUNCS
-void setFX(TalonFX *fx, float speed) // set duty cycle for speed
+void setFX(TalonFX *fx, float speed)
 {
     uint8_t buff[] = {0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
@@ -50,7 +50,7 @@ void setFX(TalonFX *fx, float speed) // set duty cycle for speed
     sendMsg(CAN_ID_SET_FX, fx->id, buff, 8);
 }
 
-void setTargetFX(TalonFX *fx, int velocity) // setting PID velocity
+void setTargetFX(TalonFX *fx, int velocity)
 {
     if (velocity >= 0)
     {
@@ -71,55 +71,47 @@ void setTargetFX(TalonFX *fx, int velocity) // setting PID velocity
 }
 
 /**
+ * @internal
+ * @brief Process an incoming CAN message containing Talon FX data and update the TalonFX structure accordingly.
  * 
+ * @param fx        Pointer to the TalonFX structure to update.
+ * @param rx_frame  Pointer to the received TWAI frame containing the CAN message data.
+ * @param recv_buff Pointer to the raw data buffer from the received CAN frame.
  */
-void receiveCANTalonFX(TalonFX *fx, twai_frame_t *rx_frame, uint64_t *recv_buff)
+static void receiveCANTalonFX(TalonFX *fx, const twai_frame_t *rx_frame, uint64_t *recv_buff)
 {
     if (rx_frame->header.id != (0x2044740 | fx->id)) {
         return;
     } 
-// 0x2044761 | fx->id
+
     fx->temperature = extractBits(*recv_buff, 40, 8);
 }
 
 /**
- * @brief 
- *
- * @param handle    TWAI node handle.
- * @param edata     TWAI "RX done" event data.
- * @param fx        TalonFX structure.
+ * @internal
+ * @brief CAN RX callback function for Talon FX messages. This function is called by the CAN driver when a message is received.
+ * It checks if the message is intended for the given TalonFX instance and updates its state accordingly.
+ * 
+ * @param context   Pointer to the TalonFX instance that should be updated based on the received CAN message.
+ * @param frame     Pointer to the received TWAI frame containing the CAN message data.
  */
-bool talonfx_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *fx)
+static void talonFXCanHandler(void *context, const twai_frame_t *frame)
 {
-    uint8_t recv_buff[8];
-    twai_frame_t rx_frame = {
-        .buffer = recv_buff,
-        .buffer_len = sizeof(recv_buff)};
-
-    if (ESP_OK == twai_node_receive_from_isr(handle, &rx_frame))
-    {
-        receiveCANTalonFX((TalonFX *)fx, &rx_frame, (uint64_t *)&recv_buff);
-    }
-    return false;
+    TalonFX *fx = (TalonFX *)context;
+    receiveCANTalonFX(fx, frame, (uint64_t *)frame->buffer);
 }
 
-/**
- * @brief Setups CAN for the Talon FX.
- *
- * @param fx    TalonFX structure.
+/*
+ * @internal
+ * @brief CAN RX context for Talon FX messages.
  */
-void canSetupTalonFX(TalonFX *fx)
+static can_rx_context_t talonfx_rx_ctx = {
+    .handler = talonFXCanHandler,
+    .context = NULL,
+};
+
+void talonFXCanSetup(TalonFX *fx)
 {
-    twai_onchip_node_config_t node_config = {
-        .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
-        .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
-        .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
-        .tx_queue_depth = 32,                // Transmit queue depth set to 32
-    };
-    twai_event_callbacks_t can_cbs = {
-        .on_rx_done = talonfx_twai_rx_cb,
-    };
-    ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, fx));
-    ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
+    talonfx_rx_ctx.context = fx;
+    canSetup(&talonfx_rx_ctx);
 }

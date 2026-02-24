@@ -1,5 +1,4 @@
-#ifndef POWERLIB_CONTROL
-#define POWERLIB_CONTROL
+#pragma once
 
 #include "can.h"
 #include "uart.h"
@@ -32,5 +31,3 @@
 extern QueueHandle_t uart_queue;
 void initializeTalons();
 void directControl(ControlPacket pkt);
-
-#endif

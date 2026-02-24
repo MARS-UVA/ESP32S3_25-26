@@ -1,9 +1,15 @@
 /*
- * util.c
- *
- *  Created on: Nov 2025
- *      Author: diana, carlos
+ * @file    util.c
+ * @brief   Utility functions for the ESP32
+ * 
+ * @author Diana Lin <xrc9wg@virginia.edu>
+ * @author Carlos Giron <rdb7fq@virginia.edu>
+ * @author Anthony Vu <anthonyvu@email.virginia.edu>
+ * @version 1.0
+ * @date    2025-11-01
+ * @copyright Copyright (c) 2025 Mechatronics and Robotics Society
  */
+
 #include "utils.h"
 
 // convert a float to an array of 4 bytes
@@ -54,4 +60,13 @@ void ledToggle(uint8_t gpio, bool *state)
 {
     gpio_set_level(gpio, *state);
     *state = !(*state);
+}
+
+uint32_t extractBits(uint64_t data, uint8_t startBit, uint8_t bitLength)
+{
+    if (bitLength == 0 || bitLength > 32 || startBit >= 64)
+        return 0;
+
+    uint64_t mask = (1ULL << bitLength) - 1ULL;
+    return (uint32_t)((data >> startBit) & mask);
 }

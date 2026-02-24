@@ -6,17 +6,19 @@
  * @author Cole Luba <meq2fg@virginia.edu>
  * @author Anthony Vu <hsh6ff@email.virginia.edu>
  * @author Aedan Stewart <aedan@email.virginia.edu>
- * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
- * @note Derivative work based on 'PDP.c' authored by Diana Lin.
+ * @note Derivative work based on 'PDP.c' authored by Diana Lin <xrc9wg@virginia.edu>.
  * @note Assisted by AI (GPT-5 & Gemini 3 Flash) for decoding logic and comments.
  * @version 1.1
  * @date 2026-02-09
+ * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
  */
 
 #include "pdh.h"
 #include "can.h"
+#include "utils.h"
 
 /**
+ * @internal
  * @brief Decode a PDH current-data CAN payload.
  *
  * Each payload contains up to 6 channels, each encoded as a 10-bit value.
@@ -26,7 +28,7 @@
  * @param out          Destination array for decoded channel values.
  * @param channelCount Number of channels to decode.
  */
-void decodePDHFrame(uint64_t payload,
+static void decodePDHFrame(uint64_t payload,
                     uint16_t *out,
                     int channelCount)
 {
@@ -64,14 +66,16 @@ double getInputVoltagePDH(PDH *pdh)
     return pdh->totalVoltage;
 }
 
+// TODO: Replace the if-else logic in the CAN RX callback with a more efficient dispatch mechanism
 /**
+ * @internal
  * @brief Process an incoming CAN message including current information.
  *
  * @param pdh   PDH structure.
  * @param msg   CAN Rx header.
  * @param data  Pointer to a 64-bit payload.
  */
-void receiveCurrentPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
+static void receiveCurrentPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 {
     // Match PDH device ID (upper bits of the extended ID)
     if ((msg->header.id & 0xFFFFF00) != 0x8051800)
@@ -112,13 +116,14 @@ void receiveCurrentPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 }
 
 /**
+ * @internal
  * @brief Process an incoming CAN message including voltage data.
  *
  * @param pdh   PDH structure.
  * @param msg   CAN Rx header.
  * @param data  Pointer to a 64-bit payload.
  */
-void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
+static void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 {
     // Match PDH device ID
     if ((msg->header.id) != (0x8051900 | pdh->identifier))
@@ -128,6 +133,7 @@ void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 }
 
 /**
+ * @internal
  * @brief Process an incoming CAN message intended for the PDH.
  *
  * Extended ID format:
@@ -138,12 +144,13 @@ void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
  * @param msg  CAN Rx header.
  * @param data Pointer to 64-bit payload.
  */
-void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
+static void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 {
     receiveVoltagePDH(pdh, msg, data);
     receiveCurrentPDH(pdh, msg, data);
 }
 
+// Replace this with abstracted version in can.c that takes a callback argument
 /**
  * @brief Handles CAN interrupts
  *
@@ -186,6 +193,7 @@ void canSetupPDH(PDH *pdh)
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 
+// TODO: Replace this with a function in talonFX.c and talonSRX.c
 /**
  * @brief Updates fxMotors and srxMotors structures with PDH current data
  *

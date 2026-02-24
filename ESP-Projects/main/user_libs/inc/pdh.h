@@ -11,8 +11,7 @@
  * @date 2026-02-09
  */
 
-#ifndef PDH_H
-#define PDH_H
+#pragma once
 
 #include <semaphore.h>
 #include "esp_twai.h"
@@ -87,5 +86,3 @@ void canSetupPDH(PDH *pdh);
 float getChannelCurrentPDH(PDH *pdh, uint8_t channelID);
 
 void current_update_task(PDH *pdh);
-
-#endif

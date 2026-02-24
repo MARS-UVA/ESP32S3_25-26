@@ -3,8 +3,8 @@
 
 void temperature_task()
 {
-    TalonFX motor = talonFXInit(27, 3);
-    canSetupTalonFX(&motor);
+    TalonFX motor = talonFXInit(0, 3);
+    talonFXCanSetup(&motor);
     while (1)
     {
         printf("Temperature:\t%d\n", motor.temperature);

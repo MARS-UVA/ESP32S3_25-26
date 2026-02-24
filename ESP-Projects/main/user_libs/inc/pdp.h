@@ -1,5 +1,4 @@
-#ifndef PDP_H
-#define PDP_H
+#pragma once
 
 #include "can.h"
 #include "control_startup.h"
@@ -53,5 +52,3 @@ bool pdp_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *
 void current_update_task(PDP *pdp);
 
 void canSetupPDP(PDP *pdp);
-
-#endif

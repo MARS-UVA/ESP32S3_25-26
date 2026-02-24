@@ -2,9 +2,9 @@
  * @file talonFX.h
  * @brief Header file for Talon FX motor controller functions.
  * 
- * @author Diana Lin
- * @author Carlos Giron
- * @author Anthony Vu
+ * @author Diana Lin <xrc9wg@virginia.edu>
+ * @author Carlos Giron <rdb7fq@virginia.edu>
+ * @author Anthony Vu <anthonyvu@email.virginia.edu>
  * 
  * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
  * @version 1.0
@@ -28,11 +28,34 @@ typedef struct
     int temperature;
 } TalonFX;
 
-// Inits
+/**
+ * @brief Initializes a TalonFX structure with default values.
+ * 
+ * @param n_id  CAN ID for the Talon FX (0-63).
+ * @param c_id  Channel number for current monitoring (0-23).
+ * @return Initialized TalonFX structure.
+ */
 TalonFX talonFXInit(uint8_t n_id, uint8_t c_id);
 
-// FX FUNCS
+/**
+ * @brief Set the duty cycle of the Talon FX motor controller.
+ * 
+ * @param fx    Pointer to the TalonFX structure representing the motor controller to control.
+ * @param speed Desired speed as a duty cycle (0.0 to 1.0
+ */
 void setFX(TalonFX *fx, float speed);
+
+/**
+ * @brief Set the target velocity for the Talon FX motor controller using PID control.
+ * 
+ * @param fx        Pointer to the TalonFX structure representing the motor controller to control.
+ * @param velocity  Desired velocity in encoder units per 100ms.
+ */
 void setTargetFX(TalonFX *fx, int velocity);
 
-void canSetupTalonFX(TalonFX *fx);
+/**
+ * @brief Set up CAN communication for the Talon FX motor controller, including registering the appropriate CAN RX handler.
+ * 
+ * @param fx    Pointer to the TalonFX structure representing the motor controller for which to set up CAN communication.
+ */
+void talonFXCanSetup(TalonFX *fx);
