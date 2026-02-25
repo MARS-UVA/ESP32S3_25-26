@@ -1,6 +1,6 @@
-# ESP32S3_25-26
+# ESP32_25-26
 
-Embedded applications running on the ESP32S3 for the 2025-2026 year.
+Embedded applications running on the ESP32 (ESP32C5 or ESP32 S3) for the 2025-2026 year.
 
 Each group should create a branch with the following naming convention: GroupX_StudentName
 Each group can have multiple branches if needed.
