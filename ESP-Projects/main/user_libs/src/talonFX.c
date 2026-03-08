@@ -22,7 +22,7 @@
  * @param c_id  Channel number for current monitoring (0-23).
  * @return Initialized TalonFX structure.
  */
-TalonFX talonFXInit(uint8_t n_id, uint8_t c_id)
+TalonFX talonFXInit(uint8_t n_id, uint8_t c_id, PDH *pdh)
 {
     return (TalonFX){
         .id = n_id,
@@ -31,9 +31,9 @@ TalonFX talonFXInit(uint8_t n_id, uint8_t c_id)
         .kI = 0.0f,
         .kD = 0.0f,
         .breakMode = false,
-        .channel = c_id,
-        .current = 0.0f,
         .temperature = 0,
+        .channel = c_id,
+        .pdh = pdh,
     };
 }
 
@@ -114,4 +114,9 @@ void talonFXCanSetup(TalonFX *fx)
 {
     talonfx_rx_ctx.context = fx;
     canSetup(&talonfx_rx_ctx);
+}
+
+float talonFXGetCurrent(TalonFX *fx)
+{
+    return getChannelCurrentPDH(fx->pdh, fx->channel);
 }

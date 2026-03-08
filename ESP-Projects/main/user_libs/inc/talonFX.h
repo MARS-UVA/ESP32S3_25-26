@@ -13,7 +13,9 @@
 
 #pragma once
 
-#include "can.h"
+#include <stdbool.h>
+
+#include "pdh.h"
 
 typedef struct
 {
@@ -23,9 +25,9 @@ typedef struct
     float kI;
     float kD;
     bool breakMode;
-    uint8_t channel;
-    float current;
     int temperature;
+    uint8_t channel;
+    PDH *pdh;
 } TalonFX;
 
 /**
@@ -35,7 +37,7 @@ typedef struct
  * @param c_id  Channel number for current monitoring (0-23).
  * @return Initialized TalonFX structure.
  */
-TalonFX talonFXInit(uint8_t n_id, uint8_t c_id);
+TalonFX talonFXInit(uint8_t n_id, uint8_t c_id, PDH *pdh);
 
 /**
  * @brief Set the duty cycle of the Talon FX motor controller.
@@ -59,3 +61,11 @@ void setTargetFX(TalonFX *fx, int velocity);
  * @param fx    Pointer to the TalonFX structure representing the motor controller for which to set up CAN communication.
  */
 void talonFXCanSetup(TalonFX *fx);
+
+/**
+ * @brief Get the current (in Amps) for the Talon FX motor controller by reading the appropriate channel from the PDH.
+ *
+ * @param fx TalonFX instance.
+ * @return Current in Amps.
+ */
+float talonFXGetCurrent(TalonFX *fx);

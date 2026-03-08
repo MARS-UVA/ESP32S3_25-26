@@ -8,7 +8,7 @@ PDH pdh;
 
 void motor_task()
 {
-    motor = talonFXInit(33, 3);
+    motor = talonFXInit(0, 3, NULL);
     while (1)
     {
         setFX(&motor, 0.1);
@@ -38,6 +38,6 @@ void current_task()
 void app_main()
 {
     canSetupPDH(&pdh);
-    // xTaskCreate(motor_task, "mtr", 4096, NULL, 8, NULL);
+    xTaskCreate(motor_task, "mtr", 4096, NULL, 8, NULL);
     xTaskCreate(current_task, "cur", 4096, NULL, 7, NULL);
 }

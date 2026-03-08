@@ -1,9 +1,12 @@
 #include "can.h"
 #include "talonFX.h"
+#include "pdh.h"
 
 void temperature_task()
 {
-    TalonFX motor = talonFXInit(0, 3);
+    PDH pdh;
+    PDHInit(&pdh, 62);
+    TalonFX motor = talonFXInit(0, 3, &pdh);
     talonFXCanSetup(&motor);
     while (1)
     {

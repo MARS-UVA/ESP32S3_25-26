@@ -13,6 +13,12 @@
  * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
  */
 
+#include <semaphore.h>
+#include <stdbool.h>
+#include <stdio.h>
+
+#include "esp_twai.h"
+#include "esp_twai_onchip.h"
 #include "pdh.h"
 #include "can.h"
 #include "utils.h"
@@ -61,7 +67,7 @@ float getChannelCurrentPDH(PDH *pdh, uint8_t channel)
  *
  * @param pdh   PDH structure.
  */
-double getInputVoltagePDH(PDH *pdh)
+float getInputVoltagePDH(PDH *pdh)
 {
     return pdh->totalVoltage;
 }
@@ -83,28 +89,23 @@ static void receiveCurrentPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 
     uint32_t channelGroup = (msg->header.id & PDH_CHANNEL_GROUP_MASK);
 
-    // SemaphoreHandle_t sem;
     uint16_t *current_arr_ptr;
 
     if (channelGroup == (PDH_GROUP_BASE_0_TO_5 | pdh->identifier))
     {
         current_arr_ptr = &(pdh->channelCurrents[0]);
-        // sem = pdh->sem_0_5;
     }
     else if (channelGroup == (PDH_GROUP_BASE_6_TO_11 | pdh->identifier))
     {
         current_arr_ptr = &(pdh->channelCurrents[6]);
-        // sem = pdh->sem_6_11;
     }
     else if (channelGroup == (PDH_GROUP_BASE_12_TO_17 | pdh->identifier))
     {
         current_arr_ptr = &(pdh->channelCurrents[12]);
-        // sem = pdh->sem_12_17;
     }
     else if (channelGroup == (PDH_GROUP_BASE_18_TO_24 | pdh->identifier))
     {
         current_arr_ptr = &(pdh->channelCurrents[18]);
-        // sem = pdh->sem_18_24;
     }
     else
     {
@@ -191,34 +192,6 @@ void canSetupPDH(PDH *pdh)
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
     ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, pdh));
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
-}
-
-// TODO: Replace this with a function in talonFX.c and talonSRX.c
-/**
- * @brief Updates fxMotors and srxMotors structures with PDH current data
- *
- * @param pdh   PDH structure.
- */
-void current_update_task(PDH *pdh)
-{
-
-    while (1)
-    {
-        for (uint8_t i = 0; i < 6; i++)
-        {
-            fxMotors[i]->current = getChannelCurrentPDH(pdh, fxMotors[i]->channel);
-            // fxMotors[i]->current = 1.0;
-            // vTaskDelay(1);
-        }
-        for (uint8_t i = 0; i < 2; i++)
-        {
-            srxMotors[i]->current = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
-            // srxMotors[i]->current = 2.0;
-            // vTaskDelay(1);
-        }
-        vTaskDelay(1000);
-        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
-    }
 }
 
 /**

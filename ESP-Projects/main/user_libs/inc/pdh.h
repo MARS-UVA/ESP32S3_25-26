@@ -5,7 +5,7 @@
  * @author Carlos Giron <rdb7fq@virginia.edu>
  * @author Anthony Vu <hsh6ff@virginia.edu>
  * @copyright Copyright (c) 2026 Mechatronics and Robotics Society
- * @note Derivative work based on 'PDH.h' authored by Diana Lin.
+ * @note Derivative work based on 'PDH.h' authored by Diana Lin <xrc9wg@virginia.edu>.
  * @note Assisted by AI (GPT-5 & Gemini 3 Flash) for decoding logic and comments.
  * @version 1.1
  * @date 2026-02-09
@@ -13,14 +13,7 @@
 
 #pragma once
 
-#include <semaphore.h>
-#include "esp_twai.h"
-#include "esp_twai_onchip.h"
 #include <stdint.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include "can.h"
-#include "control_startup.h"
 
 // CAN ID Definitions
 
@@ -33,7 +26,7 @@
 #define PDH_GROUP_BASE_12_TO_17 0x80
 #define PDH_GROUP_BASE_18_TO_24 0xC0
 
-// Each PDH current channel is encoded as a 10-bit value
+// Bits allocated for each channel in the current data frames
 #define PDH_BITS_PER_CHANNEL 10
 #define PDH_CHANNEL_GAP_BITS 2
 
@@ -49,31 +42,31 @@
 typedef struct
 {
     int identifier;
-
     uint16_t channelCurrents[25];
-
     double totalVoltage;
-
-    // SemaphoreHandle_t sem_0_5;
-    // SemaphoreHandle_t sem_6_11;
-    // SemaphoreHandle_t sem_12_17;
-    // SemaphoreHandle_t sem_18_24;
-
-    // StaticSemaphore_t _buf_0_5;
-    // StaticSemaphore_t _buf_6_11;
-    // StaticSemaphore_t _buf_12_17;
-    // StaticSemaphore_t _buf_18_24;
 } PDH;
 
-extern TalonFX *fxMotors[];
-extern TalonSRX *srxMotors[];
-
-// initiate PDP struct
+/**
+ * @brief Initialize the PDH structure.
+ *
+ * @param pdh       PDH instance.
+ * @param identifier Unique identifier for the PDH.
+ */
 void PDHInit(PDH *pdh, int identifier);
 
-double getInputVoltagePDH(PDH *pdh);
+/**
+ * @brief Get the input voltage (in Volts) for the PDH.
+ *
+ * @param pdh PDH instance.
+ * @return Input voltage in Volts.
+ */
+float getInputVoltagePDH(PDH *pdh);
 
-// initialize CAN to interpret packets into the PDH struct
+/**
+ * @brief Setups CAN communication for the PDH, including registering the appropriate CAN RX handler.
+ *
+ * @param pdh   PDH structure.
+ */
 void canSetupPDH(PDH *pdh);
 
 /**
@@ -84,5 +77,3 @@ void canSetupPDH(PDH *pdh);
  * @return Channel current in Amps, or 0.0f if unsupported.
  */
 float getChannelCurrentPDH(PDH *pdh, uint8_t channelID);
-
-void current_update_task(PDH *pdh);
