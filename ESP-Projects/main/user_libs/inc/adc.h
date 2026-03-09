@@ -1,14 +1,8 @@
-#ifndef ADC_H
-#define ADC_H
+#pragma once
 
-#include <string.h>
-#include <stdio.h>
-#include "sdkconfig.h"
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
 #include "esp_adc/adc_continuous.h"
+#include <driver/adc.h>
+#include "utils.h"
 
 typedef struct pot
 {
@@ -30,5 +24,3 @@ void readPot();
 // void calibrateYourMom(Pot *leftPot, Pot *rightPot);
 
 void PotDeInit(Pot *pot);
-
-#endif

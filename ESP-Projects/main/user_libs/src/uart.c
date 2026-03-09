@@ -1,7 +1,7 @@
 #include "uart.h"
 
+extern QueueHandle_t control_queue;
 /* --------------------- Functions ------------------ */
-QueueHandle_t uart_queue; // queue stores the serial packet values
 
 void UART_setup()
 {
@@ -34,12 +34,12 @@ void UART_setup()
     uart_driver_install(UART_NUM_1, 1024 * 2, 0, 0, NULL, 0);
     uart_param_config(UART_NUM_1, &uart_config);
     uart_set_pin(UART_NUM_1, 43, 44, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    uart_queue = xQueueCreate(1, sizeof(SerialPacket));
+    control_queue = xQueueCreate(1, sizeof(SerialPacket));
 }
 
 void UART_read(SerialPacket *packet)
 {
-    const uint8_t packetLength = sizeof(SerialPacket) - 1;  // expected packet length (1 header plus 1 byte for each motor/actuator)
+    const uint8_t packetLength = sizeof(SerialPacket) - 1; // expected packet length (1 header plus 1 byte for each motor/actuator)
 
     packet->header = 0; // Reset packet header
     uart_read_bytes(
@@ -62,22 +62,4 @@ void UART_write(OutPacket *packet) // writes a single packet to Jetson on UART
     const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(OutPacket));
     // char *test_str = "This is a test string.\n";
     // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
-}
-
-void UART_rx_task()
-{
-    SerialPacket pkt = {1, 0, 0, 0, 0, 0, 0, 0};
-
-    while (1)
-    {
-        UART_read(&pkt);
-        if (pkt.invalid == 0)
-        {
-            // OutPacket packet = {pkt.invalid, pkt.header, pkt.top_left_wheel, pkt.back_left_wheel, pkt.top_right_wheel, pkt.back_right_wheel, pkt.drum, pkt.drum, pkt.actuator, pkt.actuator};
-            // UART_write(&packet);
-            xQueueOverwrite(uart_queue, &pkt);
-            pkt.invalid = 1;    // Mark invalid so packet is not reused
-        }
-        vTaskDelay(1);
-    }
 }

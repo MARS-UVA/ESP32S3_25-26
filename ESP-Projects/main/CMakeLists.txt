@@ -1,3 +1,3 @@
-idf_component_register(SRCS "./test_code/can/pdh_currentvoltage_rtos_test.c" "./user_libs/can/can2.c" "./user_libs/utils/utils.c"  "./user_libs/can/pdh.c"
-                       INCLUDE_DIRS "." "./user_libs/can" "./user_libs/utils" "./user_libs/uart" "./user_libs/control" "./user_libs/wifi")
+idf_component_register(SRCS "./test_code/can/current_sensing_test_talonfx.c" "./user_libs/src/can.c" "./user_libs/src/talonFX.c" "./user_libs/src/pdh.c" "./user_libs/src/utils.c" 
+                       INCLUDE_DIRS "." "./user_libs/inc")
 

@@ -127,39 +127,6 @@ bool pdp_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *
     return false;
 }
 
-void current_update_task(PDP *pdp)
-{
-    int delaytime_ms = 1000;
-    while (1)
-    {
-        int sem_wait_time_ms = 100;
-        requestCurrentReadingsPDP(pdp);
-        bool recvd = awaitCurrentReadingsPDP(pdp, sem_wait_time_ms);
-
-        if (!recvd) {
-            vTaskDelay(delaytime_ms);
-            continue;
-        }
-
-        for (uint8_t i = 0; i < 6; i++)
-        {
-            // requestCurrentReadingsPDP();
-            fxMotors[i]->current = getChannelCurrentPDP(pdp, fxMotors[i]->channel);
-            // fxMotors[i]->current = 1.0;
-            // vTaskDelay(1);
-        }
-        for (uint8_t i = 0; i < 2; i++)
-        {
-            // requestCurrentReadingsPDP();
-            srxMotors[i]->current = getChannelCurrentPDP(pdp, srxMotors[i]->channel);
-            // srxMotors[i]->current = 2.0;
-            // vTaskDelay(1);
-        }
-        vTaskDelay(delaytime_ms);
-        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
-    }
-}
-
 // initiate PDP struct
 void PDPInit(PDP *pdp, int identifier)
 {
