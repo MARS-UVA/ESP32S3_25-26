@@ -30,4 +30,4 @@
 
 extern QueueHandle_t uart_queue;
 void initializeTalons();
-void directControl(ControlPacket pkt);
+void directControl(ControlPacket_OneRobot pkt);
