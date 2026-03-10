@@ -29,7 +29,7 @@
 #define BACK_ACTUATOR_CHANNEL_ID 14
 
 extern QueueHandle_t uart_queue;
-void initializeTalons();
+void initializeTalons(PDH *pdh);
 void directControl(ControlPacket_OneRobot pkt);
 
 #endif

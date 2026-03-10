@@ -1,8 +1,9 @@
-#include "marsRTOS.h"
+#include "packets.h"
+#include "uart.h"
 
 void UART_rx_task()
 {
-    ControlPacket pkt = {1, 0, 0, 0, 0, 0, 0, 0};
+    ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0};
 
     while (1)
     {
@@ -20,7 +21,7 @@ void UART_rx_task()
 
 void UART_tx_task() //
 {
-    CurrVoltPacket packet = {0, 1, 0, 1, 0, 0, 1, 0, 0, 0};
+    CurrVoltPacket_OneRobot packet = {0, 1, 0, 1, 0, 0, 1, 0, 0, 0};
 
     while (1)
     {
