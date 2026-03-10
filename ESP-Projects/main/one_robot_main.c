@@ -8,6 +8,11 @@
 #include "OneRobot.h"
 #include "tasks.h"
 
+
+can_rx_context_t can;
+PDP pdp;
+
+
 TaskHandle_t current_update_handle = NULL;
 TaskHandle_t control_can_handle = NULL;
 TaskHandle_t uart_rx_handle = NULL;
@@ -17,8 +22,8 @@ void app_main()
 {
     initializeTalons();
     UART_setup();
-    canSetup();
-    PDPInit(62);
+    canSetup(can);
+    PDPInit(pdp, 62);
 
     vTaskDelay(50);
 
