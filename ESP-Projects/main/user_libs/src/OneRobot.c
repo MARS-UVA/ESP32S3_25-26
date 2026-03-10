@@ -4,14 +4,14 @@ TalonFX frontLeft;
 TalonFX backLeft;
 TalonFX frontRight;
 TalonFX backRight;
-TalonFX bucketDrumRight;
-TalonFX bucketDrumLeft;
+TalonFX backBucketDrum;
+TalonFX frontBucketDrum;
 
-TalonSRX leftActuator;
-TalonSRX rightActuator;
+TalonSRX frontActuator;
+TalonSRX backActuator;
 
-TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &bucketDrumLeft, &bucketDrumRight};
-TalonSRX *srxMotors[] = {&leftActuator, &rightActuator};
+TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &bucketDrumFront, &bucketDrumBack};
+TalonSRX *srxMotors[] = {&frontActuator, &backActuator};
 
 // Initialize Talon "objects"
 void initializeTalons()
@@ -21,20 +21,20 @@ void initializeTalons()
     frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID);
     backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID);
 
-    // bucketDrumRight = talonFXInit(BUCKET_DRUM_RIGHT_ID, BUCKET_DRUM_RIGHT_CHANNEL_ID);
-    // bucketDrumLeft = talonFXInit(BUCKET_DRUM_LEFT_ID, BUCKET_DRUM_LEFT_CHANNEL_ID);
+    backBucketDrum = talonFXInit(BACK_BUCKET_DRUM_ID, BACK_BUCKET_DRUM_CHANNEL_ID);
+    frontBucketDrum = talonFXInit(FRONT_BUCKET_DRUM_ID, FRONT_BUCKET_DRUM_CHANNEL_ID);
 
-    // leftActuator = talonSRXInit(LEFT_ACTUATOR_ID, LEFT_ACTUATOR_CHANNEL_ID, false);
-    // rightActuator = talonSRXInit(RIGHT_ACTUATOR_ID, RIGHT_ACTUATOR_CHANNEL_ID, true);
+    frontActuator = talonSRXInit(FRONT_ACTUATOR_ID, FRONT_ACTUATOR_CHANNEL_ID, false);
+    backActuator = talonSRXInit(BACK_ACTUATOR_ID, BACK_ACTUATOR_CHANNEL_ID, true);
 }
 
-void directControl(ControlPacket pkt)
+void directControl(ControlPacket_OneRobot pkt)
 {
-    int8_t leftSpeed = pkt.top_left_wheel;
+    int8_t leftSpeed = pkt.front_left_wheel;
     setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
     setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
-    int8_t rightSpeed = pkt.top_right_wheel;
+    int8_t rightSpeed = pkt.front_right_wheel;
     setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
 }

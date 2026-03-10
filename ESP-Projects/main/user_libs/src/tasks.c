@@ -43,10 +43,10 @@ void UART_tx_task() //
     }
 }
 
-void control_can_task()
+void one_robot_control_can_task()
 {
-    ControlPacket motor_state = {0, 0x00, 0x9F, 0x7F, 0x9F, 0x7F, 0x7F, 0x7F};
-    ControlPacket new_data;
+    ControlPacket_OneRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    ControlPacket_OneRobot new_data;
 
     while (1)
     {
