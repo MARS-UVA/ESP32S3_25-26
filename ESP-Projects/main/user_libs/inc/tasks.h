@@ -15,10 +15,12 @@
 #include "wifi.h"
 #include "talonFX.h"
 #include "talonSRX.h"
-#include "pdp.h"
+#include "pdh.h"
+
 
 extern QueueHandle_t control_queue; // queue stores the control packet values
 
+void current_update_task(PDH *pdh);
 void UART_rx_task();
 void UART_tx_task();
 void one_robot_control_can_task();
