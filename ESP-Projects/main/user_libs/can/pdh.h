@@ -20,7 +20,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "can2.h"
+#include "can.h"
+#include "talonFX.h"
+#include "talonSRX.h"
 #include "control_startup.h"
 
 // CAN ID Definitions

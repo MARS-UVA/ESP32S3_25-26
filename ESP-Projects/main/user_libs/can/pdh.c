@@ -14,9 +14,8 @@
  */
 
 #include "utils.h"
-#include "can2.h"
-#include "pdh.h"
-#include "control_startup.h"
+#include "can.h"
+#include <pdh.h>
 
 /**
  * @brief Extract a contiguous bit-field from a 64-bit value.
@@ -216,27 +215,7 @@ void canSetupPDH(PDH *pdh)
  * 
  * @param pdh   PDH structure.
  */
-void current_update_task(PDH *pdh)
-{
 
-    while (1)
-    {
-        for (uint8_t i = 0; i < 6; i++)
-        {
-            fxMotors[i]->current = getChannelCurrentPDH(pdh, fxMotors[i]->channel);
-            // fxMotors[i]->current = 1.0;
-            // vTaskDelay(1);
-        }
-        for (uint8_t i = 0; i < 2; i++)
-        {
-            srxMotors[i]->current = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
-            // srxMotors[i]->current = 2.0;
-            // vTaskDelay(1);
-        }
-        vTaskDelay(1000);
-        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
-    }
-}
 
 /**
  * @brief Initalizes PDP structure.

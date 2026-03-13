@@ -24,14 +24,14 @@ void app_main()
 {
     UART_setup();
     canSetup(&can);
-    PDPInit(&pdp, 62);
+    //PDPInit(&pdp, 62);
     PDHInit(&pdh, 63);
     initializeTalons(&pdh);
 
     vTaskDelay(50);
 
-    xTaskCreate((void *)(current_update_task), "current_update", 4096, NULL, 8, &current_update_handle);
+    xTaskCreate((void *)(current_update_task), "current_update", 4096, &pdh, 8, &current_update_handle);
     xTaskCreate((void *)(one_robot_control_can_task), "uart_can", 4096, NULL, 8, &control_can_handle);
     xTaskCreate((void *)(UART_rx_task), "uart_rx", 4096, NULL, 7, &uart_rx_handle);
-    xTaskCreate(UART_tx_task, "uart_tx", 4096, NULL, 9, &uart_tx_handle);
+    xTaskCreate((void *)(UART_tx_task), "uart_tx", 4096, NULL, 9, &uart_tx_handle);
 }

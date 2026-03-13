@@ -1,9 +1,13 @@
-#include "packets.h"
 #include "uart.h"
+#include "pdh.h"
+#include "utils.h"
+#include "can.h"
+#include "tasks.h"
+#include "OneRobot.h"
 
 void UART_rx_task()
 {
-    ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0};
+    ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     while (1)
     {
@@ -19,25 +23,23 @@ void UART_rx_task()
     }
 }
 
-void UART_tx_task() //
+void UART_tx_task(PDH *pdh) //
 {
-    CurrVoltPacket_OneRobot packet = {0, 1, 0, 1, 0, 0, 1, 0, 0, 0};
+    CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
 
     while (1)
     {
-        /*packet.invalid = 0;
-        packet.header = 0x0;
+        packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
+        packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
+        packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
+        packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
+        packet.front_drum = getChannelCurrentPDH(pdh, fxMotors[4]->channel);
+        packet.back_drum = getChannelCurrentPDH(pdh, fxMotors[5]->channel);
 
-        packet.top_left_wheel = fxMotors[0]->current;
-        packet.back_left_wheel = fxMotors[1]->current;
-        packet.top_right_wheel = fxMotors[2]->current;
-        packet.back_right_wheel = fxMotors[3]->current;
-        packet.bucket_left = fxMotors[4]->current;
-        packet.bucket_right = fxMotors[5]->current;
+        packet.front_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
+        packet.back_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
 
-        packet.left_actuator = srxMotors[0]->current;
-        packet.right_actuator = srxMotors[1]->current;
-        */
+        packet.main_battery = (float)(getInputVoltagePDH(pdh));
 
         UART_write(&packet);
         vTaskDelay(100);
@@ -60,6 +62,30 @@ void one_robot_control_can_task()
     }
 }
 
+void current_update_task(PDH *pdh)
+{
+
+    while (1)
+    {
+        for (uint8_t i = 0; i < 6; i++)
+        {
+            pdh->channelCurrents[i] = getChannelCurrentPDH(pdh, fxMotors[i]->channel);
+            // fxMotors[i]->current = 1.0;
+            // vTaskDelay(1);
+        }
+        for (uint8_t i = 0; i < 2; i++)
+        {
+            pdh->channelCurrents[i + 6] = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
+            // srxMotors[i]->current = 2.0;
+            // vTaskDelay(1);
+        }
+        vTaskDelay(1000);
+        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
+    }
+}
+
+// OLD CURRENT UPDATE TASK USING PDP, NEW ONE IN PDH.C
+/**
 void current_update_task(PDP *pdp)
 {
     int delaytime_ms = 1000;
@@ -93,3 +119,4 @@ void current_update_task(PDP *pdp)
         // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
     }
 }
+    **/
