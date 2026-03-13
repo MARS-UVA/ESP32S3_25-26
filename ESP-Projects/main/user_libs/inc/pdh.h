@@ -14,7 +14,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "control_startup.h"
+
 // CAN ID Definitions
 
 // Mask for the lower nibble selecting which channel group is present
