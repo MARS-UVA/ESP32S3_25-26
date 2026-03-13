@@ -1,5 +1,4 @@
 #include "utils.h"
-#include "can2.h"
 #include "pdp.h"
 #include "control_startup.h"
 

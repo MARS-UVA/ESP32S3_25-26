@@ -33,6 +33,7 @@ TalonFX talonFXInit(uint8_t n_id, uint8_t c_id, PDH *pdh)
         .breakMode = false,
         .temperature = 0,
         .channel = c_id,
+        .current = 0.0f,
         .pdh = pdh,
     };
 }

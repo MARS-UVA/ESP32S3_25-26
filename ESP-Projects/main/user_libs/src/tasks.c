@@ -1,9 +1,9 @@
-#include "packets.h"
-#include "uart.h"
+#include "tasks.h"
+
 
 void UART_rx_task()
 {
-    ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0};
+    ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     while (1)
     {

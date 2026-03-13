@@ -17,7 +17,7 @@
 #include "talonSRX.h"
 #include "pdp.h"
 
-QueueHandle_t control_queue; // queue stores the control packet values
+extern QueueHandle_t control_queue; // queue stores the control packet values
 
 void UART_rx_task();
 void UART_tx_task();

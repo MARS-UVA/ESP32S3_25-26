@@ -27,6 +27,7 @@ typedef struct
     bool breakMode;
     int temperature;
     uint8_t channel;
+    float current;
     PDH *pdh;
 } TalonFX;
 
