@@ -9,8 +9,8 @@
 #define BACK_RIGHT_WHEEL_ID 13
 #define BUCKET_DRUM_RIGHT_ID 25
 #define BUCKET_DRUM_LEFT_ID 60
-#define LEFT_ACTUATOR_ID 3
-#define RIGHT_ACTUATOR_ID 4
+#define LEFT_ACTUATOR_ID 14
+#define RIGHT_ACTUATOR_ID 15
 
 // Define channel IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_CHANNEL_ID 12
@@ -19,8 +19,11 @@
 #define BACK_RIGHT_WHEEL_CHANNEL_ID 14
 #define BUCKET_DRUM_RIGHT_CHANNEL_ID 4
 #define BUCKET_DRUM_LEFT_CHANNEL_ID 2
-#define LEFT_ACTUATOR_CHANNEL_ID 10
+#define LEFT_ACTUATOR_CHANNEL_ID 1
 #define RIGHT_ACTUATOR_CHANNEL_ID 9
+
+#define HALL_PIN_LEFT   24
+#define HALL_PIN_RIGHT  23
 
 TalonFX frontLeft;
 TalonFX backLeft;
@@ -67,8 +70,10 @@ void initializeTalons()
     leftActuatorPID = initPID(2, 0.15, 0.001);
     rightActuatorPID = initPID(2, 0.15, 0.001);
 
-    leftActuator = initActuator(&leftActuatorSRX, &leftActuatorPot, &leftActuatorPID);
-    rightActuator = initActuator(&rightActuatorSRX, &rightActuatorPot, &rightActuatorPID);
+    hallEffectInit(HALL_PIN_LEFT, HALL_PIN_RIGHT);
+
+    leftActuator = initActuator(&leftActuatorSRX, &leftActuatorPot, &leftActuatorPID, &leftDirection);
+    rightActuator = initActuator(&rightActuatorSRX, &rightActuatorPot, &rightActuatorPID, &rightDirection);
 }
 
 void directControl(SerialPacket pkt)
@@ -99,16 +104,34 @@ void evaluteActuators() {
     while (1) {
         readPot(&leftActuatorPot);
         readPot(&rightActuatorPot);
-        moveSyncActuatorsToPosition(&leftActuator, &rightActuator, 0.75);
-        vTaskDelay(5);
+        //moveSyncActuatorsToPosition(&leftActuator, &rightActuator, 0.75);
+        //vTaskDelay(5);
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
 void moveActuators() {
     while (1) {
-        setSRX(rightActuator.controller, rightActuator.velocity);
-        setSRX(leftActuator.controller, leftActuator.velocity);
-        //vTaskDelay(1);
+        //setSRX(rightActuator.controller, rightActuator.velocity);
+        //setSRX(leftActuator.controller, leftActuator.velocity);
+        
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        *leftActuator.direction = 1;
+        *rightActuator.direction = 1;
+        for (int i = 0; i < 2.5*100; i += 1) {
+            setSRX(leftActuator.controller, -1);
+            setSRX(rightActuator.controller, -1);
+            vTaskDelay(pdMS_TO_TICKS(1));
+        } 
+
+        vTaskDelay(pdMS_TO_TICKS(3000));
+        *leftActuator.direction = -1;
+        *rightActuator.direction = -1;
+        for (int i = 0; i < 2.5*100; i += 1) {
+            setSRX(leftActuator.controller, 1);
+            setSRX(rightActuator.controller, 1);
+            vTaskDelay(pdMS_TO_TICKS(1));
+        } 
     }
 }
 
@@ -117,8 +140,12 @@ void printActuatorPositions()
 {
     while (1)
     {
-        double leftPos = leftActuator.pot->pos;
-        double rightPos = rightActuator.pot->pos;
+        //double leftPos = leftActuator.pot->pos * 4096;
+        //double rightPos = rightActuator.pot->pos * 4096;
+
+        double leftPos = leftActuator.prevPosition;
+        double rightPos = rightActuator.prevPosition;
+
         printf("%ld\t%f\t%f\n", xTaskGetTickCount(), leftPos, rightPos);
         // printf("Left Actuator Target: %f, Right Actuator Target: %f\n", leftActuator.prevVelocity, rightActuator.prevVelocity);
         vTaskDelay(pdMS_TO_TICKS(100));

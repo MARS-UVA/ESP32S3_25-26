@@ -11,12 +11,24 @@ TaskHandle_t readTaskHandle = NULL;
 extern Pot leftActuatorPot;
 extern Pot rightActuatorPot;
 
+extern Actuator leftActuator;
+extern Actuator rightActuator;
+
 void readPots()
 {
     while (1)
     {
         readPot(&leftActuatorPot);
         readPot(&rightActuatorPot);
+    }
+}
+
+void readHallEffect()
+{
+    while (1)
+    {
+        calculatePulse(&leftActuator, &rightActuator);
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
@@ -29,9 +41,11 @@ void app_main()
     //packet.invalid = 1;
 
     // xTaskCreate(readPots, "readPot", 4096, NULL, 8, NULL);
-    // xTaskCreate(printActuatorPositions, "printActuatorPositions", 4096, NULL, 10, NULL);
+    xTaskCreate(printActuatorPositions, "printActuatorPositions", 4096, NULL, 10, NULL);
+    xTaskCreate(readHallEffect, "readHallEffect", 4096, NULL, 9, NULL);
     xTaskCreate(moveActuators, "moveActuators",  4096, NULL, 8, NULL);
-    xTaskCreate(evaluteActuators, "evaluateActuators",  4096, NULL, 9, NULL);
+    //xTaskCreate(printPulse, "printPulse",  4096, NULL, 8, NULL);
+    //xTaskCreate(evaluteActuators, "evaluateActuators",  4096, NULL, 9, NULL);
 
     return;
 }

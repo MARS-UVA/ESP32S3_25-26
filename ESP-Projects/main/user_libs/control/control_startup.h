@@ -4,8 +4,12 @@
 #include "can2.h"
 #include "uart.h"
 #include "wifi.h"
+#include "actuators.h"
 
 extern QueueHandle_t uart_queue;
+extern int leftDirection;
+extern int rightDirection;
+
 void initializeTalons();
 
 void directControl(SerialPacket pkt);

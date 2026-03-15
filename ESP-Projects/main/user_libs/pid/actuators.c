@@ -2,8 +2,18 @@
 #include "pid.h"
 #include "esp_timer.h"
 #include <math.h>
+#include "driver/gpio.h"
+#include "utils.h"
 
-Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid)
+static double pulse_mm = 22.5;
+
+volatile int pulseCountLeft = 0;
+volatile int pulseCountRight = 0;
+
+int leftDirection;
+int rightDirection;
+
+Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid, int *direction)
 {
     return (Actuator){
         .controller = talonSrx,
@@ -12,8 +22,40 @@ Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid)
         .prevPosition = 0,
         .prevVelocity = 0,
         .lastTime = -1,
-        .velocity = 0};
+        .velocity = 0,
+        .direction = direction};
 };
+
+static void IRAM_ATTR gpio_isr_handler_left(void* arg) {
+    pulseCountLeft+=leftDirection;
+}
+
+static void IRAM_ATTR gpio_isr_handler_right(void* arg) {
+    pulseCountRight+=rightDirection;
+}
+
+void hallEffectInit(int pinLeft, int pinRight) 
+{
+    gpio_config_t io_conf_a = {
+        .intr_type = GPIO_INTR_POSEDGE,    // <--- Trigger on Rising Edge
+        .mode = GPIO_MODE_INPUT,
+        .pin_bit_mask = (1ULL << pinLeft),    
+        .pull_up_en = 1
+    };
+    gpio_config(&io_conf_a);
+
+    gpio_config_t io_conf_b = {
+        .intr_type = GPIO_INTR_POSEDGE, 
+        .mode = GPIO_MODE_INPUT,
+        .pin_bit_mask = (1ULL << pinRight),
+        .pull_up_en = GPIO_PULLUP_ENABLE
+    };
+    gpio_config(&io_conf_b);
+
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(pinLeft, gpio_isr_handler_left, (void*) pinLeft);
+    gpio_isr_handler_add(pinRight, gpio_isr_handler_right, (void*) pinRight);
+}
 
 void moveSyncActuatorsToPosition(Actuator *leftActuator, Actuator *rightActuator, double targetPosition)
 {
@@ -102,4 +144,12 @@ void moveSyncActuatorsToVelocity(Actuator *leftActuator, Actuator *rightActuator
     rightActuator->prevVelocity = rightVelocityOutput;
     leftActuator->lastTime = currentTime;
     rightActuator->lastTime = currentTime;
+}
+
+void calculatePulse(Actuator *leftActuator, Actuator *rightActuator) {
+    pulseCountLeft = fmax(fmin(pulseCountLeft, (int)(pulse_mm*254)), 0);
+    leftActuator->prevPosition = map((int)(pulse_mm*254), 0, pulseCountLeft);
+        
+    pulseCountRight = fmax(fmin(pulseCountRight, (int)(pulse_mm*254)), 0);
+    rightActuator->prevPosition = map((int)(pulse_mm*254), 0, pulseCountRight);
 }
