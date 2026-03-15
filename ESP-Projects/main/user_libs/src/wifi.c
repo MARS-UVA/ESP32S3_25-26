@@ -42,7 +42,7 @@ void udp_receive_task(void *pvParameters)
     }
     ESP_LOGI(TAG, "Socket bound, port %d", PORT);
 
-    SerialPacket pkt[10] = {0};
+    SerialPacket pkt[7] = {0};
     while (1)
     {
         ESP_LOGI(TAG, "Waiting for data");
@@ -67,10 +67,7 @@ void udp_receive_task(void *pvParameters)
             pkt->back_left_wheel = RxBuffer[3];
             pkt->top_right_wheel = RxBuffer[4];
             pkt->back_right_wheel = RxBuffer[5];
-            pkt->bucket_ladder = RxBuffer[6];
-            pkt->conveyor_belt = RxBuffer[7];
-            pkt->left_track_actuator = RxBuffer[8];
-            pkt->right_track_actuator = RxBuffer[9];
+            pkt->actuator = RxBuffer[6];
             xQueueOverwrite(uart_queue, &pkt);
         }
     }

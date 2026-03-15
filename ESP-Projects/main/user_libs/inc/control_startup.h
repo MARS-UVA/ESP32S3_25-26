@@ -12,4 +12,4 @@
 
 extern QueueHandle_t uart_queue;
 //void initializeTalons(PDH *pdh);
-void directControl(ControlPacket_ExcavationRobot pkt);
+void directControl(ControlPacket_ConstructionRobot pkt);

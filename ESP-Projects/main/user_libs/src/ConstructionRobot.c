@@ -1,21 +1,18 @@
 #include "control_startup.h"
-#include "ExcavationRobot.h"
+#include "ConstructionRobot.h"
 
-//Excavation robot
+//Construction robot
 TalonFX frontLeft;
 TalonFX backLeft;
 TalonFX frontRight;
 TalonFX backRight;
-TalonFX bucketLadder;
-TalonFX conveyorBelt;
 
-TalonSRX leftTrackActuator;
-TalonSRX rightTrackActuator;
+TalonSRX actuator;
 
-TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &bucketLadder, &conveyorBelt};
-TalonSRX *srxMotors[] = {&leftTrackActuator, &rightTrackActuator};
+TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight};
+TalonSRX *srxMotors[] = {&actuator};
 
-// Initialize Excavation Talons "objects"
+// Initialize Construction Talons "objects"
 void initializeTalons(PDH *pdh)
 {
     frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID, pdh);
@@ -23,14 +20,10 @@ void initializeTalons(PDH *pdh)
     frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID, pdh);
     backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID, pdh);
 
-    bucketLadder = talonFXInit(BUCKET_LADDER_ID, BUCKET_LADDER_CHANNEL_ID, pdh);
-    conveyorBelt = talonFXInit(CONVEYOR_BELT_ID, CONVEYOR_BELT_CHANNEL_ID, pdh);
-
-    leftTrackActuator = talonSRXInit(LEFT_TRACK_ACTUATOR_ID, LEFT_TRACK_ACTUATOR_CHANNEL_ID, false);
-    rightTrackActuator = talonSRXInit(RIGHT_TRACK_ACTUATOR_ID, RIGHT_TRACK_ACTUATOR_CHANNEL_ID, true);
+    actuator = talonSRXInit(ACTUATOR_ID, ACTUATOR_CHANNEL_ID, false);
 }
 
-void directControl(ControlPacket_ExcavationRobot pkt)
+void directControl(ControlPacket_ConstructionRobot pkt)
 {
     int8_t leftSpeed = pkt.front_left_wheel;
     setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);

@@ -3,7 +3,7 @@
 
 void UART_rx_task()
 {
-    ControlPacket_ExcavationRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0};
+    ControlPacket_ConstructionRobot pkt = {1, 0, 0, 0, 0, 0, 0};
 
     while (1)
     {
@@ -21,7 +21,7 @@ void UART_rx_task()
 
 void UART_tx_task(PDH *pdh)
 {
-    CurrVoltPacket_ExcavationRobot packet = Init_CurrVolt_Excavation_Robot_Packet();
+    CurrVoltPacket_ConstructionRobot packet = Init_CurrVolt_Construction_Robot_Packet();
 
     while (1)
     {
@@ -29,23 +29,19 @@ void UART_tx_task(PDH *pdh)
         packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
         packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
         packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
-        packet.bucket_ladder = getChannelCurrentPDH(pdh, fxMotors[4]->channel);
-        packet.conveyor_belt = getChannelCurrentPDH(pdh, fxMotors[5]->channel);
-
-        packet.left_track_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
-        packet.right_track_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
+        
+        packet.actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
 
         packet.main_battery = (float)(getInputVoltagePDH(pdh));
-        //Add AUX later
         UART_write(&packet);
         vTaskDelay(100);
     }
 }
 
-void excavation_robot_control_can_task()
+void construction_robot_control_can_task()
 {
-    ControlPacket_ExcavationRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
-    ControlPacket_ExcavationRobot new_data;
+    ControlPacket_ConstructionRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    ControlPacket_ConstructionRobot new_data;
 
     while (1)
     {
