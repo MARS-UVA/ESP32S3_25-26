@@ -3,7 +3,7 @@
 
 void UART_rx_task()
 {
-    ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    ControlPacket_ExcavationRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0};
 
     while (1)
     {
@@ -21,7 +21,7 @@ void UART_rx_task()
 
 void UART_tx_task(PDH *pdh) //
 {
-    CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
+    CurrVoltPacket_ExcavationRobot packet = Init_CurrVolt_Excavation_Robot_Packet();
 
     while (1)
     {
@@ -29,23 +29,23 @@ void UART_tx_task(PDH *pdh) //
         packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
         packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
         packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
-        packet.front_drum = getChannelCurrentPDH(pdh, fxMotors[4]->channel);
-        packet.back_drum = getChannelCurrentPDH(pdh, fxMotors[5]->channel);
+        packet.bucket_ladder = getChannelCurrentPDH(pdh, fxMotors[4]->channel);
+        packet.conveyor_belt = getChannelCurrentPDH(pdh, fxMotors[5]->channel);
 
-        packet.front_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
-        packet.back_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
+        packet.left_track_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
+        packet.right_track_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
 
         packet.main_battery = (float)(getInputVoltagePDH(pdh));
-
+        //Add AUX later
         UART_write(&packet);
         vTaskDelay(100);
     }
 }
 
-void one_robot_control_can_task()
+void excavation_robot_control_can_task()
 {
-    ControlPacket_OneRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
-    ControlPacket_OneRobot new_data;
+    ControlPacket_ExcavationRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    ControlPacket_ExcavationRobot new_data;
 
     while (1)
     {
@@ -79,40 +79,3 @@ void current_update_task(PDH *pdh)
         // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
     }
 }
-
-// OLD CURRENT UPDATE TASK USING PDP, NEW ONE IN PDH.C
-/**
-void current_update_task(PDP *pdp)
-{
-    int delaytime_ms = 1000;
-    while (1)
-    {
-        int sem_wait_time_ms = 100;
-        requestCurrentReadingsPDP(pdp);
-        bool recvd = awaitCurrentReadingsPDP(pdp, sem_wait_time_ms);
-
-        if (!recvd)
-        {
-            vTaskDelay(delaytime_ms);
-            continue;
-        }
-
-        for (uint8_t i = 0; i < 6; i++)
-        {
-            // requestCurrentReadingsPDP();
-            fxMotors[i]->current = getChannelCurrentPDP(pdp, fxMotors[i]->channel);
-            // fxMotors[i]->current = 1.0;
-            // vTaskDelay(1);
-        }
-        for (uint8_t i = 0; i < 2; i++)
-        {
-            // requestCurrentReadingsPDP();
-            srxMotors[i]->current = getChannelCurrentPDP(pdp, srxMotors[i]->channel);
-            // srxMotors[i]->current = 2.0;
-            // vTaskDelay(1);
-        }
-        vTaskDelay(delaytime_ms);
-        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
-    }
-}
-    **/
