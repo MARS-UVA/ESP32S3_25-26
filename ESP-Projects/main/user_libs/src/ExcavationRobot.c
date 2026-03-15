@@ -30,7 +30,6 @@ void initializeTalons(PDH *pdh)
     rightTrackActuator = talonSRXInit(RIGHT_TRACK_ACTUATOR_ID, RIGHT_TRACK_ACTUATOR_CHANNEL_ID, true);
 }
 
-
 void directControl(ControlPacket_ExcavationRobot pkt)
 {
     int8_t leftSpeed = pkt.front_left_wheel;

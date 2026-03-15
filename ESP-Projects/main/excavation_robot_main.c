@@ -5,7 +5,7 @@
 #include "control_startup.h"
 #include "can.h"
 #include "pdp.h"
-#include "OneRobot.h"
+#include "ExcavationRobot.h"
 #include "tasks.h"
 #include "pdh.h"
 
@@ -31,7 +31,7 @@ void app_main()
     vTaskDelay(50);
 
     xTaskCreate((void *)(current_update_task), "current_update", 4096, &pdh, 8, &current_update_handle);
-    xTaskCreate((void *)(one_robot_control_can_task), "uart_can", 4096, NULL, 8, &control_can_handle);
+    xTaskCreate((void *)(excavation_robot_control_can_task), "uart_can", 4096, NULL, 8, &control_can_handle);
     xTaskCreate((void *)(UART_rx_task), "uart_rx", 4096, NULL, 7, &uart_rx_handle);
     xTaskCreate((void *)(UART_tx_task), "uart_tx", 4096, NULL, 9, &uart_tx_handle);
 }
