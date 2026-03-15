@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <uart.h>
 #include "control_startup.h"
-#include "can2.h"
 #include "pdp.h"
 #include "wifi.h"
 

@@ -19,7 +19,7 @@ void UART_rx_task()
     }
 }
 
-void UART_tx_task(PDH *pdh) //
+void UART_tx_task(PDH *pdh)
 {
     CurrVoltPacket_ExcavationRobot packet = Init_CurrVolt_Excavation_Robot_Packet();
 

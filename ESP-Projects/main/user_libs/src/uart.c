@@ -35,12 +35,12 @@ void UART_setup()
     uart_driver_install(UART_NUM_1, 1024 * 2, 0, 0, NULL, 0);
     uart_param_config(UART_NUM_1, &uart_config);
     uart_set_pin(UART_NUM_1, 43, 44, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    control_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
+    control_queue = xQueueCreate(1, sizeof(ControlPacket_ExcavationRobot));
 }
 
-void UART_read(ControlPacket_OneRobot *packet)
+void UART_read(ControlPacket_ExcavationRobot *packet)
 {
-    const uint8_t packetLength = sizeof(ControlPacket_OneRobot) - 1; // expected packet length (1 header plus 1 byte for each motor/actuator)
+    const uint8_t packetLength = sizeof(ControlPacket_ExcavationRobot) - 1; // expected packet length (1 header plus 1 byte for each motor/actuator)
 
     packet->header = 0; // Reset packet header
     uart_read_bytes(
@@ -57,10 +57,10 @@ void UART_read(ControlPacket_OneRobot *packet)
 }
 
 // change back to
-void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
+void UART_write(CurrVoltPacket_ExcavationRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
 {
     // char* cPacket = (char*)packet;
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(CurrVoltPacket_OneRobot));
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(CurrVoltPacket_ExcavationRobot));
     // char *test_str = "This is a test string.\n";
     // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
 }
