@@ -42,12 +42,17 @@ void UART_read(SerialPacket *packet)
     const uint8_t packetLength = sizeof(SerialPacket) - 1; // expected packet length (1 header plus 1 byte for each motor/actuator)
 
     packet->header = 0; // Reset packet header
-    uart_read_bytes(
+    int length = uart_read_bytes(
         UART_NUM_1,
         (char *)packet + 1,
         packetLength,
-        0 // this is timeout
+        100 // this is timeout
     );
+
+    if (length <= 0)
+    {
+        return;
+    }
 
     if (packet->header == 0xFF)
     {
