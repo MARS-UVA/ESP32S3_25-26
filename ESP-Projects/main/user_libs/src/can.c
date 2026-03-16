@@ -30,7 +30,7 @@ bool twaiRxCallback(twai_node_handle_t handle, const twai_rx_done_event_data_t *
     // If a frame was successfully received, call the handler with the context and the received frame
     if (twai_node_receive_from_isr(handle, &rx_frame) == ESP_OK)
     {
-        ctx->handler(ctx->context, &rx_frame);
+        ctx->handler(ctx->context, &rx_frame); //issue is located here
     }
 
     // Return false to indicate that the interrupt has been handled

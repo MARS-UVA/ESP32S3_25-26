@@ -1,5 +1,4 @@
-#ifndef I2C_H
-#define I2C_H
+#pragma once
 
 #include <stdio.h>
 #include <string.h>
@@ -54,5 +53,3 @@ esp_err_t _I2C_Write_Register_(i2c_master_dev_handle_t* handle, uint8_t reg_addr
 esp_err_t _I2C_Write_Read_Register_(i2c_master_dev_handle_t* handle, const uint8_t* wdata, size_t wlen, uint8_t* rdata, size_t rlen);
 esp_err_t _I2C_Write_Byte_(i2c_master_dev_handle_t* handle, const uint8_t *data);
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-#endif // I2C_H
