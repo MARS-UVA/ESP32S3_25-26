@@ -14,6 +14,16 @@ TalonSRX backActuator;
 TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &frontBucketDrum, &backBucketDrum};
 TalonSRX *srxMotors[] = {&frontActuator, &backActuator};
 
+static i2c_master_bus_handle_t aux_bus_handle;
+static const i2c_sensor_config_t INA219_PROFILE = {
+    .name = "INA219",
+    .address = INA219_SENSOR_ADDR,
+    .registers = (uint8_t[]) {INA219_REG_BUSVOLTAGE},
+    .register_count = 1
+};
+static i2c_sensor_t aux_voltage_sensor = { .config = &INA219_PROFILE };
+static float aux_battery_voltage = 0.0f;
+
 // Initialize Talon "objects"
 void initializeTalons(PDH *pdh)
 {
@@ -38,4 +48,25 @@ void directControl(ControlPacket_OneRobot pkt)
     int8_t rightSpeed = pkt.front_right_wheel;
     setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
+}
+
+void initAuxVoltageSensor(void)
+{
+    I2C_Create_Bus(&aux_bus_handle);
+    I2C_Add_Sensor(&aux_bus_handle, &aux_voltage_sensor);
+    aux_battery_voltage = 0.0f;
+}
+
+//readapt the functions responsible for current updating and return
+void updateAuxVoltage(void)
+{
+    uint8_t data[2];
+
+    I2C_Burst_Read_Register(&aux_voltage_sensor, 0, data, 2);
+    aux_battery_voltage = ((((uint16_t)(data[0] << 8) | (uint16_t)(data[1])) >> 3) / 250.0f);
+}
+
+float getAuxVoltage(void)
+{
+    return aux_battery_voltage;
 }

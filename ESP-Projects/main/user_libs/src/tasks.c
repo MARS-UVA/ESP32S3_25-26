@@ -36,6 +36,9 @@ void UART_tx_task(PDH *pdh) //
         packet.back_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
 
         packet.main_battery = (float)(getInputVoltagePDH(pdh));
+        
+        updateAuxVoltage();
+        packet.aux_battery = getAuxVoltage();
 
         UART_write(&packet);
         vTaskDelay(100);

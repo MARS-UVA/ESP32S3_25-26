@@ -25,5 +25,5 @@ extern TalonSRX *srxMotors[];
 
 void current_update_task(PDH *pdh);
 void UART_rx_task();
-void UART_tx_task();
+void UART_tx_task(PDH *pdh);
 void one_robot_control_can_task();

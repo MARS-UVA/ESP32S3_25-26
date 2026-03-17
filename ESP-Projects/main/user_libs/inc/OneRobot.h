@@ -3,9 +3,9 @@
 #include "can.h"
 #include "uart.h"
 #include "packets.h"
-
 #include "talonFX.h"
 #include "talonSRX.h"
+#include "i2c.h"
 
 // Define CAN IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_ID 33 // 38
@@ -27,6 +27,13 @@
 #define FRONT_ACTUATOR_CHANNEL_ID 15
 #define BACK_ACTUATOR_CHANNEL_ID 14
 
+// Define INA219
+#define INA219_SENSOR_ADDR      65
+#define INA219_REG_BUSVOLTAGE   0x02
+
 extern QueueHandle_t uart_queue;
 void initializeTalons(PDH *pdh);
 void directControl(ControlPacket_OneRobot pkt);
+void initAuxVoltageSensor(void);
+void updateAuxVoltage(void);
+float getAuxVoltage(void);

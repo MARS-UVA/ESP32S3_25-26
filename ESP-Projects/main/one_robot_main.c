@@ -24,6 +24,7 @@ void app_main()
     //canSetup(&can);
     PDHInit(&pdh, 62);
     initializeTalons(&pdh);
+    initAuxVoltageSensor();
 
     vTaskDelay(50);
 
