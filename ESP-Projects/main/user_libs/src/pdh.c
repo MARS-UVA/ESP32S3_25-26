@@ -2,10 +2,10 @@
  * @file PDH.c
  * @brief Interprets information from the Rev Power Distribution Hub (PDH).
  *
+ * @author Aedan Stewart <aedan@email.virginia.edu>
  * @author Carlos Giron <rdb7fq@virginia.edu>
  * @author Cole Luba <meq2fg@virginia.edu>
  * @author Anthony Vu <hsh6ff@email.virginia.edu>
- * @author Aedan Stewart <aedan@email.virginia.edu>
  * @note Derivative work based on 'PDP.c' authored by Diana Lin <xrc9wg@virginia.edu>.
  * @note Assisted by AI (GPT-5 & Gemini 3 Flash) for decoding logic and comments.
  * @version 1.1
