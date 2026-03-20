@@ -1,4 +1,4 @@
-#include "uart.c"
+#include "uart.h"
 #include "packets.h"
 
 void app_main()
@@ -16,7 +16,7 @@ void app_main()
         .main_battery = 0.25f,
         .aux_battery = 0.25f     
     };
-    UART_write(uint8_t *packet, sizeof(packet));
+    UART_write((uint8_t *) &packet, sizeof(packet));
 };
 
     /*
