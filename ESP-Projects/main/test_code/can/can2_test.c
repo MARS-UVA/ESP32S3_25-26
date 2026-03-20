@@ -24,7 +24,7 @@ void app_main()
 void app_main() {
     PDH pdh;
     PDHInit(&pdh, 62);
-    TalonFX motor = talonFXInit(38, 10, &pdh);
+    TalonFX motor = talonFXInit(28, 3, &pdh);
     canSetupPDH(&pdh);
     printf("setup done!\n");
 
