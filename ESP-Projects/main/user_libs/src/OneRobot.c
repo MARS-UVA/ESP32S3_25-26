@@ -25,15 +25,15 @@ static i2c_sensor_t aux_voltage_sensor = { .config = &INA219_PROFILE };
 static float aux_battery_voltage = 0.0f;
 
 // Initialize Talon "objects"
-void initializeTalons(PDH *pdh)
+void initializeTalons()
 {
-    frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID, pdh);
-    backLeft = talonFXInit(BACK_LEFT_WHEEL_ID, BACK_LEFT_WHEEL_CHANNEL_ID, pdh);
-    frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID, pdh);
-    backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID, pdh);
+    frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID);
+    backLeft = talonFXInit(BACK_LEFT_WHEEL_ID, BACK_LEFT_WHEEL_CHANNEL_ID);
+    frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID);
+    backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID);
 
-    backBucketDrum = talonFXInit(BACK_BUCKET_DRUM_ID, BACK_BUCKET_DRUM_CHANNEL_ID, pdh);
-    frontBucketDrum = talonFXInit(FRONT_BUCKET_DRUM_ID, FRONT_BUCKET_DRUM_CHANNEL_ID, pdh);
+    backBucketDrum = talonFXInit(BACK_BUCKET_DRUM_ID, BACK_BUCKET_DRUM_CHANNEL_ID);
+    frontBucketDrum = talonFXInit(FRONT_BUCKET_DRUM_ID, FRONT_BUCKET_DRUM_CHANNEL_ID);
 
     frontActuator = talonSRXInit(FRONT_ACTUATOR_ID, FRONT_ACTUATOR_CHANNEL_ID, false);
     backActuator = talonSRXInit(BACK_ACTUATOR_ID, BACK_ACTUATOR_CHANNEL_ID, true);
@@ -50,7 +50,7 @@ void directControl(ControlPacket_OneRobot pkt)
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
 }
 
-void initAuxVoltageSensor(void)
+/**void initAuxVoltageSensor(void)
 {
     I2C_Create_Bus(&aux_bus_handle);
     I2C_Add_Sensor(&aux_bus_handle, &aux_voltage_sensor);
@@ -69,4 +69,13 @@ void updateAuxVoltage(void)
 float getAuxVoltage(void)
 {
     return aux_battery_voltage;
+}**/
+
+// TODO: Remove this function after testing
+void test_run_motor(void)
+{
+    setFX(&frontLeft, 0.5);
+    //setTargetFX(&backLeft, 0.5);
+    //setTargetFX(&frontRight, 0.5);
+    //setTargetFX(&backRight, 0.5);
 }

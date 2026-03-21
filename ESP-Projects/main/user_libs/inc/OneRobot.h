@@ -18,7 +18,7 @@
 #define BACK_ACTUATOR_ID 16 // needs updating
 
 // Define channel IDs of each motor/actuator
-#define FRONT_LEFT_WHEEL_CHANNEL_ID 11 // 12
+#define FRONT_LEFT_WHEEL_CHANNEL_ID 2 // 12
 #define BACK_LEFT_WHEEL_CHANNEL_ID 3 // 13
 #define FRONT_RIGHT_WHEEL_CHANNEL_ID 10 // 3
 #define BACK_RIGHT_WHEEL_CHANNEL_ID 1
@@ -32,8 +32,11 @@
 #define INA219_REG_BUSVOLTAGE   0x02
 
 extern QueueHandle_t uart_queue;
-void initializeTalons(PDH *pdh);
+void initializeTalons(void);
 void directControl(ControlPacket_OneRobot pkt);
 void initAuxVoltageSensor(void);
 void updateAuxVoltage(void);
 float getAuxVoltage(void);
+
+// TODO: Remove this function after testing
+void test_run_motor();

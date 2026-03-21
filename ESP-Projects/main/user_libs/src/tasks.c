@@ -25,6 +25,7 @@ void UART_tx_task(PDH *pdh) //
 
     while (1)
     {
+        printf("Current value at channel 3: %.2f\n", getChannelCurrentPDH(pdh, 2));
         packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
         packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
         packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
@@ -37,8 +38,8 @@ void UART_tx_task(PDH *pdh) //
 
         packet.main_battery = (float)(getInputVoltagePDH(pdh));
         
-        updateAuxVoltage();
-        packet.aux_battery = getAuxVoltage();
+        //updateAuxVoltage();
+        //packet.aux_battery = getAuxVoltage();
 
         UART_write(&packet);
         vTaskDelay(100);
@@ -68,13 +69,14 @@ void current_update_task(PDH *pdh)
     {
         for (uint8_t i = 0; i < 6; i++)
         {
-            pdh->channelCurrents[i] = getChannelCurrentPDH(pdh, fxMotors[i]->channel);
+            fxMotors[i]->current = getChannelCurrentPDH(pdh, fxMotors[i]->channel);
             // fxMotors[i]->current = 1.0;
             // vTaskDelay(1);
         }
         for (uint8_t i = 0; i < 2; i++)
         {
-            pdh->channelCurrents[i + 6] = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
+            srxMotors[i]->current = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
+            // pdh->channelCurrents[i + 6] = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
             // srxMotors[i]->current = 2.0;
             // vTaskDelay(1);
         }
@@ -82,6 +84,17 @@ void current_update_task(PDH *pdh)
         // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
     }
 }
+
+void motor_task()
+{
+    for (;;)
+    {
+            
+        test_run_motor();
+        vTaskDelay(1);
+    }
+}
+
 
 // OLD CURRENT UPDATE TASK USING PDP, NEW ONE IN PDH.C
 /**

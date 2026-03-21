@@ -22,7 +22,7 @@ void UART_setup()
         .parity = 0,
         .stop_bits = 1,
         .flow_ctrl = 0,
-        .source_clk = 4,
+        .source_clk = SOC_MOD_CLK_PLL_F80M, //4
     };
 
     const int uart_buffer_size_rx = (1024 * 2); // setup UART buffered RX IO with event queue
@@ -32,9 +32,9 @@ void UART_setup()
     // ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config)); // apply config
     // ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, 43, 44, 18, 19));    // [tx, rx] - board -> [43, 44] - esp32s3 | [1, 3] - esp32 devkit v1
 
-    uart_driver_install(UART_NUM_1, 1024 * 2, 0, 0, NULL, 0);
-    uart_param_config(UART_NUM_1, &uart_config);
-    uart_set_pin(UART_NUM_1, 43, 44, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_driver_install(UART_NUM_0, 1024 * 2, 0, 0, NULL, 0);
+    uart_param_config(UART_NUM_0, &uart_config);
+    uart_set_pin(UART_NUM_0, 23, 24, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE); //used to be 43, 44, but those pins are used for CAN so changed to 23, 24
     control_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
 }
 
@@ -44,7 +44,7 @@ void UART_read(ControlPacket_OneRobot *packet)
 
     packet->header = 0; // Reset packet header
     uart_read_bytes(
-        UART_NUM_1,
+        UART_NUM_0,
         (char *)packet + 1,
         packetLength,
         0 // this is timeout
@@ -60,7 +60,7 @@ void UART_read(ControlPacket_OneRobot *packet)
 void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
 {
     // char* cPacket = (char*)packet;
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(CurrVoltPacket_OneRobot));
+    const int txBytes = uart_write_bytes(UART_NUM_0, packet, sizeof(CurrVoltPacket_OneRobot));
     // char *test_str = "This is a test string.\n";
     // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
 }
