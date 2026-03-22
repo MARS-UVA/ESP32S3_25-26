@@ -15,7 +15,11 @@ void app_main()
     packet.back_actuator = 0.25f;
     packet.main_battery = 0.25f;
     packet.aux_battery = 0.25f;    
-    UART_write((uint8_t *) &packet, sizeof(packet));
+
+    while (1) {
+    UART_write(&packet, sizeof(packet));
+    vTaskDelay(pdMS_TO_TICKS(300));
+    }
 };
 
     /*
