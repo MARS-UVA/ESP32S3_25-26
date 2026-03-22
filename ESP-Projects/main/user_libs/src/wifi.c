@@ -39,7 +39,7 @@ void udp_receive_task(void *pvParameters)
     }
     ESP_LOGI(TAG, "Socket bound, port %d", PORT);
 
-    SerialPacket pkt[8] = {0};
+    ControlPacket_OneRobot pkt;
     while (1)
     {
         ESP_LOGI(TAG, "Waiting for data");
@@ -57,15 +57,17 @@ void udp_receive_task(void *pvParameters)
         {
             ESP_LOGI("Wifi", "Got packet");
             RxBuffer[len] = 0; // Null-terminate whatever is received and treat it like a string
-            ESP_LOGI("Wifi", "%x\n", RxBuffer[2]);
             pkt->invalid = 0;
             pkt->header = RxBuffer[1];
-            pkt->top_left_wheel = RxBuffer[2];
+            pkt->front_left_wheel = RxBuffer[2];
             pkt->back_left_wheel = RxBuffer[3];
-            pkt->top_right_wheel = RxBuffer[4];
+            pkt->front_right_wheel = RxBuffer[4];
             pkt->back_right_wheel = RxBuffer[5];
-            pkt->drum = RxBuffer[6];
-            pkt->actuator = RxBuffer[7];
+            pkt->front_bucket_drum = RxBuffer[6];
+            pkt->back_bucket_drum = RxBuffer[7];
+            pkt->front_actuator = RxBuffer[8];
+            pkt->back_actuator = RxBuffer[9];
+            // Send the packet to the UART task
             xQueueOverwrite(uart_queue, &pkt);
         }
     }
@@ -95,21 +97,24 @@ void sendWifiPacket(void *pvParameters)
     dest_addr.sin_port = htons(PORT);
     dest_addr.sin_addr.s_addr = inet_addr(HOST_IP_ADDR);
 
+    ControlPacket_OneRobot payload;
     while (1)
     {
-        // Implement sending logic here
-        const char *payload = "Hello from ESP32";
-        int err = sendto(sock, payload, strlen(payload), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
-        if (err < 0)
-        {
-            ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
+        if (xQueueReceive(wifi_queue, &payload, portMAX_DELAY) == pdPASS) 
+        {    
+            sendto(sock, (const uint8_t *)&payload, sizeof(payload), 0, 
+                   (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+            ESP_LOGI(TAG, "Sent packet over Wi-Fi");
         }
-        else
-        {
-            ESP_LOGI(TAG, "Message sent");
-        }
-        vTaskDelay(2000 / portTICK_PERIOD_MS); // Send every 2
     }
+}
+
+void print_IP(void)
+{
+    esp_netif_ip_info_t ip_info;
+    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+    esp_netif_get_ip_info(netif, &ip_info);
+    ESP_LOGI(TAG, "IP Address: " IPSTR, IP2STR(&ip_info.ip));
 }
 
 void setupWifi()
@@ -121,8 +126,6 @@ void setupWifi()
         .sta = {
             .ssid = "Team_02",
             .password = "marsuva!",
-            //.ssid = "Team_02",
-            //.password = "marsuva!",
         }};
 
     /* ------------- Initialize network + event loop (required) -------------*/
@@ -154,11 +157,13 @@ void setupWifi()
     }
 
     vTaskDelay(50);
-}
-void print_IP(void)
-{
-    esp_netif_ip_info_t ip_info;
-    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
-    esp_netif_get_ip_info(netif, &ip_info);
-    ESP_LOGI(TAG, "IP Address: " IPSTR, IP2STR(&ip_info.ip));
+
+    print_IP();
+
+    wifi_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
+
+    if (wifi_queue != NULL) {
+        xTaskCreate(udp_receive_task, "UDP_Receive_Task", 4096, NULL, 5, NULL);
+        xTaskCreate(sendWifiPacket, "UDP_Send_Task", 4096, NULL, 5, NULL);
+    }
 }

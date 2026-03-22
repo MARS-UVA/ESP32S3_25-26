@@ -11,7 +11,7 @@ CurrVoltPacket_OneRobot Init_CurrVolt_Packet()
 {
     CurrVoltPacket_OneRobot pkt;
     pkt.invalid = 0xFF;
-    pkt.header = CURRENT_BUS_VOLTAGE_PACKET_ID;
+    pkt.header = 00 ;//CURRENT_BUS_VOLTAGE_PACKET_ID CHANGE LATER TO VALID PACKET
     pkt.reserved_bit1 = 0x00;
     pkt.reserved_bit2 = 0x00;
 

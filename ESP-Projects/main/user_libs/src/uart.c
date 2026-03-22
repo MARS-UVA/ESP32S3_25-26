@@ -6,24 +6,24 @@ QueueHandle_t control_queue;
 
 void UART_setup()
 {
-    // uart_config_t uart_config = {
-    //     .baud_rate = 115200, // parameters subject to change
-    //     .data_bits = UART_DATA_8_BITS,
-    //     .parity = UART_PARITY_DISABLE,
-    //     .stop_bits = UART_STOP_BITS_1,
-    //     .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-    //     // .rx_flow_ctrl_thresh = 122,
-    //     .source_clk = UART_SCLK_DEFAULT,
-    // };
-
-    const uart_config_t uart_config = {
-        .baud_rate = 115200,
-        .data_bits = 3,
-        .parity = 0,
-        .stop_bits = 1,
-        .flow_ctrl = 0,
-        .source_clk = SOC_MOD_CLK_PLL_F80M, //4
+    uart_config_t uart_config = {
+        .baud_rate = 115200, // parameters subject to change
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        // .rx_flow_ctrl_thresh = 122,
+        .source_clk = UART_SCLK_DEFAULT,
     };
+
+    // const uart_config_t uart_config = {
+    //     .baud_rate = 115200,
+    //     .data_bits = 3,
+    //     .parity = 0,
+    //     .stop_bits = 1,
+    //     .flow_ctrl = 0,
+    //     .source_clk = 4,
+    // };
 
     const int uart_buffer_size_rx = (1024 * 2); // setup UART buffered RX IO with event queue
     const int uart_buffer_size_tx = (1024 * 2); // setup UART buffered TX IO with event queue
@@ -56,11 +56,14 @@ void UART_read(ControlPacket_OneRobot *packet)
     }
 }
 
-// change back to
-void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
+void UART_write(void* packet, size_t length) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
 {
-    // char* cPacket = (char*)packet;
-    const int txBytes = uart_write_bytes(UART_NUM_0, packet, sizeof(CurrVoltPacket_OneRobot));
-    // char *test_str = "This is a test string.\n";
-    // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
+    //uint8_t tmp[length + 3];
+    //uint8_t* tmp_ptr = tmp;
+    //memcpy((tmp_ptr+3), packet, length);
+    //tmp_ptr[0] = 0xff;
+    //tmp_ptr[1] = 0x00;
+    //tmp_ptr[2] = 0x00;
+
+    uart_write_bytes(UART_NUM_0, packet, length);
 }

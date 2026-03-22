@@ -1,4 +1,5 @@
 #include "tasks.h"
+#include "uart.h"
 
 
 void UART_rx_task()
@@ -41,7 +42,8 @@ void UART_tx_task(PDH *pdh) //
         //updateAuxVoltage();
         //packet.aux_battery = getAuxVoltage();
 
-        UART_write(&packet);
+        CurrVoltPacket_OneRobot new_packet = packet;
+        UART_write((uint8_t*) &new_packet, sizeof(packet));
         vTaskDelay(100);
     }
 }
