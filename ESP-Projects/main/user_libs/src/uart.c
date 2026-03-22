@@ -58,5 +58,12 @@ void UART_read(ControlPacket_OneRobot *packet)
 
 void UART_write(uint8_t *packet, size_t length) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
 {
-    uart_write_bytes(UART_NUM_1, packet, length);
+    uint8_t tmp[length + 3];
+    uint8_t* tmp_ptr = tmp;
+    memccpy((tmp_ptr+3), packet, length, uint8_t);
+    tmp_ptr[0] = 0xff;
+    tmp_ptr[1] = 0x00;
+    tmp_ptr[2] = 0x00;
+
+    uart_write_bytes(UART_NUM_1, tmp, sizeof(tmp));
 }

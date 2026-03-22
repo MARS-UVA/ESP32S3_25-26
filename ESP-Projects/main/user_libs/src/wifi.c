@@ -57,7 +57,6 @@ void udp_receive_task(void *pvParameters)
         {
             ESP_LOGI("Wifi", "Got packet");
             RxBuffer[len] = 0; // Null-terminate whatever is received and treat it like a string
-            ESP_LOGI("Wifi", "%x\n", RxBuffer[2]);
             pkt->invalid = 0;
             pkt->header = RxBuffer[1];
             pkt->front_left_wheel = RxBuffer[2];
@@ -68,6 +67,7 @@ void udp_receive_task(void *pvParameters)
             pkt->back_bucket_drum = RxBuffer[7];
             pkt->front_actuator = RxBuffer[8];
             pkt->back_actuator = RxBuffer[9];
+            // Send the packet to the UART task
             xQueueOverwrite(uart_queue, &pkt);
         }
     }
@@ -100,13 +100,21 @@ void sendWifiPacket(void *pvParameters)
     ControlPacket_OneRobot payload;
     while (1)
     {
-        if (xQueueReceive(data_queue, &payload, portMAX_DELAY) == pdPASS) 
+        if (xQueueReceive(wifi_queue, &payload, portMAX_DELAY) == pdPASS) 
         {    
             sendto(sock, (const uint8_t *)&payload, sizeof(payload), 0, 
                    (struct sockaddr *)&dest_addr, sizeof(dest_addr));
             ESP_LOGI(TAG, "Sent packet over Wi-Fi");
         }
     }
+}
+
+void print_IP(void)
+{
+    esp_netif_ip_info_t ip_info;
+    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+    esp_netif_get_ip_info(netif, &ip_info);
+    ESP_LOGI(TAG, "IP Address: " IPSTR, IP2STR(&ip_info.ip));
 }
 
 void setupWifi()
@@ -118,8 +126,6 @@ void setupWifi()
         .sta = {
             .ssid = "Team_02",
             .password = "marsuva!",
-            //.ssid = "Team_02",
-            //.password = "marsuva!",
         }};
 
     /* ------------- Initialize network + event loop (required) -------------*/
@@ -151,25 +157,12 @@ void setupWifi()
     }
 
     vTaskDelay(50);
-}
-void print_IP(void)
-{
-    esp_netif_ip_info_t ip_info;
-    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
-    esp_netif_get_ip_info(netif, &ip_info);
-    ESP_LOGI(TAG, "IP Address: " IPSTR, IP2STR(&ip_info.ip));
-}
 
-void app_main(void) {
-    // Initialize Wi-Fi and Sockets here...
-    setupWifi();
     print_IP();
 
-    // Create a queue that can hold up to 10 'SensorData' structs at a time
-    data_queue = xQueueCreate(10, sizeof(SensorData));
+    wifi_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
 
-    if (data_queue != NULL) {
-        // Start the two tasks. They will run independently in the background.
+    if (wifi_queue != NULL) {
         xTaskCreate(udp_receive_task, "UDP_Receive_Task", 4096, NULL, 5, NULL);
         xTaskCreate(sendWifiPacket, "UDP_Send_Task", 4096, NULL, 5, NULL);
     }

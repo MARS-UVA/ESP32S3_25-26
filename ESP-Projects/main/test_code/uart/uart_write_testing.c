@@ -4,24 +4,21 @@
 void app_main()
 {
     UART_setup();
-    CurrVoltPacket_OneRobot packet =  {
-        .front_left_wheel = 0.75f,
-        .back_left_wheel = 0.75f,
-        .front_right_wheel = 0.75f,
-        .back_right_wheel = 0.75f,
-        .front_drum = 0.50f,
-        .back_drum = 0.50f,
-        .front_actuator = 0.25f,
-        .back_actuator = 0.25f,
-        .main_battery = 0.25f,
-        .aux_battery = 0.25f     
-    };
+    CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
+    packet.front_left_wheel = 0.75f;
+    packet.back_left_wheel = 0.75f;
+    packet.front_right_wheel = 0.75f;
+    packet.back_right_wheel = 0.75f;
+    packet.front_drum = 0.50f;
+    packet.back_drum = 0.50f;
+    packet.front_actuator = 0.25f;
+    packet.back_actuator = 0.25f;
+    packet.main_battery = 0.25f;
+    packet.aux_battery = 0.25f;    
     UART_write((uint8_t *) &packet, sizeof(packet));
 };
 
     /*
-
-
     CurrVoltPacket_OneRobot
 
     uint8_t invalid;
@@ -39,7 +36,5 @@ void app_main()
     float back_actuator;
     float main_battery;
     float aux_battery;
-    
-
     */
     
