@@ -37,24 +37,16 @@ bool twaiRxCallback(twai_node_handle_t handle, const twai_rx_done_event_data_t *
     return false;
 }
 
-void canSetup(can_rx_context_t *rx_ctx)
+void canSetup()
 {
-    // Configure the TWAI node with the specified GPIO pins and bitrate
     twai_onchip_node_config_t node_config = {
         .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
         .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
         .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
         .tx_queue_depth = 32,                // Transmit queue depth set to 32
     };
-
-    // Set up the TWAI event callbacks, using the provided RX callback function and context
-    twai_event_callbacks_t can_cbs = {
-        .on_rx_done = twaiRxCallback,
-    };
-
-    // Create a new TWAI node with the specified configuration
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, rx_ctx));
+    // ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, NULL));
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 

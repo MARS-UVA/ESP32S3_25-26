@@ -29,3 +29,14 @@ typedef struct __attribute__((packed))
     float left_actuator;
     float right_actuator;
 } CurrVoltPacket;
+
+typedef struct __attribute__((packed))
+{
+  uint8_t start_byte;
+  uint8_t header;
+  uint8_t reserved_bit1;
+  uint8_t reserved_bit2;
+
+  float front_actuator;
+  float back_actuator;
+} PositionPacket;

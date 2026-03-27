@@ -1,26 +1,21 @@
 #pragma once
 
 #include "esp_adc/adc_continuous.h"
-#include <driver/adc.h>
 #include "utils.h"
+#include <stdio.h>
+#include "driver/gpio.h"
+#include "sdkconfig.h"
 
-typedef struct pot
+typedef struct
 {
-	adc_continuous_handle_t handle;
-	// float(*read)(struct pot*);
-	// float(*readCm)(struct pot*);
-	uint32_t actuatorOffset;
-	int minPos; // minimum ADC reading
+    int minPos; // minimum ADC reading
 	int maxPos; // maximum ADC reading
-	float pos;
+    adc_channel_t channel;
+	double pos;
 } Pot;
 
-extern Pot pot;
+void potSetup(adc_channel_t *channel, uint8_t channel_num);
 
-void PotInit(adc_unit_t unit, adc_channel_t channel);
+Pot potInit(int minPos, int maxPos, adc_channel_t channel);
 
-void readPot();
-
-// void calibrateYourMom(Pot *leftPot, Pot *rightPot);
-
-void PotDeInit(Pot *pot);
+void readPot(Pot *pot);

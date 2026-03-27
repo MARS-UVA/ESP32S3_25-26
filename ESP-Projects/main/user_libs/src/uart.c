@@ -1,6 +1,6 @@
 #include "uart.h"
 
-extern QueueHandle_t control_queue;
+QueueHandle_t control_queue;
 /* --------------------- Functions ------------------ */
 
 void UART_setup()
@@ -34,12 +34,12 @@ void UART_setup()
     uart_driver_install(UART_NUM_1, 1024 * 2, 0, 0, NULL, 0);
     uart_param_config(UART_NUM_1, &uart_config);
     uart_set_pin(UART_NUM_1, 43, 44, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    control_queue = xQueueCreate(1, sizeof(SerialPacket));
+    control_queue = xQueueCreate(1, sizeof(ControlPacket));
 }
 
-void UART_read(SerialPacket *packet)
+void UART_read(ControlPacket *packet)
 {
-    const uint8_t packetLength = sizeof(SerialPacket) - 1; // expected packet length (1 header plus 1 byte for each motor/actuator)
+    const uint8_t packetLength = sizeof(ControlPacket) - 1; // expected packet length (1 header plus 1 byte for each motor/actuator)
 
     packet->header = 0; // Reset packet header
     uart_read_bytes(
@@ -56,10 +56,15 @@ void UART_read(SerialPacket *packet)
 }
 
 // change back to
-void UART_write(OutPacket *packet) // writes a single packet to Jetson on UART
+void UART_write(CurrVoltPacket *packet) // writes a single packet to Jetson on UART
 {
     // char* cPacket = (char*)packet;
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(OutPacket));
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(CurrVoltPacket));
     // char *test_str = "This is a test string.\n";
     // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
+}
+
+void UART_write_position(PositionPacket *packet) // writes a single packet to Jetson on UART
+{
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(PositionPacket));
 }

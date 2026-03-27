@@ -80,7 +80,7 @@ bool twaiRxCallback(twai_node_handle_t handle, const twai_rx_done_event_data_t *
  * @param[in] twai_rx_cb   Pointer to the function that will handle received CAN frames.
  * @param[in] rx_cb_data   Pointer to the context data that will be passed to the RX callback function when a CAN frame is received.
  */
-void canSetup(can_rx_context_t *rx_ctx);
+void canSetup();
 
 // TODO: Write documentation for the following functions
 
