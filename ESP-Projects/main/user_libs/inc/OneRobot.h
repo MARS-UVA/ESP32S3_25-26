@@ -40,3 +40,7 @@ float getAuxVoltage(void);
 
 // TODO: Remove this function after testing
 void test_run_motor();
+
+TempPacket_OneRobot getTemperatureOneRobot();
+
+void canSetupTalons();

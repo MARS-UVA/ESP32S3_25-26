@@ -22,6 +22,7 @@ void UART_rx_task()
 void UART_tx_task(PDH *pdh) //
 {
     CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
+    TempPacket_OneRobot temperature_packet;
 
     while (1)
     {
@@ -42,6 +43,22 @@ void UART_tx_task(PDH *pdh) //
         //packet.aux_battery = getAuxVoltage();
 
         UART_write(&packet);
+
+        if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
+        {
+            printf("Debug: temperature: %d\n", temperature_packet.front_left_wheel_temp);
+            UARTWriteTemperature(&temperature_packet);
+        }
+        vTaskDelay(100);
+    }
+}
+
+void temperature_update_task()
+{
+    for (;;)
+    {
+        TempPacket_OneRobot temp_packet = getTemperatureOneRobot();
+        xQueueOverwrite(temperature_queue, &temp_packet);
         vTaskDelay(100);
     }
 }

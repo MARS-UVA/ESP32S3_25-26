@@ -37,6 +37,18 @@ void initializeTalons()
 
     frontActuator = talonSRXInit(FRONT_ACTUATOR_ID, FRONT_ACTUATOR_CHANNEL_ID, false);
     backActuator = talonSRXInit(BACK_ACTUATOR_ID, BACK_ACTUATOR_CHANNEL_ID, true);
+    canSetupTalons();
+}
+
+void canSetupTalons()
+{
+    canSetupTalonFX(&frontLeft);
+    // canSetupTalonFX(&backLeft);
+    // canSetupTalonFX(&frontRight);
+    // canSetupTalonFX(&backRight);
+
+    // canSetupTalonFX(&frontBucketDrum);
+    // canSetupTalonFX(&backBucketDrum);
 }
 
 void directControl(ControlPacket_OneRobot pkt)
@@ -78,4 +90,18 @@ void test_run_motor(void)
     //setTargetFX(&backLeft, 0.5);
     //setTargetFX(&frontRight, 0.5);
     //setTargetFX(&backRight, 0.5);
+}
+
+
+// TODO: Make it so this logic does not only work for one robot.
+TempPacket_OneRobot getTemperatureOneRobot()
+{
+    TempPacket_OneRobot packet = Init_Temp_Packet();
+    packet.front_left_wheel_temp = getTemperatureTalonFX(&frontLeft);
+    packet.back_left_wheel_temp = getTemperatureTalonFX(&backLeft);
+    packet.front_right_wheel_temp = getTemperatureTalonFX(&frontRight);
+    packet.back_right_wheel_temp = getTemperatureTalonFX(&backRight);
+    packet.front_drum_temp = getTemperatureTalonFX(&frontBucketDrum);
+    packet.back_drum_temp = getTemperatureTalonFX(&backBucketDrum);
+    return packet;
 }

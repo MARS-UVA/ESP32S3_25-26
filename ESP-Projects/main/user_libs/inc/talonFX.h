@@ -36,3 +36,5 @@ void setFX(TalonFX *fx, float speed);
 void setTargetFX(TalonFX *fx, int velocity);
 
 void canSetupTalonFX(TalonFX *fx);
+
+int getTemperatureTalonFX(TalonFX *fx);

@@ -36,12 +36,12 @@ TempPacket_OneRobot Init_Temp_Packet()
     pkt.reserved_bit1 = 0x00;
     pkt.reserved_bit2 = 0x00;
 
-    pkt.front_left_wheel_temp = 0.0f;
-    pkt.front_right_wheel_temp = 0.0f;
-    pkt.back_left_wheel_temp = 0.0f;
-    pkt.back_right_wheel_temp = 0.0f; 
-    pkt.front_drum_temp = 0.0f;
-    pkt.back_drum_temp = 0.0f; 
+    pkt.front_left_wheel_temp = 0;
+    pkt.front_right_wheel_temp = 0;
+    pkt.back_left_wheel_temp = 0;
+    pkt.back_right_wheel_temp = 0; 
+    pkt.front_drum_temp = 0;
+    pkt.back_drum_temp = 0; 
     return pkt;
 }
 

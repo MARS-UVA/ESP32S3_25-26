@@ -122,3 +122,8 @@ void canSetupTalonFX(TalonFX *fx)
     ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, fx));
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
+
+int getTemperatureTalonFX(TalonFX *fx)
+{
+    return fx->temperature;
+}

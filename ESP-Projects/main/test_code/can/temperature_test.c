@@ -6,14 +6,15 @@ void temperature_task()
 {
     PDH pdh;
     PDHInit(&pdh, 62);
-    TalonFX motor = talonFXInit(0, 3, &pdh);
-    talonFXCanSetup(&motor);
+    TalonFX motor = talonFXInit(33, 2);
+    canSetupTalonFX(&motor);
     while (1)
     {
         printf("Temperature:\t%d\n", motor.temperature);
         vTaskDelay(100);
     }
 }
+
 void app_main()
 {
     // xTaskCreate(motor_task, "mtr", 4096, NULL, 8, NULL);

@@ -20,6 +20,7 @@
 
 
 extern QueueHandle_t control_queue; // queue stores the control packet values
+extern QueueHandle_t temperature_queue; // queue stores the temperature packet values
 extern TalonFX *fxMotors[];
 extern TalonSRX *srxMotors[];
 
@@ -28,3 +29,8 @@ void UART_rx_task();
 void UART_tx_task(PDH *pdh);
 void one_robot_control_can_task();
 void motor_task();
+
+/**
+ * @brief Task that updates the temperature queue with the latest temperature readings from the robot.
+ */
+void temperature_update_task();
