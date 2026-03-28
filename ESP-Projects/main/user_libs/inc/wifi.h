@@ -5,6 +5,11 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 #include "lwip/sockets.h"
+#include "uart.h"
+#include "control_startup.h"
+#include "packets.h"
+
+extern QueueHandle_t control_queue; 
 
 /* --------------------- Functions ------------------ */
 void setupWifi(void);

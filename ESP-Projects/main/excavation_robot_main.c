@@ -8,6 +8,7 @@
 #include "ExcavationRobot.h"
 #include "tasks.h"
 #include "pdh.h"
+#include "wifi.h"
 
 
 can_rx_context_t can;
@@ -27,11 +28,13 @@ void app_main()
     //PDPInit(&pdp, 62);
     PDHInit(&pdh, 63);
     initializeTalons(&pdh);
+    setupWifi();
 
     vTaskDelay(50);
 
-    xTaskCreate((void *)(current_update_task), "current_update", 4096, &pdh, 8, &current_update_handle);
+    xTaskCreate((void *)(current_update_task), "current_update", 4096, &pdh, 9, &current_update_handle);
     xTaskCreate((void *)(excavation_robot_control_can_task), "uart_can", 4096, NULL, 8, &control_can_handle);
     xTaskCreate((void *)(UART_rx_task), "uart_rx", 4096, NULL, 7, &uart_rx_handle);
-    xTaskCreate((void *)(UART_tx_task), "uart_tx", 4096, NULL, 9, &uart_tx_handle);
+    xTaskCreate((void *)(UART_tx_task), "uart_tx", 4096, NULL, 10, &uart_tx_handle);
+    xTaskCreate((void *)(udp_receive_task), "wifi_recieve", 4096, NULL, 8, &uart_tx_handle);
 }

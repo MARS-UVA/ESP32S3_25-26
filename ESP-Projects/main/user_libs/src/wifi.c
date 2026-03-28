@@ -1,9 +1,4 @@
-#ifndef WIFI_H
-#define WIFI_H
-
 #include "wifi.h"
-#include "uart.h"
-#include "control_startup.h"
 
 static const char *TAG = "wifi";
 
@@ -42,7 +37,7 @@ void udp_receive_task(void *pvParameters)
     }
     ESP_LOGI(TAG, "Socket bound, port %d", PORT);
 
-    SerialPacket pkt[10] = {0};
+    ControlPacket_ExcavationRobot pkt[9] = {0};
     while (1)
     {
         ESP_LOGI(TAG, "Waiting for data");
@@ -54,7 +49,7 @@ void udp_receive_task(void *pvParameters)
         if (len < 0)
         {
             ESP_LOGE(TAG, "recvfrom failed: errno %d", errno);
-            break;
+            //break;
         }
         else
         {
@@ -63,16 +58,16 @@ void udp_receive_task(void *pvParameters)
             ESP_LOGI("Wifi", "%x\n", RxBuffer[2]);
             pkt->invalid = 0;
             pkt->header = RxBuffer[1];
-            pkt->top_left_wheel = RxBuffer[2];
+            pkt->front_left_wheel = RxBuffer[2];
             pkt->back_left_wheel = RxBuffer[3];
-            pkt->top_right_wheel = RxBuffer[4];
+            pkt->front_right_wheel = RxBuffer[4];
             pkt->back_right_wheel = RxBuffer[5];
             pkt->bucket_ladder = RxBuffer[6];
             pkt->conveyor_belt = RxBuffer[7];
-            pkt->left_track_actuator = RxBuffer[8];
-            pkt->right_track_actuator = RxBuffer[9];
-            xQueueOverwrite(uart_queue, &pkt);
+            pkt->track_actuator = RxBuffer[8];
+            xQueueOverwrite(control_queue, &pkt);
         }
+        vTaskDelay(pdMS_TO_TICKS(2));
     }
 
     if (sock != -1)
@@ -83,6 +78,7 @@ void udp_receive_task(void *pvParameters)
     vTaskDelete(NULL);
 }
 
+// TODO
 void sendWifiPacket(void *pvParameters)
 {
     int addr_family = AF_INET;
@@ -126,8 +122,6 @@ void setupWifi()
         .sta = {
             .ssid = "Team_02",
             .password = "marsuva!",
-            //.ssid = "Team_02",
-            //.password = "marsuva!",
         }};
 
     /* ------------- Initialize network + event loop (required) -------------*/
