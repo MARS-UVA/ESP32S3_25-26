@@ -27,7 +27,7 @@ void initializeTalons(PDH *pdh)
     conveyorBelt = talonFXInit(CONVEYOR_BELT_ID, CONVEYOR_BELT_CHANNEL_ID, pdh);
 
     leftTrackActuator = talonSRXInit(LEFT_TRACK_ACTUATOR_ID, LEFT_TRACK_ACTUATOR_CHANNEL_ID, false);
-    rightTrackActuator = talonSRXInit(RIGHT_TRACK_ACTUATOR_ID, RIGHT_TRACK_ACTUATOR_CHANNEL_ID, true);
+    rightTrackActuator = talonSRXInit(RIGHT_TRACK_ACTUATOR_ID, RIGHT_TRACK_ACTUATOR_CHANNEL_ID, false);
 }
 
 void directControl(ControlPacket_ExcavationRobot pkt)
@@ -39,4 +39,14 @@ void directControl(ControlPacket_ExcavationRobot pkt)
     int8_t rightSpeed = pkt.front_right_wheel;
     setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
+
+    int8_t bucketLadderSpeed = pkt.bucket_ladder;
+    setTargetFX(&bucketLadder, ((int8_t)(bucketLadderSpeed - 127)));
+
+    int8_t conveyorBeltSpeed = pkt.conveyor_belt;
+    setTargetFX(&conveyorBelt, ((int8_t)(conveyorBeltSpeed - 127)));
+
+    float actuatorOutput = (pkt.track_actuator - 127) / 127.0;
+    setSRX(&leftTrackActuator, actuatorOutput);
+    setSRX(&rightTrackActuator, actuatorOutput);
 }

@@ -10,7 +10,7 @@
  * @date 2026-02-09
  */
 
-#include "TalonSRX.h"
+#include "talonSRX.h"
 
 TalonSRX talonSRXInit(uint8_t n_id, uint8_t c_id, bool inv)
 {
