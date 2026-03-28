@@ -72,24 +72,17 @@ extern twai_node_handle_t g_node_hdl;
  * @param[in] arg       Pointer to a can_rx_context_t struct containing the handler and context for processing the received frame.
  * @return          false (indicates that the interrupt has been handled)
  */
-bool twaiRxCallback(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *arg);
+
+void canSetup();
 
 /**
- * @brief Set up CAN communication by configuring the TWAI node and registering the RX callback.
- * 
- * @param[in] twai_rx_cb   Pointer to the function that will handle received CAN frames.
- * @param[in] rx_cb_data   Pointer to the context data that will be passed to the RX callback function when a CAN frame is received.
- */
-void canSetup(can_rx_context_t *rx_ctx);
-
-// TODO: Write documentation for the following functions
-
-/**
+ * @brief Sets up basic CAN functionality not including callback functionality
  * 
  */
 void sendEn();
 
 /**
+ * @brief Sends an enable frame to allow motors to move
  * 
  */
 void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len);

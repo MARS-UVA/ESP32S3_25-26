@@ -15,29 +15,7 @@
 // Global TWAI node handle
 twai_node_handle_t g_node_hdl = NULL;
 
-bool twaiRxCallback(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *arg)
-{
-    //  Cast the argument to our context struct
-    can_rx_context_t *ctx = (can_rx_context_t *)arg;
-
-    // Receive the CAN frame from the TWAI node
-    uint8_t recv_buff[8];
-    twai_frame_t rx_frame = {
-        .buffer = recv_buff,
-        .buffer_len = sizeof(recv_buff)
-    };
-
-    // If a frame was successfully received, call the handler with the context and the received frame
-    if (twai_node_receive_from_isr(handle, &rx_frame) == ESP_OK)
-    {
-        ctx->handler(ctx->context, &rx_frame);
-    }
-
-    // Return false to indicate that the interrupt has been handled
-    return false;
-}
-
-void canSetup(can_rx_context_t *rx_ctx)
+void canSetup()
 {
     // Configure the TWAI node with the specified GPIO pins and bitrate
     twai_onchip_node_config_t node_config = {
@@ -47,14 +25,8 @@ void canSetup(can_rx_context_t *rx_ctx)
         .tx_queue_depth = 32,                // Transmit queue depth set to 32
     };
 
-    // Set up the TWAI event callbacks, using the provided RX callback function and context
-    twai_event_callbacks_t can_cbs = {
-        .on_rx_done = twaiRxCallback,
-    };
 
-    // Create a new TWAI node with the specified configuration
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, rx_ctx));
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 
