@@ -40,7 +40,7 @@ void UART_tx_task(PDH *pdh)
 
 void construction_robot_control_can_task()
 {
-    ControlPacket_ConstructionRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    ControlPacket_ConstructionRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7f, 0x9f};
     ControlPacket_ConstructionRobot new_data;
 
     while (1)

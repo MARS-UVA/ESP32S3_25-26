@@ -14,6 +14,7 @@ typedef struct __attribute__((packed))
     uint8_t back_right_wheel;
     
     uint8_t actuator;
+    uint8_t vibrator;
 } ControlPacket_ConstructionRobot;
 //jayradster hates kittens
 

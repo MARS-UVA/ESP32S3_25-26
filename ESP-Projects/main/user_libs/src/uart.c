@@ -17,12 +17,12 @@ void UART_setup()
     // };
 
     const uart_config_t uart_config = {
-        .baud_rate = 115200,
+        .baud_rate = 200000,
         .data_bits = 3,
         .parity = 0,
         .stop_bits = 1,
         .flow_ctrl = 0,
-        .source_clk = 4,
+        .source_clk = UART_SCLK_DEFAULT,
     };
 
     const int uart_buffer_size_rx = (1024 * 2); // setup UART buffered RX IO with event queue
@@ -34,7 +34,7 @@ void UART_setup()
 
     uart_driver_install(UART_NUM_1, 1024 * 2, 0, 0, NULL, 0);
     uart_param_config(UART_NUM_1, &uart_config);
-    uart_set_pin(UART_NUM_1, 43, 44, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_set_pin(UART_NUM_1, 23, 24, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     control_queue = xQueueCreate(1, sizeof(ControlPacket_ConstructionRobot));
 }
 

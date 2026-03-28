@@ -14,14 +14,16 @@
 #define BACK_LEFT_WHEEL_ID 13
 #define FRONT_RIGHT_WHEEL_ID 36
 #define BACK_RIGHT_WHEEL_ID 37
-#define ACTUATOR_ID 25
+#define ACTUATOR_ID 35
+#define VIBRATOR_ID 3  
 
 // Define channel IDs of each motor/actuator
-#define FRONT_LEFT_WHEEL_CHANNEL_ID 12
+#define FRONT_LEFT_WHEEL_CHANNEL_ID 14
 #define BACK_LEFT_WHEEL_CHANNEL_ID 13
-#define FRONT_RIGHT_WHEEL_CHANNEL_ID 3
-#define BACK_RIGHT_WHEEL_CHANNEL_ID 1
-#define ACTUATOR_CHANNEL_ID 0
+#define FRONT_RIGHT_WHEEL_CHANNEL_ID 16
+#define BACK_RIGHT_WHEEL_CHANNEL_ID 15
+#define ACTUATOR_CHANNEL_ID 12
+#define VIBRATOR_CHANNEL_ID 17
 
 extern QueueHandle_t uart_queue;
 void initializeTalons(PDH *pdh);

@@ -8,9 +8,10 @@ TalonFX frontRight;
 TalonFX backRight;
 
 TalonSRX actuator;
+TalonSRX vibrator;
 
 TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight};
-TalonSRX *srxMotors[] = {&actuator};
+TalonSRX *srxMotors[] = {&actuator, &vibrator};
 
 // Initialize Construction Talons "objects"
 void initializeTalons(PDH *pdh)
@@ -21,6 +22,7 @@ void initializeTalons(PDH *pdh)
     backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID, pdh);
 
     actuator = talonSRXInit(ACTUATOR_ID, ACTUATOR_CHANNEL_ID, false);
+    vibrator = talonSRXInit(VIBRATOR_ID, VIBRATOR_CHANNEL_ID, false);
 }
 
 void directControl(ControlPacket_ConstructionRobot pkt)
@@ -30,6 +32,24 @@ void directControl(ControlPacket_ConstructionRobot pkt)
     setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
     int8_t rightSpeed = pkt.front_right_wheel;
-    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * 1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
+
+    float actuatorOutput = 0;
+    if (pkt.actuator > 127)
+    {
+        actuatorOutput = 0.8;
+    }
+    else if (pkt.actuator < 127)
+    {
+        actuatorOutput = -0.8;
+    }
+    setSRX(&actuator, actuatorOutput);
+
+    float vibratorOutput = 0;
+    if (pkt.vibrator > 127)
+    {
+        vibratorOutput = 1;
+    }
+    setSRX(&vibrator, vibratorOutput);
 }
