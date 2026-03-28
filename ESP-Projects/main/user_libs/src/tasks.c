@@ -52,7 +52,9 @@ void excavation_robot_control_can_task()
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
             motor_state = new_data;
+            ESP_LOGI("CAN", "Motor Control:\t%d %d %d %d %d %d %d\n", motor_state.front_left_wheel, motor_state.back_left_wheel, motor_state.front_right_wheel, motor_state.back_right_wheel, motor_state.bucket_ladder, motor_state.conveyor_belt, motor_state.track_actuator);        
         }
+
         directControl(motor_state);
         vTaskDelay(pdMS_TO_TICKS(2));
     }

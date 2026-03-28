@@ -10,14 +10,14 @@
 
 //Excavation robot
 // Define CAN IDs of each motor/actuator
-#define FRONT_LEFT_WHEEL_ID 38
-#define BACK_LEFT_WHEEL_ID 13
-#define FRONT_RIGHT_WHEEL_ID 36
-#define BACK_RIGHT_WHEEL_ID 37
-#define BUCKET_LADDER_ID 25  // needs updating
-#define CONVEYOR_BELT_ID 60
-#define LEFT_TRACK_ACTUATOR_ID 55
-#define RIGHT_TRACK_ACTUATOR_ID 16 // needs updating
+#define FRONT_LEFT_WHEEL_ID 33
+#define BACK_LEFT_WHEEL_ID 33
+#define FRONT_RIGHT_WHEEL_ID 33
+#define BACK_RIGHT_WHEEL_ID 33
+#define BUCKET_LADDER_ID 33  // needs updating
+#define CONVEYOR_BELT_ID 33
+#define LEFT_TRACK_ACTUATOR_ID 14
+#define RIGHT_TRACK_ACTUATOR_ID 11 // needs updating
 
 // Define channel IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_CHANNEL_ID 12

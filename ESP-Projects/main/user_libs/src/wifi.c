@@ -3,7 +3,7 @@
 static const char *TAG = "wifi";
 
 #define PORT 25000
-#define HOST_IP_ADDR "172.20.10.13"
+#define HOST_IP_ADDR "192.168.50.139"
 
 extern QueueHandle_t uart_queue;
 
@@ -120,7 +120,7 @@ void setupWifi()
     wifi_mode_t mode = WIFI_MODE_STA;
     wifi_config_t wifi_config = {
         .sta = {
-            .ssid = "Team_02",
+            .ssid = "Team_39",
             .password = "marsuva!",
         }};
 
@@ -153,11 +153,15 @@ void setupWifi()
     }
 
     vTaskDelay(50);
+
+    print_IP();
 }
 void print_IP(void)
 {
     esp_netif_ip_info_t ip_info;
     esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
-    esp_netif_get_ip_info(netif, &ip_info);
-    ESP_LOGI(TAG, "IP Address: " IPSTR, IP2STR(&ip_info.ip));
+    if (esp_netif_get_ip_info(netif, &ip_info) == ESP_OK)
+    {
+        ESP_LOGI(TAG, "IP Address: " IPSTR, IP2STR(&ip_info.ip));
+    }
 }
