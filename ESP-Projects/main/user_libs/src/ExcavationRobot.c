@@ -37,7 +37,7 @@ void directControl(ControlPacket_ExcavationRobot pkt)
     setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
     int8_t rightSpeed = pkt.front_right_wheel;
-    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * 1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
 
     int8_t bucketLadderSpeed = pkt.bucket_ladder;
