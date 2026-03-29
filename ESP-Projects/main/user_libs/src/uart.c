@@ -17,7 +17,7 @@ void UART_setup()
     // };
 
     const uart_config_t uart_config = {
-        .baud_rate = 200000,
+        .baud_rate = 115200,
         .data_bits = 3,
         .parity = 0,
         .stop_bits = 1,

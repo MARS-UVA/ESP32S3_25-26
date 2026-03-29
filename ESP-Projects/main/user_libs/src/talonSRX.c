@@ -1,5 +1,5 @@
 /**
- * @file TalonSRX.c
+ * @file talonSRX.c
  * @brief Implements functions for controlling the Talon SRX motor controller.
  * 
  * @author Diana Lin
@@ -10,7 +10,7 @@
  * @date 2026-02-09
  */
 
-#include "TalonSRX.h"
+#include "talonSRX.h"
 
 TalonSRX talonSRXInit(uint8_t n_id, uint8_t c_id, bool inv)
 {
