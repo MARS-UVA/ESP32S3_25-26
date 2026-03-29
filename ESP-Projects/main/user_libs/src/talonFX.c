@@ -12,7 +12,15 @@
  */
 
 #include "talonFX.h"
+
+#include <stdbool.h>
+
 #include "can.h"
+
+typedef struct {
+    TalonFX **motors;   // pointer to array of TalonFX pointers
+    size_t count;
+} TalonFXRegistry;
 
 /**
  * @brief Initializes a TalonFX structure with default values.
@@ -88,17 +96,23 @@ void receiveCANTalonFX(TalonFX *fx, twai_frame_t *rx_frame, uint64_t *recv_buff)
  * @param edata     TWAI "RX done" event data.
  * @param fx        TalonFX structure.
  */
-bool talonfx_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *fx)
+bool talonfx_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx)
 {
     uint8_t recv_buff[8];
     twai_frame_t rx_frame = {
         .buffer = recv_buff,
-        .buffer_len = sizeof(recv_buff)};
+        .buffer_len = sizeof(recv_buff)
+    };
 
-    if (ESP_OK == twai_node_receive_from_isr(handle, &rx_frame))
-    {
-        receiveCANTalonFX((TalonFX *)fx, &rx_frame, (uint64_t *)&recv_buff);
+    if (ESP_OK != twai_node_receive_from_isr(handle, &rx_frame)) {
+        return false;
     }
+
+    TalonFXRegistry *reg = (TalonFXRegistry *)user_ctx;
+    for (size_t i = 0; i < reg->count; i++) {
+        receiveCANTalonFX(reg->motors[i], &rx_frame, (uint64_t *)recv_buff);
+    }
+
     return false;
 }
 
@@ -107,20 +121,30 @@ bool talonfx_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data
  *
  * @param fx    TalonFX structure.
  */
-void canSetupTalonFX(TalonFX *fx)
+void canSetupTalonFX(TalonFX **motors, size_t count)
 {
-    twai_onchip_node_config_t node_config = {
-        .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
-        .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
-        .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
-        .tx_queue_depth = 32,                // Transmit queue depth set to 32
-    };
-    twai_event_callbacks_t can_cbs = {
-        .on_rx_done = talonfx_twai_rx_cb,
-    };
-    ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-    ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, fx));
-    ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
+    static bool can_initialized = false;
+    static TalonFXRegistry registry;
+    if (!can_initialized) {
+        registry.motors = motors;
+        registry.count = count;
+    
+        twai_onchip_node_config_t node_config = {
+            .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
+            .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
+            .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
+            .tx_queue_depth = 32,                // Transmit queue depth set to 32
+        };
+
+        twai_event_callbacks_t can_cbs = {
+            .on_rx_done = talonfx_twai_rx_cb,
+        };
+    
+        ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
+        ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, &registry));
+        ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
+        can_initialized = true;
+    }
 }
 
 int getTemperatureTalonFX(TalonFX *fx)

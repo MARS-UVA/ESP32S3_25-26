@@ -35,6 +35,6 @@ TalonFX talonFXInit(uint8_t n_id, uint8_t c_id);
 void setFX(TalonFX *fx, float speed);
 void setTargetFX(TalonFX *fx, int velocity);
 
-void canSetupTalonFX(TalonFX *fx);
+void canSetupTalonFX(TalonFX **motors, size_t count);
 
 int getTemperatureTalonFX(TalonFX *fx);

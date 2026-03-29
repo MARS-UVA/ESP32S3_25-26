@@ -8,7 +8,7 @@
 #include "i2c.h"
 
 // Define CAN IDs of each motor/actuator
-#define FRONT_LEFT_WHEEL_ID 33 // 38
+#define FRONT_LEFT_WHEEL_ID 30 // 38
 #define BACK_LEFT_WHEEL_ID 0 // 13
 #define FRONT_RIGHT_WHEEL_ID 59 // 36
 #define BACK_RIGHT_WHEEL_ID 37

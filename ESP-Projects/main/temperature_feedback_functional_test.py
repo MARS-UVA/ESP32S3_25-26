@@ -25,7 +25,7 @@ try:
         print(f"Debug header: {header}")
         if header == b'\xFF\x02\x00\x00': # Check if the header matches the expected value
             print(f"Read header: {header}")
-            feedback = list(struct.iter_unpack("d",ser.read(24))) # tuple of: fl, fr, bl, br, ldrum, rdrum, la, ra, potentiometer
+            feedback = list(struct.iter_unpack("6i",ser.read(24))) # tuple of: fl, fr, bl, br, ldrum, rdrum, la, ra, potentiometer
             feedback = [i[0] for i in feedback]
             print(f"Header: {header}, Feedback: {feedback}")
             #print(f"Potentiometer reading: {feedback[8]}")

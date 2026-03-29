@@ -42,7 +42,7 @@ void initializeTalons()
 
 void canSetupTalons()
 {
-    canSetupTalonFX(&frontLeft);
+    canSetupTalonFX(&fxMotors[0], 6);
     // canSetupTalonFX(&backLeft);
     // canSetupTalonFX(&frontRight);
     // canSetupTalonFX(&backRight);
