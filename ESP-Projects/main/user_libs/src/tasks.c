@@ -49,8 +49,10 @@ void construction_robot_control_can_task()
         {
             motor_state = new_data;
         }
+        sendEn();
         directControl(motor_state);
-        vTaskDelay(pdMS_TO_TICKS(2));
+        ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT));
+        vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 
