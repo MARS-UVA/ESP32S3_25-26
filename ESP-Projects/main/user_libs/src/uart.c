@@ -23,7 +23,7 @@ void UART_setup()
         .parity = 0,
         .stop_bits = 1,
         .flow_ctrl = 0,
-        .source_clk = UART_SCLK_DEFAULT,
+        .source_clk = 4,
     };
 
     const int uart_buffer_size_rx = (1024 * 2); // setup UART buffered RX IO with event queue
@@ -41,12 +41,12 @@ void UART_setup()
 
 void UART_read(ControlPacket_ConstructionRobot *packet)
 {
-    const uint8_t packetLength = sizeof(ControlPacket_ConstructionRobot) - 1; // expected packet length (1 header plus 1 byte for each motor/actuator)
+    const uint8_t packetLength = sizeof(ControlPacket_ConstructionRobot); // expected packet length (1 header plus 1 byte for each motor/actuator)
 
     packet->header = 0; // Reset packet header
     uart_read_bytes(
         UART_NUM_1,
-        (char *)packet + 1,
+        (char *)packet,
         packetLength,
         0 // this is timeout
     );

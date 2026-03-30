@@ -1,6 +1,5 @@
 #include "tasks.h"
 
-
 void UART_rx_task()
 {
     ControlPacket_ConstructionRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0};
@@ -29,7 +28,7 @@ void UART_tx_task(PDH *pdh)
         packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
         packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
         packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
-        
+
         packet.actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
 
         packet.main_battery = (float)(getInputVoltagePDH(pdh));

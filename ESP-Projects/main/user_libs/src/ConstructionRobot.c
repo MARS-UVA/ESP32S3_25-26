@@ -1,7 +1,7 @@
 #include "control_startup.h"
 #include "ConstructionRobot.h"
 
-//Construction robot
+// Construction robot
 TalonFX frontLeft;
 TalonFX backLeft;
 TalonFX frontRight;
@@ -49,7 +49,7 @@ void directControl(ControlPacket_ConstructionRobot pkt)
     float vibratorOutput = 0;
     if (pkt.vibrator > 127)
     {
-        vibratorOutput = 1;
+        vibratorOutput = 0.3;
     }
     setSRX(&vibrator, vibratorOutput);
 }
