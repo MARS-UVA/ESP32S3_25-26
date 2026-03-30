@@ -6,7 +6,6 @@
 typedef struct __attribute__((packed))
 {
     uint8_t invalid;
-    uint8_t start;
     uint8_t header;
 
     uint8_t front_left_wheel;

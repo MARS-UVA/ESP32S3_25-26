@@ -3,7 +3,7 @@
 
 void UART_rx_task()
 {
-    ControlPacket_ConstructionRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0};
+    ControlPacket_ConstructionRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0};
 
     while (1)
     {
@@ -40,18 +40,18 @@ void UART_tx_task(PDH *pdh)
 
 void construction_robot_control_can_task()
 {
-    ControlPacket_ConstructionRobot motor_state = {0, 0, 0, 0xff, 0xff, 0xff, 0xff, 0x7f, 0x7f};
-    // ControlPacket_ConstructionRobot new_data;
+    ControlPacket_ConstructionRobot motor_state = {0, 0, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f};
+    ControlPacket_ConstructionRobot new_data;
 
     while (1)
     {
-        // if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
-        // {
-        //     // motor_state = new_data;
-        // }
+        if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
+        {
+            motor_state = new_data;
+        }
         sendEn();
         directControl(motor_state);
-        ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT));
+        //ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT));
         vTaskDelay(pdMS_TO_TICKS(5));
     }
 }

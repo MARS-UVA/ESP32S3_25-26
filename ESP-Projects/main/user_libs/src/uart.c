@@ -1,5 +1,6 @@
 #include "uart.h"
 #include "tasks.h"
+#include "esp_log.h"
 
 QueueHandle_t control_queue;
 /* --------------------- Functions ------------------ */
@@ -30,11 +31,11 @@ void UART_setup()
 
     // ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, uart_buffer_size_rx, uart_buffer_size_tx, 0, NULL, 0));
     // ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config)); // apply config
-    // ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, 43, 44, 18, 19));    // [tx, rx] - board -> [43, 44] - esp32s3 | [1, 3] - esp32 devkit v1
+    // ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, 43, 44, 18, 19));    // [tx, rx] - board -> [43, 44] - esp32s3 | [1, 3] - esp32 devkit v1 23 24 c5
 
     uart_driver_install(UART_NUM_1, 1024 * 2, 0, 0, NULL, 0);
     uart_param_config(UART_NUM_1, &uart_config);
-    uart_set_pin(UART_NUM_1, 23, 24, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_set_pin(UART_NUM_1, 43, 44, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     control_queue = xQueueCreate(1, sizeof(ControlPacket_ConstructionRobot));
 }
 
@@ -54,6 +55,7 @@ void UART_read(ControlPacket_ConstructionRobot *packet)
     {
         packet->invalid = 0;
     }
+    ESP_LOGI("ehh", "hello");
 }
 
 // change back to
