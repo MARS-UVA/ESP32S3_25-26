@@ -19,11 +19,11 @@ void UART_setup()
 
     const uart_config_t uart_config = {
         .baud_rate = 115200,
-        .data_bits = 3,
+        .data_bits = UART_DATA_8_BITS,
         .parity = 0,
         .stop_bits = 1,
         .flow_ctrl = 0,
-        .source_clk = SOC_MOD_CLK_PLL_F80M, //4
+        .source_clk = UART_SCLK_DEFAULT,
     };
 
     const int uart_buffer_size_rx = (1024 * 2); // setup UART buffered RX IO with event queue
@@ -33,9 +33,9 @@ void UART_setup()
     // ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config)); // apply config
     // ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, 43, 44, 18, 19));    // [tx, rx] - board -> [43, 44] - esp32s3 | [1, 3] - esp32 devkit v1
 
-    uart_driver_install(UART_NUM_0, 1024 * 2, 0, 0, NULL, 0);
-    uart_param_config(UART_NUM_0, &uart_config);
-    uart_set_pin(UART_NUM_0, 23, 24, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE); //used to be 43, 44, but those pins are used for CAN so changed to 23, 24
+    uart_driver_install(UART_NUM_1, 1024 * 2, 0, 0, NULL, 0);
+    uart_param_config(UART_NUM_1, &uart_config);
+    uart_set_pin(UART_NUM_1, S3_TX_PIN, S3_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE); //used to be 43, 44, but those pins are used for CAN so changed to 23, 24
     control_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
     temperature_queue = xQueueCreate(1, sizeof(TempPacket_OneRobot));
 }
@@ -46,7 +46,7 @@ void UART_read(ControlPacket_OneRobot *packet)
 
     packet->header = 0; // Reset packet header
     uart_read_bytes(
-        UART_NUM_0,
+        UART_NUM_1,
         (char *)packet + 1,
         packetLength,
         0 // this is timeout
@@ -62,7 +62,7 @@ void UART_read(ControlPacket_OneRobot *packet)
 void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
 {
     // char* cPacket = (char*)packet;
-    const int txBytes = uart_write_bytes(UART_NUM_0, packet, sizeof(CurrVoltPacket_OneRobot));
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(CurrVoltPacket_OneRobot));
     // char *test_str = "This is a test string.\n";
     // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
 }
@@ -70,5 +70,5 @@ void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Je
 // TODO: Combine with UART_write and make it so that the function can write either CurrVoltPacket_OneRobot or TempPacket_OneRobot (or any other packet we may create in the future)
 void UARTWriteTemperature(TempPacket_OneRobot *packet)
 {
-    const int txBytes = uart_write_bytes(UART_NUM_0, packet, sizeof(TempPacket_OneRobot));
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(TempPacket_OneRobot));
 }

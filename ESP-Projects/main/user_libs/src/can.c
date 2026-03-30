@@ -43,6 +43,6 @@ void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
         .buffer = data_buff,
         .buffer_len = len,
     };
-    sendEn();
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &msg, TIMEOUT));
+    vTaskDelay(1);
 }

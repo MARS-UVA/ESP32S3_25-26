@@ -75,7 +75,7 @@ void one_robot_control_can_task()
             motor_state = new_data;
         }
         directControl(motor_state);
-        vTaskDelay(pdMS_TO_TICKS(2));
+        vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 

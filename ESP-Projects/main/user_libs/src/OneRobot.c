@@ -54,6 +54,7 @@ void canSetupTalons()
 void directControl(ControlPacket_OneRobot pkt)
 {
     int8_t leftSpeed = pkt.front_left_wheel;
+    sendEn();
     setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
     setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
