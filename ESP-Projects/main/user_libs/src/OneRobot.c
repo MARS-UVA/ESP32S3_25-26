@@ -37,7 +37,6 @@ void initializeTalons()
 
     frontActuator = talonSRXInit(FRONT_ACTUATOR_ID, FRONT_ACTUATOR_CHANNEL_ID, false);
     backActuator = talonSRXInit(BACK_ACTUATOR_ID, BACK_ACTUATOR_CHANNEL_ID, true);
-    canSetupTalons();
 }
 
 void canSetupTalons()

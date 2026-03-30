@@ -65,15 +65,16 @@ void temperature_update_task()
 
 void one_robot_control_can_task()
 {
-    ControlPacket_OneRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    ControlPacket_OneRobot motor_state = {0, 0, 0x8F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
     ControlPacket_OneRobot new_data;
 
     while (1)
     {
-        if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
+        //if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
-            motor_state = new_data;
+         //   motor_state = new_data;
         }
+        printf("hello, hello, hello\n");
         directControl(motor_state);
         vTaskDelay(pdMS_TO_TICKS(5));
     }
