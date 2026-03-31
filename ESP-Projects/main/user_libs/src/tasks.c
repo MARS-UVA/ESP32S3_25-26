@@ -26,7 +26,7 @@ void UART_tx_task(PDH *pdh) //
 
     while (1)
     {
-        printf("Current value at channel 3: %.2f\n", getChannelCurrentPDH(pdh, 2));
+        printf("Current value at channel 3: %.2f\n", getChannelCurrentPDH(pdh, 12));
         packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
         packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
         packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);

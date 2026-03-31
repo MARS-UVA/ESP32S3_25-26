@@ -86,10 +86,10 @@ float getAuxVoltage(void)
 // TODO: Remove this function after testing
 void test_run_motor(void)
 {
-    setFX(&frontLeft, 0.5);
-    //setTargetFX(&backLeft, 0.5);
-    //setTargetFX(&frontRight, 0.5);
-    //setTargetFX(&backRight, 0.5);
+    setTargetFX(&frontLeft, 200);
+    setTargetFX(&backLeft, 200);
+    setTargetFX(&frontRight, 200);
+    setTargetFX(&backRight, 200);
 }
 
 
