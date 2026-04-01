@@ -121,7 +121,8 @@ void setupWifi()
     wifi_config_t wifi_config = {
         .sta = {
             .ssid = "Team_39",
-            .password = "marsuva!",
+            .password = "lunabotics#1",    //"marsuva!",
+            
         }};
 
     /* ------------- Initialize network + event loop (required) -------------*/
@@ -162,6 +163,6 @@ void print_IP(void)
     esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
     if (esp_netif_get_ip_info(netif, &ip_info) == ESP_OK)
     {
-        ESP_LOGI(TAG, "IP Address: " IPSTR, IP2STR(&ip_info.ip));
+        ESP_LOGI(TAG, "IP Address -  " IPSTR, IP2STR(&ip_info.ip));
     }
 }
