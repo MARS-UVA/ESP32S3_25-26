@@ -1,4 +1,3 @@
-#include "control_startup.h"
 #include "OneRobot.h"
 
 TalonFX frontLeft;
@@ -8,11 +7,19 @@ TalonFX backRight;
 TalonFX frontBucketDrum;
 TalonFX backBucketDrum;
 
-TalonSRX frontActuator;
-TalonSRX backActuator;
+TalonSRX frontActuatorSRX;
+TalonSRX backActuatorSRX;
+
+Actuator frontActuator;
+Pot frontActuatorPot;
+PIDController frontActuatorPID;
+
+Actuator backActuator;
+Pot backActuatorPot;
+PIDController backActuatorPID;
 
 TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &frontBucketDrum, &backBucketDrum};
-TalonSRX *srxMotors[] = {&frontActuator, &backActuator};
+TalonSRX *srxMotors[] = {&frontActuatorSRX, &backActuatorSRX};
 
 static i2c_master_bus_handle_t aux_bus_handle;
 static const i2c_sensor_config_t INA219_PROFILE = {
@@ -27,16 +34,33 @@ static float aux_battery_voltage = 0.0f;
 // Initialize Talon "objects"
 void initializeTalons()
 {
-    frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID);
-    backLeft = talonFXInit(BACK_LEFT_WHEEL_ID, BACK_LEFT_WHEEL_CHANNEL_ID);
-    frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID);
-    backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID);
+    // frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID);
+    // backLeft = talonFXInit(BACK_LEFT_WHEEL_ID, BACK_LEFT_WHEEL_CHANNEL_ID);
+    // frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID);
+    // backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID);
 
     backBucketDrum = talonFXInit(BACK_BUCKET_DRUM_ID, BACK_BUCKET_DRUM_CHANNEL_ID);
     frontBucketDrum = talonFXInit(FRONT_BUCKET_DRUM_ID, FRONT_BUCKET_DRUM_CHANNEL_ID);
 
-    frontActuator = talonSRXInit(FRONT_ACTUATOR_ID, FRONT_ACTUATOR_CHANNEL_ID, false);
-    backActuator = talonSRXInit(BACK_ACTUATOR_ID, BACK_ACTUATOR_CHANNEL_ID, true);
+    frontActuatorSRX = talonSRXInit(FRONT_ACTUATOR_ID, FRONT_ACTUATOR_CHANNEL_ID, false);
+    backActuatorSRX = talonSRXInit(BACK_ACTUATOR_ID, BACK_ACTUATOR_CHANNEL_ID, true);
+
+    // potSetup((adc_channel_t[]){ADC_PIN_FRONT, ADC_PIN_BACK}, 2);
+    // frontActuatorPot = potInit(90, 1260, ADC_PIN_FRONT);
+    // backActuatorPot = potInit(90, 1260, ADC_PIN_BACK);
+    
+    // position
+    // frontActuatorPID = initPID(2, 0.15, 0.001);
+    // backActuatorPID = initPID(2, 0.15, 0.001);
+
+    // velocity
+    // frontActuatorPID = initPID(0.9, 0.5, 0); 
+    // backActuatorPID = initPID(0.9, 0.5, 0);
+
+    hallEffectInit(HALL_PIN_FRONT, HALL_PIN_BACK);
+
+    frontActuator = initActuator(&frontActuatorSRX, &frontActuatorPot, &frontActuatorPID, &frontDirection);
+    backActuator = initActuator(&backActuatorSRX, &backActuatorPot, &backActuatorPID, &backDirection);
 }
 
 void canSetupTalons()
@@ -68,23 +92,30 @@ void directControl(ControlPacket_OneRobot pkt)
     if (pkt.back_actuator > 127)
     {
         actuatorOutput = 1;
+        *backActuator.direction = 1;
     }
     else if (pkt.back_actuator < 127)
     {
         actuatorOutput = -1;
+        *backActuator.direction = -1;
     }
-    setSRX(&backActuator, 1 * actuatorOutput);
+    setSRX(backActuator.controller, 1 * actuatorOutput);
 
     actuatorOutput = 0;
     if (pkt.front_actuator > 127)
     {
         actuatorOutput = 1;
+        *frontActuator.direction = 1;
     }
     else if (pkt.front_actuator < 127)
     {
         actuatorOutput = -1;
+        *frontActuator.direction = -1;
     }
-    setSRX(&frontActuator, -1 * actuatorOutput);
+    setSRX(frontActuator.controller, -1 * actuatorOutput);
+
+    // moveSyncActuatorsToPosition(&leftActuator, &rightActuator, actuatorPosition);
+    // moveSyncActuatorsToVelocity(&leftActuator, &rightActuator, -1);
 }
 
 /**void initAuxVoltageSensor(void)

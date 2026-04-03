@@ -8,8 +8,6 @@
 #include "talonFX.h"
 #include "talonSRX.h"
 
-
-
 extern QueueHandle_t uart_queue;
 void initializeTalons();
 void directControl(ControlPacket_OneRobot pkt);
