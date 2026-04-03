@@ -4,17 +4,17 @@
 void UART_rx_task()
 {
     ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
 
     while (1)
     {
         UART_read(&pkt);
         if (pkt.invalid == 0)
         {
-            // OutPacket packet = {pkt.invalid, pkt.header, pkt.top_left_wheel, pkt.back_left_wheel, pkt.top_right_wheel, pkt.back_right_wheel, pkt.drum, pkt.drum, pkt.actuator, pkt.actuator};
-            // UART_write(&packet);
             xQueueOverwrite(control_queue, &pkt);
             pkt.invalid = 1; // Mark invalid so packet is not reused
         }
+        UART_write(&pkt);
         vTaskDelay(1);
     }
 }
@@ -42,7 +42,7 @@ void UART_tx_task(PDH *pdh) //
         //updateAuxVoltage();
         //packet.aux_battery = getAuxVoltage();
 
-        UART_write(&packet);
+        //UART_write(&packet);
 
         if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
         {
@@ -65,18 +65,18 @@ void temperature_update_task()
 
 void one_robot_control_can_task()
 {
-    ControlPacket_OneRobot motor_state = {0, 0, 0x8F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    ControlPacket_OneRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
     ControlPacket_OneRobot new_data;
 
     while (1)
     {
-        //if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
+        if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
-         //   motor_state = new_data;
+            motor_state = new_data;
         }
-        printf("hello, hello, hello\n");
         directControl(motor_state);
-        vTaskDelay(pdMS_TO_TICKS(2));
+        //ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); DO NOT REMOVE OR I WILL SLIME YOU OUT
+        vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 
@@ -107,9 +107,9 @@ void motor_task()
 {
     for (;;)
     {
-            
+        //sendEn();    
         test_run_motor();
-        vTaskDelay(1);
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 

@@ -12,8 +12,8 @@ typedef struct __attribute__((packed))
     uint8_t front_right_wheel;
     uint8_t back_right_wheel;
     uint8_t front_bucket_drum;
-    uint8_t back_bucket_drum;
     uint8_t front_actuator;
+    uint8_t back_bucket_drum;
     uint8_t back_actuator;
 } ControlPacket_OneRobot;
 

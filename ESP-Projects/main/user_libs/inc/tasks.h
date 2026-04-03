@@ -11,6 +11,7 @@
 #include "freertos/task.h"
 #include "packets.h"
 
+#include "can.h"
 #include "uart.h"
 #include "wifi.h"
 #include "talonFX.h"

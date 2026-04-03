@@ -5,8 +5,8 @@ TalonFX frontLeft;
 TalonFX backLeft;
 TalonFX frontRight;
 TalonFX backRight;
-TalonFX backBucketDrum;
 TalonFX frontBucketDrum;
+TalonFX backBucketDrum;
 
 TalonSRX frontActuator;
 TalonSRX backActuator;
@@ -52,13 +52,39 @@ void canSetupTalons()
 
 void directControl(ControlPacket_OneRobot pkt)
 {
+    sendEn();
     int8_t leftSpeed = pkt.front_left_wheel;
     setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
-    setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
+    setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)));
 
     int8_t rightSpeed = pkt.front_right_wheel;
-    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)));
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
+
+    //setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)) * -1);
+    setTargetFX(&backBucketDrum, ((int8_t)(pkt.back_bucket_drum - 127)));
+
+    float actuatorOutput = 0;
+    if (pkt.back_actuator > 127)
+    {
+        actuatorOutput = 1;
+    }
+    else if (pkt.back_actuator < 127)
+    {
+        actuatorOutput = -1;
+    }
+    setSRX(&backActuator, -1 * actuatorOutput);
+
+    actuatorOutput = 0;
+    if (pkt.front_actuator > 127)
+    {
+        actuatorOutput = 1;
+    }
+    else if (pkt.front_actuator < 127)
+    {
+        actuatorOutput = -1;
+    }
+    setSRX(&frontActuator, -1 * actuatorOutput);
 }
 
 /**void initAuxVoltageSensor(void)
@@ -85,6 +111,7 @@ float getAuxVoltage(void)
 // TODO: Remove this function after testing
 void test_run_motor(void)
 {
+    sendEn();
     setTargetFX(&frontLeft, 200);
     setTargetFX(&backLeft, 200);
     setTargetFX(&frontRight, 200);

@@ -12,10 +12,10 @@
 #define BACK_LEFT_WHEEL_ID 13 // 13
 #define FRONT_RIGHT_WHEEL_ID 36 // 36
 #define BACK_RIGHT_WHEEL_ID 37
-#define BACK_BUCKET_DRUM_ID 25  // needs updating
+#define BACK_BUCKET_DRUM_ID 25  
 #define FRONT_BUCKET_DRUM_ID 60
-#define FRONT_ACTUATOR_ID 55
-#define BACK_ACTUATOR_ID 16 // needs updating
+#define FRONT_ACTUATOR_ID 16
+#define BACK_ACTUATOR_ID 55 
 
 // Define channel IDs of each motor/actuator
 #define FRONT_LEFT_WHEEL_CHANNEL_ID 12 // 12
