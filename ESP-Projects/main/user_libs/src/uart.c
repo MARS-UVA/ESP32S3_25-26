@@ -94,8 +94,7 @@ void UART_read(SerialPacket *packet)
  */
 
 // change back to
-//void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
-void UART_write(CurrVoltPacket_OneRobot *packet)
+void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
 {
     // char* cPacket = (char*)packet;
     const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(CurrVoltPacket_OneRobot));
@@ -107,4 +106,9 @@ void UART_write(CurrVoltPacket_OneRobot *packet)
 void UARTWriteTemperature(TempPacket_OneRobot *packet)
 {
     const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(TempPacket_OneRobot));
+}
+
+void UART_write_position(PositionPacket *packet) // writes a single packet to Jetson on UART
+{
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(PositionPacket));
 }

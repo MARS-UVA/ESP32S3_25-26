@@ -2,7 +2,7 @@ import serial
 from time import sleep
 from array import array
 
-COM_Port = 'COM12'  # Change this to your actual COM port
+COM_Port = 'COM3'  # Change this to your actual COM port
 BAUD_Rate = 115200    # Set the baud rate
 
 # Open the serial port
@@ -15,17 +15,17 @@ try:
     # full speed forward for top left motor, neutral speed for all others
     i = 5
     while (True):
-        i = (i + 1) % 250
-        motor_data[4] = i
-        ser.write(motor_data)
-        sleep(0.01)  # Send data every 100ms
+        #i = (i + 1) % 250
+        #motor_data[4] = i
+        #ser.write(motor_data)
+        #sleep(0.01)  # Send data every 100ms
         
-        data = ser.read(34)
-        if len(data) == 34:
-            floats = array('f', data[2:])
-            print(f"Received: {data[0]} {data[1]} {floats[0]} {floats[1]} {floats[2]} {floats[3]} {floats[4]} {floats[6]}")
+        data = ser.read(12)
+        if len(data) == 12:
+            floats = array('f', data[4:])
+            print(f"Received: {data[0]} {data[1]} {data[2]} {data[3]} {floats[0]} {floats[1]}")
         else:
-             print("No data received")
+            print("No data received")
 
 except serial.SerialException as e:
     print(f"Error opening or communicating with serial port: {e}")
