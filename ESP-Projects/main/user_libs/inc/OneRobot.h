@@ -8,9 +8,9 @@
 #include "i2c.h"
 
 // Define CAN IDs of each motor/actuator
-#define FRONT_LEFT_WHEEL_ID 30 // 38
-#define BACK_LEFT_WHEEL_ID 0 // 13
-#define FRONT_RIGHT_WHEEL_ID 59 // 36
+#define FRONT_LEFT_WHEEL_ID 38 // 38
+#define BACK_LEFT_WHEEL_ID 13 // 13
+#define FRONT_RIGHT_WHEEL_ID 36 // 36
 #define BACK_RIGHT_WHEEL_ID 37
 #define BACK_BUCKET_DRUM_ID 25  // needs updating
 #define FRONT_BUCKET_DRUM_ID 60
@@ -18,9 +18,9 @@
 #define BACK_ACTUATOR_ID 16 // needs updating
 
 // Define channel IDs of each motor/actuator
-#define FRONT_LEFT_WHEEL_CHANNEL_ID 2 // 12
-#define BACK_LEFT_WHEEL_CHANNEL_ID 3 // 13
-#define FRONT_RIGHT_WHEEL_CHANNEL_ID 10 // 3
+#define FRONT_LEFT_WHEEL_CHANNEL_ID 12 // 12
+#define BACK_LEFT_WHEEL_CHANNEL_ID 13 // 13
+#define FRONT_RIGHT_WHEEL_CHANNEL_ID 3 // 3
 #define BACK_RIGHT_WHEEL_CHANNEL_ID 1
 #define BACK_BUCKET_DRUM_CHANNEL_ID 0
 #define FRONT_BUCKET_DRUM_CHANNEL_ID 2
