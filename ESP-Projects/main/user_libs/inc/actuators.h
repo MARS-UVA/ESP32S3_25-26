@@ -12,7 +12,7 @@
 #include "driver/gpio.h"
 #include "utils.h"
 
-typedef struct Actuator
+typedef struct
 {
     TalonSRX *controller;
     Pot *pot;
@@ -25,8 +25,8 @@ typedef struct Actuator
 } Actuator;
 
 Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid, int *direction);
-void hallEffectInit(int pinLeft, int pinRight);
-void moveSyncActuatorsToPosition(Actuator *leftActuator, Actuator *rightActuator, double targetPosition);
-void moveSyncActuatorsToVelocity(Actuator *leftActuator, Actuator *rightActuator, double targetVelocity);
-PositionPacket calculatePulse(Actuator *leftActuator, Actuator *rightActuator);
-void evaluatePot(Actuator *leftActuator, Actuator *rightActuator);
+void hallEffectInit(int pinFront, int pinBack);
+void moveSyncActuatorsToPosition(Actuator *frontActuator, Actuator *backActuator, double targetPosition);
+void moveSyncActuatorsToVelocity(Actuator *frontActuator, Actuator *backActuator, double targetVelocity);
+PositionPacket_OneRobot calculatePulse(Actuator *frontActuator, Actuator *backActuator);
+void evaluatePot(Actuator *frontActuator, Actuator *backActuator);

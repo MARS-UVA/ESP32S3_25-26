@@ -1,4 +1,3 @@
-#include "control_startup.h"
 #include "OneRobot.h"
 
 TalonFX frontLeft;
@@ -58,7 +57,7 @@ void initializeTalons()
     // frontActuatorPID = initPID(0.9, 0.5, 0); 
     // backActuatorPID = initPID(0.9, 0.5, 0);
 
-    hallEffectInit(HALL_PIN_LEFT, HALL_PIN_BACK);
+    hallEffectInit(HALL_PIN_FRONT, HALL_PIN_BACK);
 
     frontActuator = initActuator(&frontActuatorSRX, &frontActuatorPot, &frontActuatorPID, &frontDirection);
     backActuator = initActuator(&backActuatorSRX, &backActuatorPot, &backActuatorPID, &backDirection);
@@ -93,12 +92,12 @@ void directControl(ControlPacket_OneRobot pkt)
     if (pkt.back_actuator > 127)
     {
         actuatorOutput = 1;
-        *backActuator.direction = -1;
+        *backActuator.direction = 1;
     }
     else if (pkt.back_actuator < 127)
     {
         actuatorOutput = -1;
-        *backActuator.direction = 1;
+        *backActuator.direction = -1;
     }
     setSRX(backActuator.controller, 1 * actuatorOutput);
 
@@ -106,12 +105,12 @@ void directControl(ControlPacket_OneRobot pkt)
     if (pkt.front_actuator > 127)
     {
         actuatorOutput = 1;
-        *frontActuator.direction = -1;
+        *frontActuator.direction = 1;
     }
     else if (pkt.front_actuator < 127)
     {
         actuatorOutput = -1;
-        *frontActuator.direction = 1;
+        *frontActuator.direction = -1;
     }
     setSRX(frontActuator.controller, -1 * actuatorOutput);
 

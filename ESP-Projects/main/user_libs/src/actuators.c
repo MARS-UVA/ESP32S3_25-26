@@ -1,12 +1,12 @@
 #include "actuators.h"
 
-static double pulse_mm = 17.4; //22.5
+static double pulse_mm = 22.5; //printing gave a multiplier of 22.5
 
-volatile int pulseCountLeft = 0;
-volatile int pulseCountRight = 0;
+volatile int pulseCountFront = 0;
+volatile int pulseCountBack = 0;
 
-int leftDirection;
-int rightDirection;
+int frontDirection;
+int backDirection;
 
 Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid, int *direction)
 {
@@ -21,20 +21,20 @@ Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid, int *dir
         .direction = direction};
 };
 
-static void IRAM_ATTR gpio_isr_handler_left(void* arg) {
-    pulseCountLeft+=leftDirection;
+static void IRAM_ATTR gpio_isr_handler_front(void* arg) {
+    pulseCountFront-=frontDirection;
 }
 
-static void IRAM_ATTR gpio_isr_handler_right(void* arg) {
-    pulseCountRight+=rightDirection;
+static void IRAM_ATTR gpio_isr_handler_back(void* arg) {
+    pulseCountBack-=backDirection;
 }
 
-void hallEffectInit(int pinLeft, int pinRight) 
+void hallEffectInit(int pinFront, int pinBack) 
 {
     gpio_config_t io_conf_a = {
         .intr_type = GPIO_INTR_POSEDGE,    // <--- Trigger on Rising Edge
         .mode = GPIO_MODE_INPUT,
-        .pin_bit_mask = (1ULL << pinLeft),    
+        .pin_bit_mask = (1ULL << pinFront),    
         .pull_up_en = 1
     };
     gpio_config(&io_conf_a);
@@ -42,124 +42,122 @@ void hallEffectInit(int pinLeft, int pinRight)
     gpio_config_t io_conf_b = {
         .intr_type = GPIO_INTR_POSEDGE, 
         .mode = GPIO_MODE_INPUT,
-        .pin_bit_mask = (1ULL << pinRight),
+        .pin_bit_mask = (1ULL << pinBack),
         .pull_up_en = GPIO_PULLUP_ENABLE
     };
     gpio_config(&io_conf_b);
 
     gpio_install_isr_service(0);
-    gpio_isr_handler_add(pinLeft, gpio_isr_handler_left, (void*) pinLeft);
-    gpio_isr_handler_add(pinRight, gpio_isr_handler_right, (void*) pinRight);
+    gpio_isr_handler_add(pinFront, gpio_isr_handler_front, (void*) pinFront);
+    gpio_isr_handler_add(pinBack, gpio_isr_handler_back, (void*) pinBack);
 }
 
-void moveSyncActuatorsToPosition(Actuator *leftActuator, Actuator *rightActuator, double targetPosition)
+void moveSyncActuatorsToPosition(Actuator *frontActuator, Actuator *backActuator, double targetPosition)
 {
-    double leftPos = leftActuator->pot->pos;
-    double rightPos = rightActuator->pot->pos;
-    double syncPositionError = (leftPos - rightPos) * 0.5;
+    double frontPos = frontActuator->pot->pos;
+    double backPos = backActuator->pot->pos;
+    double syncPositionError = (frontPos - backPos) * 0.5;
     //double syncPositionError = 0;
 
-    if (leftActuator->lastTime < 0 || rightActuator->lastTime < 0)
+    if (frontActuator->lastTime < 0 || backActuator->lastTime < 0)
     {
-        leftActuator->lastTime = esp_timer_get_time() / 1000000.0;
-        rightActuator->lastTime = esp_timer_get_time() / 1000000.0;
+        frontActuator->lastTime = esp_timer_get_time() / 1000000.0;
+        backActuator->lastTime = esp_timer_get_time() / 1000000.0;
 
         return;
     }
 
     double currentTime = esp_timer_get_time() / 1000000.0;
 
-    double leftPositionOutput = computePID(leftActuator->pid, targetPosition, leftPos - syncPositionError, currentTime - leftActuator->lastTime);
-    double rightPositionOutput = computePID(rightActuator->pid, targetPosition, rightPos + syncPositionError, currentTime - rightActuator->lastTime);
+    double frontPositionOutput = computePID(frontActuator->pid, targetPosition, frontPos - syncPositionError, currentTime - frontActuator->lastTime);
+    double backPositionOutput = computePID(backActuator->pid, targetPosition, backPos + syncPositionError, currentTime - backActuator->lastTime);
 
-    //double leftDistance = leftPositionOutput - ((leftPos + rightPos) / 2.0);
-    //double rightDistance = rightPositionOutput - ((leftPos + rightPos) / 2.0);
+    //double frontDistance = frontPositionOutput - ((frontPos + backPos) / 2.0);
+    //double backDistance = backPositionOutput - ((frontPos + backPos) / 2.0);
 
-    double leftVelocity = leftPositionOutput;
-    double rightVelocity = rightPositionOutput;
+    double frontVelocity = frontPositionOutput;
+    double backVelocity = backPositionOutput;
 
-    printf("Left Output: %f, Left Pos: %f, Right Output: %f, Right Pos: %f, Target Pos: %f\n", leftVelocity, leftPos, rightVelocity, rightPos, targetPosition);
+    printf("Front Output: %f, Front Pos: %f, Back Output: %f, Back Pos: %f, Target Pos: %f\n", frontVelocity, frontPos, backVelocity, backPos, targetPosition);
 
-    leftVelocity = fmax(fmin(leftVelocity, 1), -1);
-    rightVelocity = fmax(fmin(rightVelocity, 1), -1);
+    frontVelocity = fmax(fmin(frontVelocity, 1), -1);
+    backVelocity = fmax(fmin(backVelocity, 1), -1);
 
-    leftActuator->velocity = leftVelocity;
-    rightActuator->velocity = rightVelocity;
-    //setSRX(leftActuator->controller, leftVelocity);
-    //setSRX(rightActuator->controller, rightVelocity);
+    frontActuator->velocity = frontVelocity;
+    backActuator->velocity = backVelocity;
+    //setSRX(frontActuator->controller, frontVelocity);
+    //setSRX(backActuator->controller, backVelocity);
 
-    //printf("Left Output: %f, Right Output: %f\n", leftVelocity, rightVelocity);
+    //printf("Front Output: %f, Back Output: %f\n", frontVelocity, backVelocity);
 
-    leftActuator->lastTime = currentTime;
-    rightActuator->lastTime = currentTime;
+    frontActuator->lastTime = currentTime;
+    backActuator->lastTime = currentTime;
 }
 
-void moveSyncActuatorsToVelocity(Actuator *leftActuator, Actuator *rightActuator, double targetVelocity)
+void moveSyncActuatorsToVelocity(Actuator *frontActuator, Actuator *backActuator, double targetVelocity)
 {
-    double leftPos = leftActuator->pot->pos;
-    double rightPos = rightActuator->pot->pos;
-    double syncPositionError = (leftPos - rightPos);
+    double frontPos = frontActuator->pot->pos;
+    double backPos = backActuator->pot->pos;
+    double syncPositionError = (frontPos - backPos);
 
-    if (leftActuator->lastTime < 0 || rightActuator->lastTime < 0)
+    if (frontActuator->lastTime < 0 || backActuator->lastTime < 0)
     {
-        leftActuator->lastTime = esp_timer_get_time() / 1000000.0;
-        rightActuator->lastTime = esp_timer_get_time() / 1000000.0;
+        frontActuator->lastTime = esp_timer_get_time() / 1000000.0;
+        backActuator->lastTime = esp_timer_get_time() / 1000000.0;
 
-        leftActuator->prevPosition = leftPos;
-        rightActuator->prevPosition = rightPos;
-        leftActuator->prevVelocity = 0;
-        rightActuator->prevVelocity = 0;
+        frontActuator->prevPosition = frontPos;
+        backActuator->prevPosition = backPos;
+        frontActuator->prevVelocity = 0;
+        backActuator->prevVelocity = 0;
         return;
     }
 
-    double leftVelocity = leftActuator->prevVelocity;
-    double rightVelocity = rightActuator->prevVelocity;
+    double frontVelocity = frontActuator->prevVelocity;
+    double backVelocity = backActuator->prevVelocity;
 
     double currentTime = esp_timer_get_time() / 1000000.0;
 
-    double leftVelocityOutput = computePID(leftActuator->pid, targetVelocity - syncPositionError, leftVelocity, currentTime - leftActuator->lastTime);
-    double rightVelocityOutput = computePID(rightActuator->pid, targetVelocity + syncPositionError, rightVelocity, currentTime - rightActuator->lastTime);
+    double frontVelocityOutput = computePID(frontActuator->pid, targetVelocity - syncPositionError, frontVelocity, currentTime - frontActuator->lastTime);
+    double backVelocityOutput = computePID(backActuator->pid, targetVelocity + syncPositionError, backVelocity, currentTime - backActuator->lastTime);
 
-    //printf("Left Velocity: %f, Position: %f, Right Velocity: %f, Position: %f, Target Velocity: %f (before clamping)\n", leftVelocityOutput, leftPos, rightVelocityOutput, rightPos, targetVelocity);
+    //printf("Front Velocity: %f, Position: %f, Back Velocity: %f, Position: %f, Target Velocity: %f (before clamping)\n", frontVelocityOutput, frontPos, backVelocityOutput, backPos, targetVelocity);
 
-    leftVelocityOutput = fmax(fmin(leftVelocityOutput, 1), -1);
-    rightVelocityOutput = fmax(fmin(rightVelocityOutput, 1), -1);
+    frontVelocityOutput = fmax(fmin(frontVelocityOutput, 1), -1);
+    backVelocityOutput = fmax(fmin(backVelocityOutput, 1), -1);
 
-    leftActuator->velocity = leftVelocityOutput;
-    rightActuator->velocity = rightVelocityOutput;
-    //setSRX(leftActuator->controller, leftVelocityOutput);
-    //setSRX(rightActuator->controller, rightVelocityOutput);
+    frontActuator->velocity = frontVelocityOutput;
+    backActuator->velocity = backVelocityOutput;
+    //setSRX(frontActuator->controller, frontVelocityOutput);
+    //setSRX(backActuator->controller, backVelocityOutput);
 
-    // printf("Left Velocity: %f, Right Velocity: %f, Target Velocity: %f\n", leftVelocityOutput, rightVelocityOutput, targetVelocity);
-    // printf("targetVelocity: %f, time delta: %f\n", targetVelocity, currentTime - leftActuator->lastTime);
+    // printf("Front Velocity: %f, Back Velocity: %f, Target Velocity: %f\n", frontVelocityOutput, backVelocityOutput, targetVelocity);
+    // printf("targetVelocity: %f, time delta: %f\n", targetVelocity, currentTime - frontActuator->lastTime);
 
-    leftActuator->prevPosition = leftPos;
-    rightActuator->prevPosition = rightPos;
-    leftActuator->prevVelocity = leftVelocityOutput;
-    rightActuator->prevVelocity = rightVelocityOutput;
-    leftActuator->lastTime = currentTime;
-    rightActuator->lastTime = currentTime;
+    frontActuator->prevPosition = frontPos;
+    backActuator->prevPosition = backPos;
+    frontActuator->prevVelocity = frontVelocityOutput;
+    backActuator->prevVelocity = backVelocityOutput;
+    frontActuator->lastTime = currentTime;
+    backActuator->lastTime = currentTime;
 }
 
-PositionPacket calculatePulse(Actuator *leftActuator, Actuator *rightActuator) 
+PositionPacket_OneRobot calculatePulse(Actuator *frontActuator, Actuator *backActuator) 
 {
-    pulseCountLeft = fmax(fmin(pulseCountLeft, (int)(pulse_mm*254)), 0);
-    leftActuator->prevPosition = map((int)(pulse_mm*254), 0, pulseCountLeft);
+    pulseCountFront = fmax(fmin(pulseCountFront, (int)(pulse_mm*254)), 0);
+    frontActuator->prevPosition = map((int)(pulse_mm*254), 0, pulseCountFront);
 
-    pulseCountRight = fmax(fmin(pulseCountRight, (int)(pulse_mm*254)), 0);
-    rightActuator->prevPosition = map((int)(pulse_mm*254), 0, pulseCountRight);
+    pulseCountBack = fmax(fmin(pulseCountBack, (int)(pulse_mm*254)), 0);
+    backActuator->prevPosition = map((int)(pulse_mm*254), 0, pulseCountBack);
 
-    return (PositionPacket){
-        .start_byte = 0xFF,
-        .header = 0x03,
-        .reserved_bit1 = 0x00,
-        .reserved_bit2 = 0x00,
-        .front_actuator = leftActuator->prevPosition,
-        .back_actuator = rightActuator->prevPosition};
+    PositionPacket_OneRobot pkt = Init_Position_Packet();
+    pkt.front_actuator_position = frontActuator->prevPosition;
+    pkt.back_actuator_position = backActuator->prevPosition;
+
+    return pkt;
 } 
 
-void evaluatePot(Actuator *leftActuator, Actuator *rightActuator) 
+void evaluatePot(Actuator *frontActuator, Actuator *backActuator) 
 {
-    readPot(leftActuator->pot);
-    readPot(rightActuator->pot);
+    readPot(frontActuator->pot);
+    readPot(backActuator->pot);
 }

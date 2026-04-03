@@ -103,12 +103,12 @@ void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Je
 }
 
 // TODO: Combine with UART_write and make it so that the function can write either CurrVoltPacket_OneRobot or TempPacket_OneRobot (or any other packet we may create in the future)
-void UARTWriteTemperature(TempPacket_OneRobot *packet)
+void UART_write_temperature(TempPacket_OneRobot *packet)
 {
     const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(TempPacket_OneRobot));
 }
 
-void UART_write_position(PositionPacket *packet) // writes a single packet to Jetson on UART
+void UART_write_position(PositionPacket_OneRobot *packet) // writes a single packet to Jetson on UART
 {
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(PositionPacket));
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(PositionPacket_OneRobot));
 }
