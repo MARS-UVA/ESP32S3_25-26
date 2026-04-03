@@ -72,7 +72,7 @@ void one_robot_control_can_task()
     {
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
-            motor_state = new_data;
+          motor_state = new_data;
         }
         directControl(motor_state);
         //ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); DO NOT REMOVE OR I WILL SLIME YOU OUT

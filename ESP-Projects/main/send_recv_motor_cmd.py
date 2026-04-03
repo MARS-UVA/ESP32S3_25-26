@@ -11,7 +11,7 @@ try:
     ser = serial.Serial(COM_Port, baudrate=BAUD_Rate, timeout=1) 
     print(f"Opened port: {ser.name}")
         
-    motor_data = bytearray([0xFF, 0x9f, 0x7f, 0x9f, 0x7f, 0x7f, 0x7F, 0x7F, 0x7F, 0x7F])  # Example motor command data
+    motor_data = bytearray([0xFF, 0x6f, 0x7f, 0x6f, 0x7f, 0x7f, 0x7F, 0x7F, 0x7F, 0x7F])  # Example motor command data
     # first byte: start byte (0xFF)
     # second byte: header byte (just 0x0)
     # the next 6 bytes set neutral speed for all 6 motors and 2 actuators

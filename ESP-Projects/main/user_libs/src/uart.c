@@ -58,11 +58,40 @@ void UART_read(ControlPacket_OneRobot *packet)
     //     return;
     // }
 
-    if (packet->header == 0xFF)
+    if (packet->invalid == 0xFF)
     {
         packet->invalid = 0;
     }
 }
+
+/**
+void UART_read(SerialPacket *packet)
+{
+    const uint8_t packetLength = 10;
+    uint8_t RxBuffer[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // zeroinit this so it doesn't have garbage data
+
+    uart_read_bytes(
+        UART_NUM_1,
+        RxBuffer,
+        packetLength,
+        0 // this is timeout
+    );
+
+    if (RxBuffer[0] == 0xFF)
+    {
+        packet->invalid = 0;
+        packet->header = RxBuffer[1];
+        packet->front_left_drive_motor = RxBuffer[2];
+        packet->back_left_drive_motor = RxBuffer[3];
+        packet->front_right_drive_motor = RxBuffer[4];
+        packet->back_right_drive_motor = RxBuffer[5];
+        packet->spin_front_motor = RxBuffer[6];
+        packet->arm_front_actuator = RxBuffer[7];
+        packet->spin_back_motor = RxBuffer[8];
+        packet->arm_back_actuator = RxBuffer[9];
+    }
+}
+ */
 
 // change back to
 //void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
