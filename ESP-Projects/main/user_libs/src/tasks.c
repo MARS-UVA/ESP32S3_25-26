@@ -46,7 +46,7 @@ void UART_tx_task(PDH *pdh) //
             printf("Debug: temperature: %d\n", temperature_packet.front_left_wheel_temp);
             UARTWriteTemperature(&temperature_packet);
         }*/
-        vTaskDelay(100);
+        vTaskDelay(10);
     }
 }
 
