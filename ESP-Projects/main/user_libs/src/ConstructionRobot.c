@@ -38,18 +38,13 @@ void directControl(ControlPacket_ConstructionRobot pkt)
     float actuatorOutput = 0;
     if (pkt.actuator > 127)
     {
-        actuatorOutput = 0.8;
+        actuatorOutput = 1;
     }
     else if (pkt.actuator < 127)
     {
-        actuatorOutput = -0.8;
+        actuatorOutput = -1;
     }
     setSRX(&actuator, actuatorOutput);
 
-    float vibratorOutput = 0;
-    if (pkt.vibrator > 127)
-    {
-        vibratorOutput = 0.3;
-    }
-    setSRX(&vibrator, vibratorOutput);
+    setSRX(&vibrator, ((int8_t)(pkt.vibrator - 127)) * 0.5);
 }
