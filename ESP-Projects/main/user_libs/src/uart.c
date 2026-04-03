@@ -95,10 +95,10 @@ void UART_read(SerialPacket *packet)
 
 // change back to
 //void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
-void UART_write(ControlPacket_OneRobot *packet)
+void UART_write(CurrVoltPacket_OneRobot *packet)
 {
     // char* cPacket = (char*)packet;
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(ControlPacket_OneRobot));
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(CurrVoltPacket_OneRobot));
     // char *test_str = "This is a test string.\n";
     // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
 }

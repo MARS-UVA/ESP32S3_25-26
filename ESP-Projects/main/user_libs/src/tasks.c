@@ -4,7 +4,6 @@
 void UART_rx_task()
 {
     ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
 
     while (1)
     {
@@ -14,7 +13,6 @@ void UART_rx_task()
             xQueueOverwrite(control_queue, &pkt);
             pkt.invalid = 1; // Mark invalid so packet is not reused
         }
-        UART_write(&pkt);
         vTaskDelay(1);
     }
 }
@@ -22,11 +20,10 @@ void UART_rx_task()
 void UART_tx_task(PDH *pdh) //
 {
     CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
-    TempPacket_OneRobot temperature_packet;
+    //TempPacket_OneRobot temperature_packet;
 
     while (1)
     {
-        printf("Current value at channel 3: %.2f\n", getChannelCurrentPDH(pdh, 12));
         packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
         packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
         packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
@@ -42,13 +39,13 @@ void UART_tx_task(PDH *pdh) //
         //updateAuxVoltage();
         //packet.aux_battery = getAuxVoltage();
 
-        //UART_write(&packet);
+        UART_write(&packet);
 
-        if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
+        /**if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
         {
             printf("Debug: temperature: %d\n", temperature_packet.front_left_wheel_temp);
             UARTWriteTemperature(&temperature_packet);
-        }
+        }*/
         vTaskDelay(100);
     }
 }

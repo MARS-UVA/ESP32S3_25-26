@@ -21,8 +21,8 @@ typedef struct __attribute__((packed))
 {
     uint8_t invalid;
     uint8_t header;
-    uint8_t reserved_bit1;
-    uint8_t reserved_bit2;
+    uint8_t reserved_byte1;
+    uint8_t reserved_byte2;
 
     float front_left_wheel;
     float back_left_wheel;
@@ -40,8 +40,8 @@ typedef struct __attribute__((packed))
 {
     uint8_t invalid;
     uint8_t header;
-    uint8_t reserved_bit1;
-    uint8_t reserved_bit2;
+    uint8_t reserved_byte1;
+    uint8_t reserved_byte2;
     
     int front_left_wheel_temp;
     int back_left_wheel_temp;
@@ -55,8 +55,8 @@ typedef struct __attribute__((packed))
 {
     uint8_t invalid;
     uint8_t header;
-    uint8_t reserved_bit1;
-    uint8_t reserved_bit2;
+    uint8_t reserved_byte1;
+    uint8_t reserved_byte2;
 
     float front_actuator_position;
     float back_actuator_position;    

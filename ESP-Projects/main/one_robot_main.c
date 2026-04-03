@@ -33,6 +33,6 @@ void app_main()
     xTaskCreate((void *)(one_robot_control_can_task), "uart_can", 4096, NULL, 8, &control_can_handle);
     //xTaskCreate((void *)(temperature_update_task), "temperature_update", 4096, NULL, 7, &temperature_update_handle);
     xTaskCreate((void *)(UART_rx_task), "uart_rx", 4096, NULL, 7, &uart_rx_handle);
-    //xTaskCreate((void *)(UART_tx_task), "uart_tx", 4096, &pdh, 9, &uart_tx_handle);
+    xTaskCreate((void *)(UART_tx_task), "uart_tx", 4096, &pdh, 9, &uart_tx_handle);
     //xTaskCreate((void *)(motor_task), "motor_task", 4096, NULL, 9, &motor_task_handle);
 }

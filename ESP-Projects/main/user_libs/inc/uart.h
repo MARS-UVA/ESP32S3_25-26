@@ -11,7 +11,7 @@
 
 void UART_setup();
 void UART_read(ControlPacket_OneRobot *packet);
-void UART_write(ControlPacket_OneRobot *packet);
+void UART_write(CurrVoltPacket_OneRobot *packet);
 //void UART_write(CurrVoltPacket_OneRobot *packet);
 
 void UARTWriteTemperature(TempPacket_OneRobot *packet);
