@@ -24,6 +24,8 @@ extern QueueHandle_t control_queue; // queue stores the control packet values
 extern QueueHandle_t temperature_queue; // queue stores the temperature packet values
 extern TalonFX *fxMotors[];
 extern TalonSRX *srxMotors[];
+extern Actuator frontActuator;
+extern Actuator backActuator;
 
 void current_update_task(PDH *pdh);
 void UART_rx_task();

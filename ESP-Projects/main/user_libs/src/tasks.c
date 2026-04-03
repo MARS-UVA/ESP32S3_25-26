@@ -21,6 +21,7 @@ void UART_tx_task(PDH *pdh) //
 {
     CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
     //TempPacket_OneRobot temperature_packet;
+    PositionPacket_OneRobot position_packet = calculatePulse(&frontActuator, &backActuator);
 
     while (1)
     {
@@ -39,7 +40,9 @@ void UART_tx_task(PDH *pdh) //
         //updateAuxVoltage();
         //packet.aux_battery = getAuxVoltage();
 
-        UART_write(&packet);
+        //UART_write(&packet);
+
+        UART_write_position(&position_packet);
 
         /**if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
         {

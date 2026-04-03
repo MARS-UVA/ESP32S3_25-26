@@ -34,10 +34,10 @@ static float aux_battery_voltage = 0.0f;
 // Initialize Talon "objects"
 void initializeTalons()
 {
-    // frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID);
-    // backLeft = talonFXInit(BACK_LEFT_WHEEL_ID, BACK_LEFT_WHEEL_CHANNEL_ID);
-    // frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID);
-    // backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID);
+    frontLeft = talonFXInit(FRONT_LEFT_WHEEL_ID, FRONT_LEFT_WHEEL_CHANNEL_ID);
+    backLeft = talonFXInit(BACK_LEFT_WHEEL_ID, BACK_LEFT_WHEEL_CHANNEL_ID);
+    frontRight = talonFXInit(FRONT_RIGHT_WHEEL_ID, FRONT_RIGHT_WHEEL_CHANNEL_ID);
+    backRight = talonFXInit(BACK_RIGHT_WHEEL_ID, BACK_RIGHT_WHEEL_CHANNEL_ID);
 
     backBucketDrum = talonFXInit(BACK_BUCKET_DRUM_ID, BACK_BUCKET_DRUM_CHANNEL_ID);
     frontBucketDrum = talonFXInit(FRONT_BUCKET_DRUM_ID, FRONT_BUCKET_DRUM_CHANNEL_ID);
