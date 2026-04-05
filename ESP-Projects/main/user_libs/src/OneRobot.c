@@ -57,6 +57,8 @@ void initializeTalons()
     // frontActuatorPID = initPID(0.9, 0.5, 0); 
     // backActuatorPID = initPID(0.9, 0.5, 0);
 
+    //canSetupTalons();
+
     hallEffectInit(HALL_PIN_FRONT, HALL_PIN_BACK);
 
     frontActuator = initActuator(&frontActuatorSRX, &frontActuatorPot, &frontActuatorPID, &frontDirection);

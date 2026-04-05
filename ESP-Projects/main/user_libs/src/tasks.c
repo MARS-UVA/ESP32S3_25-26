@@ -20,12 +20,12 @@ void UART_rx_task()
 void UART_tx_task(PDH *pdh) //
 {
     CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
-    //TempPacket_OneRobot temperature_packet;
-    PositionPacket_OneRobot position_packet = calculatePulse(&frontActuator, &backActuator);
+    TempPacket_OneRobot temperature_packet = Init_Temp_Packet();
+    PositionPacket_OneRobot position_packet = Init_Position_Packet();
 
     while (1)
     {
-        packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
+        /**packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
         packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
         packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
         packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
@@ -35,8 +35,10 @@ void UART_tx_task(PDH *pdh) //
         packet.front_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
         packet.back_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
 
-        packet.main_battery = (float)(getInputVoltagePDH(pdh));
+        packet.main_battery = (float)(getInputVoltagePDH(pdh));**/
         
+        position_packet = calculatePulse(&frontActuator, &backActuator);
+
         //updateAuxVoltage();
         //packet.aux_battery = getAuxVoltage();
 
@@ -44,11 +46,11 @@ void UART_tx_task(PDH *pdh) //
 
         UART_write_position(&position_packet);
 
-        /**if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
+        if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
         {
-            printf("Debug: temperature: %d\n", temperature_packet.front_left_wheel_temp);
-            UARTWriteTemperature(&temperature_packet);
-        }*/
+            printf("Debug: temperature: %f\n", temperature_packet.front_left_wheel_temp);
+            UART_write_temperature(&temperature_packet);
+        }
         vTaskDelay(10);
     }
 }

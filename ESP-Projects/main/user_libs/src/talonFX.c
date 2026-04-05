@@ -140,14 +140,14 @@ void canSetupTalonFX(TalonFX **motors, size_t count)
             .on_rx_done = talonfx_twai_rx_cb,
         };
     
-        ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
+        //ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
         ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, &registry));
-        ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
+        //ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
         can_initialized = true;
     }
 }
 
-int getTemperatureTalonFX(TalonFX *fx)
+float getTemperatureTalonFX(TalonFX *fx)
 {
     return fx->temperature;
 }

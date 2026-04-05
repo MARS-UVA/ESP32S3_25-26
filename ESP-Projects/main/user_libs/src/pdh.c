@@ -22,6 +22,9 @@
 #include "pdh.h"
 #include "can.h"
 #include "utils.h"
+#include "talonfx.h"
+
+extern TalonFX *fxMotors[];
 
 /**
  * @internal
@@ -191,6 +194,7 @@ void canSetupPDH(PDH *pdh)
     };
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
     ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, pdh));
+    canSetupTalonFX(&fxMotors[0],6);
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 

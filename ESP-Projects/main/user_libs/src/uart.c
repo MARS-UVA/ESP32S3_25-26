@@ -18,7 +18,7 @@ void UART_setup()
     // };
 
     const uart_config_t uart_config = {
-        .baud_rate = 1000000,
+        .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,
         .parity = 0,
         .stop_bits = 1,
@@ -38,7 +38,7 @@ void UART_setup()
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
     ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, S3_TX_PIN, S3_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE)); //used to be 43, 44, but those pins are used for CAN so changed to 23, 24
     control_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
-    //temperature_queue = xQueueCreate(1, sizeof(TempPacket_OneRobot));
+    temperature_queue = xQueueCreate(1, sizeof(TempPacket_OneRobot));
 }
 
 void UART_read(ControlPacket_OneRobot *packet)
@@ -112,3 +112,8 @@ void UART_write_position(PositionPacket_OneRobot *packet) // writes a single pac
 {
     const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(PositionPacket_OneRobot));
 }
+
+/*void UART_write_general(void *packet, size_t size) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
+{       
+    const int txBytes = uart_write_bytes(UART_NUM_1, packet, size);
+}*/

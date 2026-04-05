@@ -43,12 +43,12 @@ typedef struct __attribute__((packed))
     uint8_t reserved_byte1;
     uint8_t reserved_byte2;
     
-    int front_left_wheel_temp;
-    int back_left_wheel_temp;
-    int front_right_wheel_temp;
-    int back_right_wheel_temp;
-    int front_drum_temp;
-    int back_drum_temp;
+    float front_left_wheel_temp;
+    float back_left_wheel_temp;
+    float front_right_wheel_temp;
+    float back_right_wheel_temp;
+    float front_drum_temp;
+    float back_drum_temp;
 } TempPacket_OneRobot;
 
 typedef struct __attribute__((packed))

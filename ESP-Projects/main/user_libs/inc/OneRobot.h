@@ -45,8 +45,8 @@ void test_run_motor();
 TempPacket_OneRobot getTemperatureOneRobot();
 
 void canSetupTalons();
-#define HALL_PIN_FRONT   16
-#define HALL_PIN_BACK  17
+#define HALL_PIN_FRONT   6
+#define HALL_PIN_BACK  7
 
 #define ADC_PIN_FRONT ADC_CHANNEL_3
 #define ADC_PIN_BACK ADC_CHANNEL_4
