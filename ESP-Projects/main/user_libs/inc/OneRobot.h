@@ -41,7 +41,9 @@ void updateAuxVoltage(void);
 float getAuxVoltage(void);
 
 
-// STURCT
+/**
+ * @brief Representation of hardware across robot needed for callback func setup
+ */
 typedef struct {
     PDH* pdh;
     TalonFX** motors;

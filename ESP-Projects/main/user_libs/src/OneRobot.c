@@ -165,13 +165,6 @@ TempPacket_OneRobot getTemperatureOneRobot()
     return packet;
 }
 
-
-
-/**
- * @brief Setups CAN for the PDH.
- *
- * @param pdh   PDH structure.
- */
 bool robot_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx)
 {
     uint8_t recv_buff[8];

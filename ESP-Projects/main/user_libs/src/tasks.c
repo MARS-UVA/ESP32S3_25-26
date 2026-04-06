@@ -38,7 +38,7 @@ void UART_tx_task(PDH *pdh) //
 
         curr_volt_packet.main_battery = (float)(getInputVoltagePDH(pdh));
         
-        position_packet = calculatePulse(&frontActuator, &backActuator);
+        //position_packet = calculatePulse(&frontActuator, &backActuator);
 
         //pdateAuxVoltage();
         //curr_volt_packet.aux_battery = getAuxVoltage();
@@ -49,7 +49,6 @@ void UART_tx_task(PDH *pdh) //
 
         if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
         {
-            printf("Debug: temperature: %f\n", temperature_packet.front_left_wheel_temp);
             UART_write_temperature(&temperature_packet);
         }
         vTaskDelay(10);
