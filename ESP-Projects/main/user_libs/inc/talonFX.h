@@ -14,6 +14,7 @@
 #pragma once
 
 #include "can.h"
+#include "pdh.h"
 
 typedef struct
 {
@@ -28,6 +29,12 @@ typedef struct
     int temperature;
 } TalonFX;
 
+typedef struct {
+
+    TalonFX **motors;   // pointer to array of TalonFX pointers
+    size_t count;
+} TalonFXRegistry;
+
 // Inits
 TalonFX talonFXInit(uint8_t n_id, uint8_t c_id);
 
@@ -36,5 +43,6 @@ void setFX(TalonFX *fx, float speed);
 void setTargetFX(TalonFX *fx, int velocity);
 
 void canSetupTalonFX(TalonFX **motors, size_t count);
+void receiveCANTalonFX(TalonFX *fx, twai_frame_t *rx_frame, uint64_t *recv_buff);
 
 float getTemperatureTalonFX(TalonFX *fx);

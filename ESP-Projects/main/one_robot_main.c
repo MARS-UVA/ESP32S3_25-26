@@ -24,7 +24,7 @@ void app_main()
     UART_setup();
     PDHInit(&pdh, 62);
     initializeTalons();
-    canSetupPDH(&pdh);
+    canSetupRobot(&pdh, &fxMotors[0],6);
     //initAuxVoltageSensor();
 
     xTaskCreate((void *)(one_robot_control_can_task), "uart_can", 4096, NULL, 8, &control_can_handle);

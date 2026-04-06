@@ -7,6 +7,7 @@
 
 #include "talonFX.h"
 #include "talonSRX.h"
+#include "pdh.h"
 #include "i2c.h"
 
 // Define CAN IDs of each motor/actuator
@@ -39,12 +40,30 @@ void initAuxVoltageSensor(void);
 void updateAuxVoltage(void);
 float getAuxVoltage(void);
 
+
+// STURCT
+typedef struct {
+    PDH* pdh;
+    TalonFX** motors;
+    size_t count;
+}RobotRegistry;
+
 // TODO: Remove this function after testing
 void test_run_motor();
 
 TempPacket_OneRobot getTemperatureOneRobot();
 
 void canSetupTalons();
+
+/**
+ * @brief Sets up CAN comms and all callback funcs used on competition robot
+ *
+ * @param pdh     Pointer to PDH instance.
+ * @param motors  Pointer to TalonFX array for temp sensing
+ * @param count   Number of TalonFX motors on robot
+ */
+void canSetupRobot(PDH *pdh, TalonFX **motors, size_t count);
+
 #define HALL_PIN_FRONT   6
 #define HALL_PIN_BACK  7
 
@@ -53,3 +72,5 @@ void canSetupTalons();
 
 extern int frontDirection;
 extern int backDirection;
+
+//Jayrady hates kittens

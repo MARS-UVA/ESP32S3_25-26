@@ -17,11 +17,6 @@
 
 #include "can.h"
 
-typedef struct {
-    TalonFX **motors;   // pointer to array of TalonFX pointers
-    size_t count;
-} TalonFXRegistry;
-
 /**
  * @brief Initializes a TalonFX structure with default values.
  * 
@@ -112,7 +107,7 @@ bool talonfx_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data
     for (size_t i = 0; i < reg->count; i++) {
         receiveCANTalonFX(reg->motors[i], &rx_frame, (uint64_t *)recv_buff);
     }
-
+    //receiveCANPDH((PDH *)pdh, &rx_frame, (uint64_t *)&recv_buff);
     return false;
 }
 

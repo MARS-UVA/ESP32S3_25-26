@@ -19,30 +19,31 @@ void UART_rx_task()
 
 void UART_tx_task(PDH *pdh) //
 {
-    CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
+    CurrVoltPacket_OneRobot curr_volt_packet = Init_CurrVolt_Packet();
     TempPacket_OneRobot temperature_packet = Init_Temp_Packet();
     PositionPacket_OneRobot position_packet = Init_Position_Packet();
 
     while (1)
     {
-        /**packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
-        packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
-        packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
-        packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
-        packet.front_drum = getChannelCurrentPDH(pdh, fxMotors[4]->channel);
-        packet.back_drum = getChannelCurrentPDH(pdh, fxMotors[5]->channel);
 
-        packet.front_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
-        packet.back_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
+        curr_volt_packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
+        curr_volt_packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
+        curr_volt_packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
+        curr_volt_packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
+        curr_volt_packet.front_drum = getChannelCurrentPDH(pdh, fxMotors[4]->channel);
+        curr_volt_packet.back_drum = getChannelCurrentPDH(pdh, fxMotors[5]->channel);
 
-        packet.main_battery = (float)(getInputVoltagePDH(pdh));**/
+        curr_volt_packet.front_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
+        curr_volt_packet.back_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
+
+        curr_volt_packet.main_battery = (float)(getInputVoltagePDH(pdh));
         
         position_packet = calculatePulse(&frontActuator, &backActuator);
 
-        //updateAuxVoltage();
-        //packet.aux_battery = getAuxVoltage();
+        //pdateAuxVoltage();
+        //curr_volt_packet.aux_battery = getAuxVoltage();
 
-        //UART_write(&packet);
+        UART_write(&curr_volt_packet);
 
         UART_write_position(&position_packet);
 
@@ -84,7 +85,6 @@ void one_robot_control_can_task()
 
 void current_update_task(PDH *pdh)
 {
-
     while (1)
     {
         for (uint8_t i = 0; i < 6; i++)
@@ -100,7 +100,7 @@ void current_update_task(PDH *pdh)
             // srxMotors[i]->current = 2.0;
             // vTaskDelay(1);
         }
-        vTaskDelay(1000);
+        vTaskDelay(100);
         // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
     }
 }

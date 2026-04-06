@@ -148,7 +148,7 @@ static void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
  * @param msg  CAN Rx header.
  * @param data Pointer to 64-bit payload.
  */
-static void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
+void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 {
     receiveVoltagePDH(pdh, msg, data);
     receiveCurrentPDH(pdh, msg, data);
