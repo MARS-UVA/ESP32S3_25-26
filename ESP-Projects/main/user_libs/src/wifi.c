@@ -49,6 +49,15 @@ void udp_receive_task(void *pvParameters)
         if (len < 0)
         {
             ESP_LOGE(TAG, "recvfrom failed: errno %d", errno);
+            pkt->invalid = 0;
+            pkt->front_left_wheel = 127;
+            pkt->back_left_wheel = 127;
+            pkt->front_right_wheel = 127;
+            pkt->back_right_wheel = 127;
+            pkt->bucket_ladder = 127;
+            pkt->conveyor_belt = 127;
+            pkt->track_actuator = 127;
+            xQueueOverwrite(control_queue, &pkt);
             //break;
         }
         else
