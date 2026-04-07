@@ -50,3 +50,22 @@ void directControl(ControlPacket_ExcavationRobot pkt)
     setSRX(&leftTrackActuator, actuatorOutput);
     setSRX(&rightTrackActuator, actuatorOutput);
 }
+
+TempPacket_ExcavationRobot getTemperatureExcavationRobot()
+{
+    TempPacket_ExcavationRobot packet = Init_Temp_Excavation_Robot_Packet();
+    packet.front_left_wheel_temp = getTemperatureTalonFX(&frontLeft);
+    packet.back_left_wheel_temp = getTemperatureTalonFX(&backLeft);
+    packet.front_right_wheel_temp = getTemperatureTalonFX(&frontRight);
+    packet.back_right_wheel_temp = getTemperatureTalonFX(&backRight);
+    return packet;
+}
+
+void test_run_motor()
+{
+    sendEn();
+    setTargetFX(&frontLeft, 200);
+    setTargetFX(&backLeft, 200);
+    setTargetFX(&frontRight, 200);
+    setTargetFX(&backRight, 200);
+}

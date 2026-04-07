@@ -1,5 +1,9 @@
 #include "tasks.h"
 
+extern QueueHandle_t control_queue; // queue stores the control packet values
+extern QueueHandle_t temperature_queue;
+extern QueueHandle_t currvolt_queue;
+extern QueueHandle_t position_queue;
 
 void UART_rx_task()
 {
@@ -38,6 +42,16 @@ void UART_tx_task(PDH *pdh)
         packet.main_battery = (float)(getInputVoltagePDH(pdh));
         //Add AUX later
         UART_write(&packet);
+        vTaskDelay(100);
+    }
+}
+
+void temperature_update_task()
+{
+    for (;;)
+    {
+        TempPacket_ExcavationRobot temp_packet = getTemperatureExcavationRobot();
+        xQueueOverwrite(temperature_queue, &temp_packet);
         vTaskDelay(100);
     }
 }
@@ -81,5 +95,15 @@ void current_update_task(PDH *pdh)
         }
         vTaskDelay(1000);
         // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
+    }
+}
+
+void motor_task()
+{
+    for (;;)
+    {
+        //sendEn();    
+        test_run_motor();
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }

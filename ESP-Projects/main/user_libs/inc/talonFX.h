@@ -70,3 +70,4 @@ void talonFXCanSetup(TalonFX *fx);
  * @return Current in Amps.
  */
 float talonFXGetCurrent(TalonFX *fx);
+int getTemperatureTalonFX(TalonFX *fx);

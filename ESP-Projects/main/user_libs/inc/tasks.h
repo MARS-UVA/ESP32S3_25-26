@@ -28,3 +28,5 @@ void current_update_task(PDH *pdh);
 void UART_rx_task();
 void UART_tx_task(PDH *pdh);
 void excavation_robot_control_can_task();
+void temperature_update_task();
+void motor_task();

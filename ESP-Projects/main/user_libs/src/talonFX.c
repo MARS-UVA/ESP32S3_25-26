@@ -121,3 +121,10 @@ float talonFXGetCurrent(TalonFX *fx)
 {
     return getChannelCurrentPDH(fx->pdh, fx->channel);
 }
+
+int getTemperatureTalonFX(TalonFX *fx)
+{
+    return fx->temperature;
+}
+
+
