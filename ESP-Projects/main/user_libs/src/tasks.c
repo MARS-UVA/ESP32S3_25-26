@@ -17,51 +17,63 @@ void UART_rx_task()
     }
 }
 
-void UART_tx_task(PDH *pdh) //
+void UART_tx_task()
 {
-    CurrVoltPacket_OneRobot curr_volt_packet = Init_CurrVolt_Packet();
-    TempPacket_OneRobot temperature_packet = Init_Temp_Packet();
-    PositionPacket_OneRobot position_packet = Init_Position_Packet();
+    // Declare packets that will be sent to the Jetson
+    CurrVoltPacket_OneRobot current_voltage_packet;
+    TempPacket_OneRobot temperature_packet;
+    PositionPacket_OneRobot position_packet;
 
-    while (1)
+    // Continuously check for new packets in the queues and send them over UART
+    for (;;)
     {
+        if (xQueueReceive(current_voltage_queue, &current_voltage_packet, 0) == pdTRUE)
+        {
+            UART_write(&current_voltage_packet, sizeof(CurrVoltPacket_OneRobot));
+        }
 
-        curr_volt_packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
-        curr_volt_packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
-        curr_volt_packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
-        curr_volt_packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
-        curr_volt_packet.front_drum = getChannelCurrentPDH(pdh, fxMotors[4]->channel);
-        curr_volt_packet.back_drum = getChannelCurrentPDH(pdh, fxMotors[5]->channel);
-
-        curr_volt_packet.front_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
-        curr_volt_packet.back_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
-
-        curr_volt_packet.main_battery = (float)(getInputVoltagePDH(pdh));
-        
-        position_packet = calculatePulse(&frontActuator, &backActuator);
-
-        //pdateAuxVoltage();
-        //curr_volt_packet.aux_battery = getAuxVoltage();
-
-        UART_write(&curr_volt_packet);
-
-        UART_write_position(&position_packet);
+        if (xQueueReceive(position_queue, &position_packet, 0) == pdTRUE)
+        {
+            UART_write(&position_packet, sizeof(PositionPacket_OneRobot));
+        }
 
         if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
         {
-            printf("Debug: temperature: %f\n", temperature_packet.front_left_wheel_temp);
-            UART_write_temperature(&temperature_packet);
+            UART_write(&temperature_packet, sizeof(TempPacket_OneRobot));
         }
+        vTaskDelay(10);
+    }
+}
+
+void current_voltage_update_task(PDH *pdh)
+{
+    // Continuously read current/voltage data from the robot and update the current_voltage_queue
+    for(;;)
+    {
+        CurrVoltPacket_OneRobot current_voltage_packet = getCurrentVoltageOneRobot(pdh);
+        xQueueOverwrite(current_voltage_queue, &current_voltage_packet);
+        vTaskDelay(10);
+    }
+}
+
+void position_update_task()
+{
+    // Continuously read position data from the robot and update the position_queue
+    for(;;)
+    {
+        PositionPacket_OneRobot position_packet = calculatePulse(&frontActuator, &backActuator);
+        xQueueOverwrite(position_queue, &position_packet);
         vTaskDelay(10);
     }
 }
 
 void temperature_update_task()
 {
+    // Continuously read temperature data from the robot and update the temperature_queue
     for (;;)
     {
-        TempPacket_OneRobot temp_packet = getTemperatureOneRobot();
-        xQueueOverwrite(temperature_queue, &temp_packet);
+        TempPacket_OneRobot temperature_packet = getTemperatureOneRobot();
+        xQueueOverwrite(temperature_queue, &temperature_packet);
         vTaskDelay(100);
     }
 }
@@ -69,6 +81,7 @@ void temperature_update_task()
 void one_robot_control_can_task()
 {
     ControlPacket_OneRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+    // ControlPacket_OneRobot motor_state = {0, 0, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F, 0x7F, 0x7F}; // test packet with max speed forward and no actuator movement
     ControlPacket_OneRobot new_data;
 
     while (1)
@@ -78,33 +91,21 @@ void one_robot_control_can_task()
             motor_state = new_data;
         }
         directControl(motor_state);
-        //ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); DO NOT REMOVE OR I WILL SLIME YOU OUT
+        // ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); //DO NOT REMOVE OR I WILL SLIME YOU OUT
+        vTaskDelay(pdMS_TO_TICKS(15));
+    }
+}
+
+void CAN_enable_task()
+{
+    for (;;)
+    {
+        sendEn();
         vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 
-void current_update_task(PDH *pdh)
-{
-    while (1)
-    {
-        for (uint8_t i = 0; i < 6; i++)
-        {
-            fxMotors[i]->current = getChannelCurrentPDH(pdh, fxMotors[i]->channel);
-            // fxMotors[i]->current = 1.0;
-            // vTaskDelay(1);
-        }
-        for (uint8_t i = 0; i < 2; i++)
-        {
-            srxMotors[i]->current = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
-            // pdh->channelCurrents[i + 6] = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
-            // srxMotors[i]->current = 2.0;
-            // vTaskDelay(1);
-        }
-        vTaskDelay(100);
-        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
-    }
-}
-
+// TODO: Remove this function after testing
 void motor_task()
 {
     for (;;)
@@ -114,41 +115,3 @@ void motor_task()
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
-
-
-// OLD CURRENT UPDATE TASK USING PDP, NEW ONE IN PDH.C
-/**
-void current_update_task(PDP *pdp)
-{
-    int delaytime_ms = 1000;
-    while (1)
-    {
-        int sem_wait_time_ms = 100;
-        requestCurrentReadingsPDP(pdp);
-        bool recvd = awaitCurrentReadingsPDP(pdp, sem_wait_time_ms);
-
-        if (!recvd)
-        {
-            vTaskDelay(delaytime_ms);
-            continue;
-        }
-
-        for (uint8_t i = 0; i < 6; i++)
-        {
-            // requestCurrentReadingsPDP();
-            fxMotors[i]->current = getChannelCurrentPDP(pdp, fxMotors[i]->channel);
-            // fxMotors[i]->current = 1.0;
-            // vTaskDelay(1);
-        }
-        for (uint8_t i = 0; i < 2; i++)
-        {
-            // requestCurrentReadingsPDP();
-            srxMotors[i]->current = getChannelCurrentPDP(pdp, srxMotors[i]->channel);
-            // srxMotors[i]->current = 2.0;
-            // vTaskDelay(1);
-        }
-        vTaskDelay(delaytime_ms);
-        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
-    }
-}
-    **/

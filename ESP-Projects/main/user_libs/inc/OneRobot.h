@@ -33,7 +33,16 @@
 #define INA219_SENSOR_ADDR      65
 #define INA219_REG_BUSVOLTAGE   0x02
 
+#define HALL_PIN_FRONT   6
+#define HALL_PIN_BACK  7
+
+#define ADC_PIN_FRONT ADC_CHANNEL_3
+#define ADC_PIN_BACK ADC_CHANNEL_4
+
+extern int frontDirection;
+extern int backDirection;
 extern QueueHandle_t uart_queue;
+
 void initializeTalons(void);
 void directControl(ControlPacket_OneRobot pkt);
 void initAuxVoltageSensor(void);
@@ -64,13 +73,10 @@ void canSetupTalons();
  */
 void canSetupRobot(PDH *pdh, TalonFX **motors, size_t count);
 
-#define HALL_PIN_FRONT   6
-#define HALL_PIN_BACK  7
-
-#define ADC_PIN_FRONT ADC_CHANNEL_3
-#define ADC_PIN_BACK ADC_CHANNEL_4
-
-extern int frontDirection;
-extern int backDirection;
-
-//Jayrady hates kittens
+/**
+ * @brief Gets current/voltage data from the robot and stores it in a packet struct.
+ * 
+ * @param pdh   Pointer to PDH instance.
+ * @return CurrVoltPacket_OneRobot struct containing current/voltage data.
+ */
+CurrVoltPacket_OneRobot getCurrentVoltageOneRobot(PDH *pdh);

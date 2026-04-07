@@ -3,6 +3,8 @@
 
 QueueHandle_t control_queue;
 QueueHandle_t temperature_queue;
+QueueHandle_t current_voltage_queue;
+QueueHandle_t position_queue;
 /* --------------------- Functions ------------------ */
 
 void UART_setup()
@@ -39,6 +41,8 @@ void UART_setup()
     ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, S3_TX_PIN, S3_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE)); //used to be 43, 44, but those pins are used for CAN so changed to 23, 24
     control_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
     temperature_queue = xQueueCreate(1, sizeof(TempPacket_OneRobot));
+    current_voltage_queue = xQueueCreate(1, sizeof(CurrVoltPacket_OneRobot));
+    position_queue = xQueueCreate(1, sizeof(PositionPacket_OneRobot));
 }
 
 void UART_read(ControlPacket_OneRobot *packet)
@@ -93,27 +97,7 @@ void UART_read(SerialPacket *packet)
 }
  */
 
-// change back to
-void UART_write(CurrVoltPacket_OneRobot *packet) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
-{
-    // char* cPacket = (char*)packet;
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(CurrVoltPacket_OneRobot));
-    // char *test_str = "This is a test string.\n";
-    // const int txBytes2 = uart_write_bytes(UART_NUM_1, test_str, strlen(test_str));
-}
-
-// TODO: Combine with UART_write and make it so that the function can write either CurrVoltPacket_OneRobot or TempPacket_OneRobot (or any other packet we may create in the future)
-void UART_write_temperature(TempPacket_OneRobot *packet)
-{
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(TempPacket_OneRobot));
-}
-
-void UART_write_position(PositionPacket_OneRobot *packet) // writes a single packet to Jetson on UART
-{
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, sizeof(PositionPacket_OneRobot));
-}
-
-/*void UART_write_general(void *packet, size_t size) // writes a single packet to Jetson on UART (temporarily, will only be used to use current/bus voltage packets)
+void UART_write(void *packet, size_t size)
 {       
-    const int txBytes = uart_write_bytes(UART_NUM_1, packet, size);
-}*/
+    uart_write_bytes(UART_NUM_1, packet, size);
+}
