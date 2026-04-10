@@ -35,8 +35,8 @@
  * @param channelCount Number of channels to decode.
  */
 static void decodePDHFrame(uint64_t payload,
-                    uint16_t *out,
-                    int channelCount)
+                           uint16_t *out,
+                           int channelCount)
 {
     uint8_t bitIndex = 0;
 
@@ -183,9 +183,12 @@ void canSetupPDH(PDH *pdh)
     twai_onchip_node_config_t node_config = {
         .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
         .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
+        .io_cfg.quanta_clk_out = -1,         // FIX: Disable clock out (prevents GPIO 0 conflict)
+        .io_cfg.bus_off_indicator = -1,      // FIX: Disable bus-off indicator
         .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
         .tx_queue_depth = 32,                // Transmit queue depth set to 32
     };
+
     twai_event_callbacks_t can_cbs = {
         .on_rx_done = pdh_twai_rx_cb,
     };

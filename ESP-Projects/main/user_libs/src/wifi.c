@@ -1,6 +1,6 @@
 #include "wifi.h"
 
-//DEBUG/LOGGING TAG
+// DEBUG/LOGGING TAG
 static const char *TAG = "WIFI_APP";
 
 /// Wi-Fi configuration
@@ -13,12 +13,13 @@ static const char *TAG = "WIFI_APP";
 
 // Maximum size of a Wi-Fi packet, based on the largest packet structure we expect to send/receive
 #define MAX_WIFI_PACKET_SIZE sizeof(CurrVoltPacket_ExcavationRobot)
-typedef struct {
+typedef struct
+{
     uint8_t data[MAX_WIFI_PACKET_SIZE];
     size_t size;
 } WifiQueueItem;
 
-//All the RTOS queues used
+// All the RTOS queues used
 extern QueueHandle_t control_queue;
 QueueHandle_t wifi_queue;
 QueueHandle_t currvolt_queue;
@@ -27,7 +28,7 @@ QueueHandle_t position_queue;
 
 /**
  * @brief Establishes a UDP connection and continuously listens for packets sent to the specified port. When a packet is received, it is parsed and added to the appropriate FreeRTOS queue based on its header value. DO NOT CALL THIS FUNCTION DIRECTLY, INSTEAD USE setupWifi() TO INITIALIZE THE WIFI AND START THIS TASK.
- * 
+ *
  * @param pvParameters FreeRTOS task parameters (not used).
  */
 void udp_receive_task(void *pvParameters)
@@ -50,6 +51,8 @@ void udp_receive_task(void *pvParameters)
     }
     ESP_LOGI(TAG, "Socket created");
 
+    int flag = 1;
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
     int err = bind(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
     if (err < 0)
     {
@@ -82,40 +85,44 @@ void udp_receive_task(void *pvParameters)
         {
             switch (RxBuffer[1])
             {
-                case 0x00:
-                    //Control packet
-                    ESP_LOGI(TAG, "Got Control packet");
-                    if (len >= sizeof(ControlPacket_ExcavationRobot)) {
-                        memcpy(&control_pkt, RxBuffer, sizeof(ControlPacket_ExcavationRobot));
-                        xQueueOverwrite(control_queue, &control_pkt);
-                    }
-                    break;
-                case 0x01:
-                    //Curr/Volt packet
-                    ESP_LOGI(TAG, "Got Curr/Volt packet");
-                    if (len >= sizeof(CurrVoltPacket_ExcavationRobot)) {
-                        memcpy(&curr_volt_pkt, RxBuffer, sizeof(CurrVoltPacket_ExcavationRobot));
-                        xQueueOverwrite(currvolt_queue, &curr_volt_pkt);
-                    }
-                    break;
-                case 0x02:
-                    //Temp packet
-                    ESP_LOGI(TAG, "Got Temp packet");
-                    if (len >= sizeof(TempPacket_ExcavationRobot)) {
-                        memcpy(&temp_pkt, RxBuffer, sizeof(TempPacket_ExcavationRobot));
-                        xQueueOverwrite(temperature_queue, &temp_pkt);
-                    }
-                    break;
-                case 0x03:
-                    //Position packet
-                    ESP_LOGI(TAG, "Got Position packet");
-                    if (len >= sizeof(PositionPacket_ExcavationRobot)) {
-                        memcpy(&position_pkt, RxBuffer, sizeof(PositionPacket_ExcavationRobot));
-                        xQueueOverwrite(position_queue, &position_pkt);
-                    }
-                    break;
-                default:
-                    break;
+            case 0x00:
+                // Control packet
+                ESP_LOGI(TAG, "Got Control packet");
+                if (len >= sizeof(ControlPacket_ExcavationRobot))
+                {
+                    memcpy(&control_pkt, RxBuffer, sizeof(ControlPacket_ExcavationRobot));
+                    xQueueOverwrite(control_queue, &control_pkt);
+                }
+                break;
+            case 0x01:
+                // Curr/Volt packet
+                ESP_LOGI(TAG, "Got Curr/Volt packet");
+                if (len >= sizeof(CurrVoltPacket_ExcavationRobot))
+                {
+                    memcpy(&curr_volt_pkt, RxBuffer, sizeof(CurrVoltPacket_ExcavationRobot));
+                    xQueueOverwrite(currvolt_queue, &curr_volt_pkt);
+                }
+                break;
+            case 0x02:
+                // Temp packet
+                ESP_LOGI(TAG, "Got Temp packet");
+                if (len >= sizeof(TempPacket_ExcavationRobot))
+                {
+                    memcpy(&temp_pkt, RxBuffer, sizeof(TempPacket_ExcavationRobot));
+                    xQueueOverwrite(temperature_queue, &temp_pkt);
+                }
+                break;
+            case 0x03:
+                // Position packet
+                ESP_LOGI(TAG, "Got Position packet");
+                if (len >= sizeof(PositionPacket_ExcavationRobot))
+                {
+                    memcpy(&position_pkt, RxBuffer, sizeof(PositionPacket_ExcavationRobot));
+                    xQueueOverwrite(position_queue, &position_pkt);
+                }
+                break;
+            default:
+                break;
             }
         }
     }
@@ -130,7 +137,7 @@ void udp_receive_task(void *pvParameters)
 
 /**
  * @brief Establishes a UDP connection and continuously sends packets from the Wi-Fi transmit queue to the specified target IP address and port. DO NOT USE THIS FUNCTION, INSTEAD USE wifi_write() TO ADD PACKETS TO THE TRANSMIT QUEUE.
- * 
+ *
  * @param pvParameters FreeRTOS task parameters (not used).
  */
 void sendWifiPacket(void *pvParameters)
@@ -158,7 +165,7 @@ void sendWifiPacket(void *pvParameters)
         if (wifi_queue != NULL && xQueueReceive(wifi_queue, &item, portMAX_DELAY) == pdTRUE)
         {
             int err = sendto(sock, item.data, item.size, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
-            if (err < 0) 
+            if (err < 0)
             {
                 ESP_LOGE(TAG, "Error occurred during sending packet: errno %d", errno);
                 vTaskDelay(pdMS_TO_TICKS(50)); // If fails, wait to try again
@@ -235,9 +242,7 @@ void setupWifi()
     temperature_queue = xQueueCreate(1, sizeof(TempPacket_ExcavationRobot));
     position_queue = xQueueCreate(1, sizeof(PositionPacket_ExcavationRobot));
 
-    //get_IP();
-
-
+    // get_IP();
 
     /* ------------- FreeRTOS Tasks -------------*/
     xTaskCreate(udp_receive_task, "udp_rx_task", 4096, NULL, 7, NULL);
@@ -251,30 +256,32 @@ void get_IP()
 {
     esp_netif_ip_info_t ip_info;
     esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
-    
-    //Wait until we get a non zero IP address
+
+    // Wait until we get a non zero IP address
     ESP_LOGI(TAG, "Waiting for IP address...");
-    do {
+    do
+    {
         vTaskDelay(pdMS_TO_TICKS(50));
         esp_netif_get_ip_info(netif, &ip_info);
     } while (ip_info.ip.addr == 0);
-    
+
     ESP_LOGI(TAG, "IP Address: " IPSTR, IP2STR(&ip_info.ip));
 }
 
 /**
  * @brief Sends a packet over Wi-Fi by adding it to the Wi-Fi transmit queue.
- * 
+ *
  * @param packet   The data packet you want to send.
  * @param size   The size of the data packet.
  */
-void wifi_write(void* packet, size_t size)
+void wifi_write(void *packet, size_t size)
 {
-    if (wifi_queue == NULL || size > MAX_WIFI_PACKET_SIZE) return;
-    
+    if (wifi_queue == NULL || size > MAX_WIFI_PACKET_SIZE)
+        return;
+
     WifiQueueItem item;
     item.size = size;
     memcpy(item.data, packet, size);
-    
+
     xQueueSend(wifi_queue, &item, 0); // Send to queue without blocking
 }
