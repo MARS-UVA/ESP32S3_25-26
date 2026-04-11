@@ -52,7 +52,7 @@ void current_voltage_update_task(PDH *pdh)
     {
         CurrVoltPacket_OneRobot current_voltage_packet = getCurrentVoltageOneRobot(pdh);
         xQueueOverwrite(current_voltage_queue, &current_voltage_packet);
-        vTaskDelay(10);
+        vTaskDelay(100);
     }
 }
 
@@ -63,7 +63,7 @@ void position_update_task()
     {
         PositionPacket_OneRobot position_packet = calculatePulse(&frontActuator, &backActuator);
         xQueueOverwrite(position_queue, &position_packet);
-        vTaskDelay(10);
+        vTaskDelay(100);
     }
 }
 
@@ -101,7 +101,7 @@ void CAN_enable_task()
     for (;;)
     {
         sendEn();
-        vTaskDelay(pdMS_TO_TICKS(5));
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
