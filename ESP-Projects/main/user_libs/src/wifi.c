@@ -1,4 +1,5 @@
 #include "wifi.h"
+#include "packets.h"
 
 // DEBUG/LOGGING TAG
 static const char *TAG = "WIFI_APP";
@@ -70,7 +71,7 @@ void udp_receive_task(void *pvParameters)
 
     while (1)
     {
-        ESP_LOGI(TAG, "Waiting for data");
+        // ESP_LOGI(TAG, "Waiting for data");
         struct sockaddr_in source_addr;
         socklen_t socklen = sizeof(source_addr);
         int len = recvfrom(sock, RxBuffer, sizeof(RxBuffer) - 1, 0,
@@ -87,7 +88,7 @@ void udp_receive_task(void *pvParameters)
             {
             case 0x00:
                 // Control packet
-                ESP_LOGI(TAG, "Got Control packet");
+                // ESP_LOGI(TAG, "Got Control packet");
                 if (len >= sizeof(ControlPacket_ExcavationRobot))
                 {
                     memcpy(&control_pkt, RxBuffer, sizeof(ControlPacket_ExcavationRobot));
@@ -133,6 +134,39 @@ void udp_receive_task(void *pvParameters)
         close(sock);
     }
     vTaskDelete(NULL);
+}
+
+void write_feedback_task(void)
+{
+
+    while (1)
+    {
+        {
+            TempPacket_ExcavationRobot new_data;
+            if (xQueueReceive(temperature_queue, &new_data, 0) == pdTRUE)
+            {
+                wifi_write(&new_data, sizeof(TempPacket_ExcavationRobot));
+            }
+        }
+
+        {
+            PositionPacket_ExcavationRobot new_data;
+            if (xQueueReceive(position_queue, &new_data, 0) == pdTRUE)
+            {
+                wifi_write(&new_data, sizeof(PositionPacket_ExcavationRobot));
+            }
+        }
+
+        {
+            CurrVoltPacket_ExcavationRobot new_data;
+            if (xQueueReceive(currvolt_queue, &new_data, 0) == pdTRUE)
+            {
+                wifi_write(&new_data, sizeof(CurrVoltPacket_ExcavationRobot));
+            }
+        }
+
+        vTaskDelay(1);
+    }
 }
 
 /**

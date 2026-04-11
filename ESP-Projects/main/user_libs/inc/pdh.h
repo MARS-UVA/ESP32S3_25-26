@@ -14,6 +14,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "can.h"
 
 // CAN ID Definitions
 
@@ -77,3 +78,4 @@ void canSetupPDH(PDH *pdh);
  * @return Channel current in Amps, or 0.0f if unsupported.
  */
 float getChannelCurrentPDH(PDH *pdh, uint8_t channelID);
+void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data);

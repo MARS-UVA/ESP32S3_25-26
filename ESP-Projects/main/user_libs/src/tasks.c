@@ -40,7 +40,7 @@ void UART_tx_task(PDH *pdh)
         packet.right_track_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
 
         packet.main_battery = (float)(getInputVoltagePDH(pdh));
-        //Add AUX later
+        // Add AUX later
         UART_write(&packet);
         vTaskDelay(100);
     }
@@ -51,6 +51,7 @@ void temperature_update_task()
     for (;;)
     {
         TempPacket_ExcavationRobot temp_packet = getTemperatureExcavationRobot();
+        ESP_LOGI("Temperature", "Temperature: \t %f %f %f %f", temp_packet.front_left_wheel_temp, temp_packet.front_right_wheel_temp, temp_packet.back_left_wheel_temp, temp_packet.back_right_wheel_temp);
         xQueueOverwrite(temperature_queue, &temp_packet);
         vTaskDelay(100);
     }
@@ -66,35 +67,25 @@ void excavation_robot_control_can_task()
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
             motor_state = new_data;
-            ESP_LOGI("CAN", "Motor Control:\t%d %d %d %d %d %d %d\n", motor_state.front_left_wheel, motor_state.back_left_wheel, motor_state.front_right_wheel, motor_state.back_right_wheel, motor_state.bucket_ladder, motor_state.conveyor_belt, motor_state.track_actuator);        
+            // ESP_LOGI("CAN", "Motor Control:\t%d %d %d %d %d %d %d\n", motor_state.front_left_wheel, motor_state.back_left_wheel, motor_state.front_right_wheel, motor_state.back_right_wheel, motor_state.bucket_ladder, motor_state.conveyor_belt, motor_state.track_actuator);
         }
 
         sendEn();
         directControl(motor_state);
-        //ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT));
+        // ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT));
         vTaskDelay(pdMS_TO_TICKS(6));
     }
 }
 
-void current_update_task(PDH *pdh)
+void current_voltage_update_task(PDH *pdh)
 {
 
     while (1)
     {
-        for (uint8_t i = 0; i < 6; i++)
-        {
-            pdh->channelCurrents[i] = getChannelCurrentPDH(pdh, fxMotors[i]->channel);
-            // fxMotors[i]->current = 1.0;
-            // vTaskDelay(1);
-        }
-        for (uint8_t i = 0; i < 2; i++)
-        {
-            pdh->channelCurrents[i + 6] = getChannelCurrentPDH(pdh, srxMotors[i]->channel);
-            // srxMotors[i]->current = 2.0;
-            // vTaskDelay(1);
-        }
-        vTaskDelay(1000);
-        // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
+        CurrVoltPacket_ExcavationRobot current_voltage_packet = getCurrentVoltageExcavationRobot(pdh);
+        ESP_LOGI("Current", "Current: \t %f %f %f %f", current_voltage_packet.front_left_wheel, current_voltage_packet.front_right_wheel, current_voltage_packet.back_left_wheel, current_voltage_packet.back_right_wheel);
+        xQueueOverwrite(currvolt_queue, &current_voltage_packet);
+        vTaskDelay(100);
     }
 }
 
@@ -102,7 +93,7 @@ void motor_task()
 {
     for (;;)
     {
-        //sendEn();    
+        // sendEn();
         test_run_motor();
         vTaskDelay(pdMS_TO_TICKS(10));
     }

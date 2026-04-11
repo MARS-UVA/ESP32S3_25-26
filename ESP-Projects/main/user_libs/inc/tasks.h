@@ -19,12 +19,11 @@
 #include "pdh.h"
 #include "ExcavationRobot.h"
 
-
 extern QueueHandle_t control_queue; // queue stores the control packet values
 extern TalonFX *fxMotors[];
 extern TalonSRX *srxMotors[];
 
-void current_update_task(PDH *pdh);
+void current_voltage_update_task(PDH *pdh);
 void UART_rx_task();
 void UART_tx_task(PDH *pdh);
 void excavation_robot_control_can_task();

@@ -78,7 +78,7 @@ float getChannelCurrentPDH(PDH *pdh, uint8_t channel)
 
 /**
  * @brief Get the input voltage (in volts) of the PDH
- * 
+ *
  * @param pdh   PDH structure.
  */
 double getInputVoltagePDH(PDH *pdh)
@@ -88,14 +88,14 @@ double getInputVoltagePDH(PDH *pdh)
 
 /**
  * @brief Process an incoming CAN message including current information.
- * 
+ *
  * @param pdh   PDH structure.
  * @param msg   CAN Rx header.
  * @param data  Pointer to a 64-bit payload.
  */
 void receiveCurrentPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 {
- // Match PDH device ID (upper bits of the extended ID)
+    // Match PDH device ID (upper bits of the extended ID)
     if ((msg->header.id & 0xFFFFF00) != 0x8051800)
         return;
 
@@ -135,7 +135,7 @@ void receiveCurrentPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 
 /**
  * @brief Process an incoming CAN message including voltage data.
- * 
+ *
  * @param pdh   PDH structure.
  * @param msg   CAN Rx header.
  * @param data  Pointer to a 64-bit payload.
@@ -145,11 +145,9 @@ void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
     // Match PDH device ID
     if ((msg->header.id) != (0x8051900 | pdh->identifier))
         return;
-    
+
     pdh->totalVoltage = extractBits(*data, 0, 12) * PDH_VOLTAGE_RESOLUTION;
 }
-
-
 
 /**
  * @brief Process an incoming CAN message intended for the PDH.
@@ -164,13 +162,14 @@ void receiveVoltagePDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
  */
 void receiveCANPDH(PDH *pdh, twai_frame_t *msg, uint64_t *data)
 {
+    ESP_LOGI("Hi", "Hi");
     receiveVoltagePDH(pdh, msg, data);
     receiveCurrentPDH(pdh, msg, data);
 }
 
 /**
  * @brief Handles CAN interrupts
- * 
+ *
  * @param handle    TWAI node handle.
  * @param edata     TWAI "RX done" event data.
  * @param pdh       PDH structure.
@@ -191,7 +190,7 @@ bool pdh_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *
 
 /**
  * @brief Setups CAN for the PDH.
- * 
+ *
  * @param pdh   PDH structure.
  */
 void canSetupPDH(PDH *pdh)
@@ -212,14 +211,13 @@ void canSetupPDH(PDH *pdh)
 
 /**
  * @brief Updates fxMotors and srxMotors structures with PDH current data
- * 
+ *
  * @param pdh   PDH structure.
  */
 
-
 /**
  * @brief Initalizes PDP structure.
- * 
+ *
  * @param pdh           PDH structure.
  * @param identifier    CAN identifier.
  */

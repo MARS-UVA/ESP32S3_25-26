@@ -16,4 +16,5 @@ void setupWifi(void);
 void get_IP(void);
 void sendWifiPacket(void *pvParameters);
 void udp_receive_task(void *pvParameters);
-void wifi_write(void* packet, size_t size);
+void wifi_write(void *packet, size_t size);
+void write_feedback_task(void);

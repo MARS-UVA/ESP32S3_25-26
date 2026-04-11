@@ -52,16 +52,16 @@
 typedef struct
 {
     int identifier;
-    
+
     uint16_t channelCurrents[25];
-    
+
     double totalVoltage;
 
     // SemaphoreHandle_t sem_0_5;
     // SemaphoreHandle_t sem_6_11;
     // SemaphoreHandle_t sem_12_17;
     // SemaphoreHandle_t sem_18_24;
-     
+
     // StaticSemaphore_t _buf_0_5;
     // StaticSemaphore_t _buf_6_11;
     // StaticSemaphore_t _buf_12_17;
@@ -86,10 +86,8 @@ void canSetupPDH(PDH *pdh);
  * @param channel Channel index (0–19).
  * @return Channel current in Amps, or 0.0f if unsupported.
  */
-float getChannelCurrentPDH(PDH* pdh, uint8_t channelID);
+float getChannelCurrentPDH(PDH *pdh, uint8_t channelID);
 
-void current_update_task(PDH* pdh);
-
-
+void current_voltage_update_task(PDH *pdh);
 
 #endif
