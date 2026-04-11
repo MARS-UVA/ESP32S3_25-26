@@ -104,6 +104,7 @@ void UART_can_task()
     }
 }
 
+
 void UART_tx_task() //
 {
     OutPacket packet = {0, 1, 0, 1, 0, 0, 1, 0, 0, 0};
