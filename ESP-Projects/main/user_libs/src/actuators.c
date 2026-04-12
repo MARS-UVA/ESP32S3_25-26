@@ -1,6 +1,6 @@
 #include "actuators.h"
 
-static double pulse_mm = 14.7; //printing gave a multiplier of 22.5
+static double pulse_mm = 44; //printing gave a multiplier of 22.5
 
 volatile int pulseCountFront = 0;
 volatile int pulseCountBack = 0;
