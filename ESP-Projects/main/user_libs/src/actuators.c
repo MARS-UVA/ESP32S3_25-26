@@ -1,6 +1,6 @@
 #include "actuators.h"
 
-static double pulse_mm = 22.5; //printing gave a multiplier of 22.5
+static double pulse_mm = 44; //printing gave a multiplier of 22.5
 
 volatile int pulseCountFront = 0;
 volatile int pulseCountBack = 0;
@@ -34,7 +34,7 @@ void hallEffectInit(int pinFront, int pinBack)
     gpio_config_t io_conf_a = {
         .intr_type = GPIO_INTR_POSEDGE,    // <--- Trigger on Rising Edge
         .mode = GPIO_MODE_INPUT,
-        .pin_bit_mask = (1ULL << pinFront) | (1ULL << pinBack),    
+        .pin_bit_mask = (1ULL << pinFront),    
         .pull_up_en = GPIO_PULLUP_ENABLE
     };
     gpio_config(&io_conf_a);
@@ -45,11 +45,11 @@ void hallEffectInit(int pinFront, int pinBack)
         .pin_bit_mask = (1ULL << pinBack),
         .pull_up_en = GPIO_PULLUP_ENABLE
     };
-    //gpio_config(&io_conf_b);
+    gpio_config(&io_conf_b);
 
     gpio_install_isr_service(0);
     gpio_isr_handler_add(pinFront, gpio_isr_handler_front, (void*) pinFront);
-    //gpio_isr_handler_add(pinBack, gpio_isr_handler_back, (void*) pinBack);
+    gpio_isr_handler_add(pinBack, gpio_isr_handler_back, (void*) pinBack);
 }
 
 void moveSyncActuatorsToPosition(Actuator *frontActuator, Actuator *backActuator, double targetPosition)
