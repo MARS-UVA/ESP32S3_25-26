@@ -24,12 +24,13 @@ void app_main()
 void app_main() {
     PDH pdh;
     PDHInit(&pdh, 62);
-    TalonFX motor = talonFXInit(33, 2, &pdh);
+    TalonFX motor = talonFXInit(33, 2);
     canSetupPDH(&pdh);
     printf("setup done!\n");
 
     while(1) {
         printf("running...\n");
+        sendEn();
         setTargetFX(&motor, 100);
         vTaskDelay(1);
     }

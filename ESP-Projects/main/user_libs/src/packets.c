@@ -1,5 +1,3 @@
-#pragma once
-
 #include "packets.h"
 
 #define CONTROL_PACKET_ID 0x00

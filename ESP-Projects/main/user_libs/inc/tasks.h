@@ -20,6 +20,7 @@
 #include "OneRobot.h"
 
 
+
 extern QueueHandle_t control_queue; // queue stores the control packet values
 extern QueueHandle_t temperature_queue; // queue stores the temperature packet values
 extern TalonFX *fxMotors[];
@@ -31,6 +32,7 @@ void current_update_task(PDH *pdh);
 void UART_rx_task();
 void UART_tx_task(PDH *pdh);
 void one_robot_control_can_task();
+void enable_task();
 void motor_task();
 
 /**

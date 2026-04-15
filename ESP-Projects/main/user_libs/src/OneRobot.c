@@ -78,7 +78,6 @@ void canSetupTalons()
 
 void directControl(ControlPacket_OneRobot pkt)
 {
-    sendEn();
     int8_t leftSpeed = pkt.front_left_wheel;
     setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
     setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)));
@@ -197,6 +196,7 @@ void canSetupRobot(PDH *pdh, TalonFX **motors, size_t count)
             .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
             .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
             .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
+            .bit_timing.sp_permill = 800,
             .tx_queue_depth = 32,                // Transmit queue depth set to 32
         };
         twai_event_callbacks_t can_cbs = {

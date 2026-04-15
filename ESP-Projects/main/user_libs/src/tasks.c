@@ -55,6 +55,13 @@ void UART_tx_task(PDH *pdh) //
     }
 }
 
+void enable_task() {
+    while (1) {
+        sendEn();
+        vTaskDelay(pdMS_TO_TICKS(5));
+    }
+}
+
 void temperature_update_task()
 {
     for (;;)
@@ -69,16 +76,19 @@ void one_robot_control_can_task()
 {
     ControlPacket_OneRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
     ControlPacket_OneRobot new_data;
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t frequency = pdMS_TO_TICKS(15);
+
 
     while (1)
     {
+        vTaskDelayUntil(&xLastWakeTime, frequency);
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
             motor_state = new_data;
         }
         directControl(motor_state);
-        //ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); DO NOT REMOVE OR I WILL SLIME YOU OUT
-        vTaskDelay(pdMS_TO_TICKS(5));
+        ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); //DO NOT REMOVE OR I WILL SLIME YOU OUT
     }
 }
 
