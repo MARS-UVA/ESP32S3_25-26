@@ -71,7 +71,7 @@ twai_frame_t en_msg = {
 void sendEn()
 {
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &en_msg, TIMEOUT)); // Timeout = 0: returns immediately if queue is full
-    vTaskDelay(1);                                                     // without delay watchdog timers are triggered for tasks
+    ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); // DO NOT REMOVE OR I WILL SLIME YOU OUT
 }
 
 void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
@@ -83,5 +83,5 @@ void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
         .buffer_len = len,
     };
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &msg, TIMEOUT));
-    vTaskDelay(1);
+    ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); // DO NOT REMOVE OR I WILL SLIME YOU OUT
 }

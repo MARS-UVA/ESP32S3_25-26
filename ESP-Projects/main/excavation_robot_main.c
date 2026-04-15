@@ -34,7 +34,7 @@ void app_main()
     xTaskCreate((void *)(write_feedback_task), "uart_can", 4096, NULL, 9, &control_can_handle);
     xTaskCreate((void *)(current_voltage_update_task), "current_update", 4096, &pdh, 9, &current_update_handle);
     xTaskCreate((void *)(temperature_update_task), "temperature_update", 4096, &pdh, 9, &current_update_handle);
-    xTaskCreate((void *)(excavation_robot_control_can_task), "uart_can", 4096, NULL, 8, &control_can_handle);
-    // xTaskCreate((void *)(UART_rx_task), "uart_rx", 4096, NULL, 7, &uart_rx_handle);
+    xTaskCreate((void *)(excavation_robot_control_can_task), "uart_can", 4096, NULL, configMAX_PRIORITIES-1, &control_can_handle);
+    // axTaskCreate((void *)(UART_rx_task), "uart_rx", 4096, NULL, 7, &uart_rx_handle);
     // xTaskCreate((void *)(UART_tx_task), "uart_tx", 4096, NULL, 10, &uart_tx_handle);
 }
