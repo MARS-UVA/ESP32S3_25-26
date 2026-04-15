@@ -93,7 +93,6 @@ void one_robot_control_can_task()
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t frequency = pdMS_TO_TICKS(15);
 
-
     while (1)
     {
         vTaskDelayUntil(&xLastWakeTime, frequency);
@@ -103,7 +102,6 @@ void one_robot_control_can_task()
         }
         directControl(motor_state);
         ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); //DO NOT REMOVE OR I WILL SLIME YOU OUT
-        vTaskDelay(pdMS_TO_TICKS(15));
     }
 }
 
