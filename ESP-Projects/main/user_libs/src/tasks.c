@@ -62,12 +62,19 @@ void excavation_robot_control_can_task()
     ControlPacket_ExcavationRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
     ControlPacket_ExcavationRobot new_data;
 
+    uint32_t last_tick_time = xTaskGetTickCount() * portTICK_PERIOD_MS;
+
     while (1)
     {
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
             motor_state = new_data;
+            last_tick_time = xTaskGetTickCount() * portTICK_PERIOD_MS;
             // ESP_LOGI("CAN", "Motor Control:\t%d %d %d %d %d %d %d\n", motor_state.front_left_wheel, motor_state.back_left_wheel, motor_state.front_right_wheel, motor_state.back_right_wheel, motor_state.bucket_ladder, motor_state.conveyor_belt, motor_state.track_actuator);
+        }
+        else if (xTaskGetTickCount() * portTICK_PERIOD_MS - last_tick_time >= 1000)
+        {
+            motor_state = (ControlPacket_ExcavationRobot){0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
         }
 
         sendEn();
