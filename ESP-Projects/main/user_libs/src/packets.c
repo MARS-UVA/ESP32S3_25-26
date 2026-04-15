@@ -1,5 +1,3 @@
-#pragma once
-
 #include "packets.h"
 
 #define CONTROL_PACKET_ID 0x00
@@ -20,7 +18,7 @@ CurrVoltPacket_ConstructionRobot Init_CurrVolt_Construction_Robot_Packet()
     pkt.front_left_wheel = 0.0f;
     pkt.front_right_wheel = 0.0f;
     pkt.back_left_wheel = 0.0f;
-    pkt.back_right_wheel = 0.0f; 
+    pkt.back_right_wheel = 0.0f;
     pkt.actuator = 0.0f;
     pkt.main_battery = 0.0f;
     return pkt;
@@ -37,7 +35,7 @@ TempPacket_ConstructionRobot Init_Temp_Construction_Robot_Packet()
     pkt.front_left_wheel_temp = 0.0f;
     pkt.front_right_wheel_temp = 0.0f;
     pkt.back_left_wheel_temp = 0.0f;
-    pkt.back_right_wheel_temp = 0.0f; 
+    pkt.back_right_wheel_temp = 0.0f;
     return pkt;
 }
 

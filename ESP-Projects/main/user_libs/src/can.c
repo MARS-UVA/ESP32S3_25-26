@@ -1,7 +1,7 @@
 /**
  * @file    can.c
  * @brief   CAN communication functions for the robot.
- * 
+ *
  * @author      Carlos Giron <rdb7fq@virginia.edu>
  * @author      Anthony Vu <anthonyvu@email.virginia.edu>
  * @note        Assisted by AI (GPT-5) for TWAI abstraction.
@@ -24,8 +24,7 @@ bool twaiRxCallback(twai_node_handle_t handle, const twai_rx_done_event_data_t *
     uint8_t recv_buff[8];
     twai_frame_t rx_frame = {
         .buffer = recv_buff,
-        .buffer_len = sizeof(recv_buff)
-    };
+        .buffer_len = sizeof(recv_buff)};
 
     // If a frame was successfully received, call the handler with the context and the received frame
     if (twai_node_receive_from_isr(handle, &rx_frame) == ESP_OK)
@@ -71,7 +70,7 @@ twai_frame_t en_msg = {
 void sendEn()
 {
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &en_msg, TIMEOUT)); // Timeout = 0: returns immediately if queue is full
-    vTaskDelay(1);                                                     // without delay watchdog timers are triggered for tasks
+    ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT));
 }
 
 void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
@@ -83,5 +82,5 @@ void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
         .buffer_len = len,
     };
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &msg, TIMEOUT));
-    vTaskDelay(1);
+    ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT));
 }

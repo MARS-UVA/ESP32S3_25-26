@@ -41,17 +41,17 @@ void construction_robot_control_can_task()
 {
     ControlPacket_ConstructionRobot motor_state = {0, 0, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f};
     ControlPacket_ConstructionRobot new_data;
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t frequency = pdMS_TO_TICKS(15);
 
     while (1)
     {
+        vTaskDelayUntil(&xLastWakeTime, frequency);
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
             motor_state = new_data;
         }
-        sendEn();
         directControl(motor_state);
-        ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT));
-        vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 
@@ -74,5 +74,14 @@ void current_update_task(PDH *pdh)
         }
         vTaskDelay(1000);
         // ESP_LOGI("CURRENT TEST", "Current:\t%.3f\n", fxMotors[0]->current);
+    }
+}
+
+void CAN_enable_task()
+{
+    for (;;)
+    {
+        sendEn();
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }

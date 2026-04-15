@@ -19,7 +19,6 @@
 #include "pdh.h"
 #include "ConstructionRobot.h"
 
-
 extern QueueHandle_t control_queue; // queue stores the control packet values
 extern TalonFX *fxMotors[];
 extern TalonSRX *srxMotors[];
@@ -28,3 +27,4 @@ void current_update_task(PDH *pdh);
 void UART_rx_task();
 void UART_tx_task(PDH *pdh);
 void construction_robot_control_can_task();
+void CAN_enable_task();
