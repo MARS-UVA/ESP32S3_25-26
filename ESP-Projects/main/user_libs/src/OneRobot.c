@@ -68,12 +68,6 @@ void initializeTalons()
 void canSetupTalons()
 {
     canSetupTalonFX(&fxMotors[0], 6);
-    // canSetupTalonFX(&backLeft);
-    // canSetupTalonFX(&frontRight);
-    // canSetupTalonFX(&backRight);
-
-    // canSetupTalonFX(&frontBucketDrum);
-    // canSetupTalonFX(&backBucketDrum);
 }
 
 void directControl(ControlPacket_OneRobot pkt)
@@ -150,8 +144,6 @@ void test_run_motor(void)
     setTargetFX(&backRight, 200);
 }
 
-
-// TODO: Make it so this logic does not only work for one robot.
 TempPacket_OneRobot getTemperatureOneRobot()
 {
     TempPacket_OneRobot packet = Init_Temp_Packet();
@@ -207,4 +199,27 @@ void canSetupRobot(PDH *pdh, TalonFX **motors, size_t count)
         ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
         canInitialized = true;
     }
+}
+
+CurrVoltPacket_OneRobot getCurrentVoltageOneRobot(PDH *pdh)
+{
+    CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
+    packet.front_left_wheel = getChannelCurrentPDH(pdh, fxMotors[0]->channel);
+    packet.back_left_wheel = getChannelCurrentPDH(pdh, fxMotors[1]->channel);
+    packet.front_right_wheel = getChannelCurrentPDH(pdh, fxMotors[2]->channel);
+    packet.back_right_wheel = getChannelCurrentPDH(pdh, fxMotors[3]->channel);
+    packet.front_drum = getChannelCurrentPDH(pdh, fxMotors[4]->channel);
+    packet.back_drum = getChannelCurrentPDH(pdh, fxMotors[5]->channel);
+
+    packet.front_actuator = getChannelCurrentPDH(pdh, srxMotors[0]->channel);
+    packet.back_actuator = getChannelCurrentPDH(pdh, srxMotors[1]->channel);
+
+    packet.main_battery = (float)(getInputVoltagePDH(pdh));
+
+    // FIXME: Get auxiliary battery voltage working
+    // updateAuxVoltage();
+    // packet.aux_battery = getAuxVoltage();
+    
+    return packet;
+
 }
