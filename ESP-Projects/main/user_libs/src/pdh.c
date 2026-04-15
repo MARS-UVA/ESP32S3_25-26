@@ -22,7 +22,7 @@
 #include "pdh.h"
 #include "can.h"
 #include "utils.h"
-#include "talonfx.h"
+#include "talonFX.h"
 
 extern TalonFX *fxMotors[];
 
@@ -38,8 +38,8 @@ extern TalonFX *fxMotors[];
  * @param channelCount Number of channels to decode.
  */
 static void decodePDHFrame(uint64_t payload,
-                    uint16_t *out,
-                    int channelCount)
+                           uint16_t *out,
+                           int channelCount)
 {
     uint8_t bitIndex = 0;
 
@@ -194,7 +194,7 @@ void canSetupPDH(PDH *pdh)
     };
     ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
     ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, pdh));
-    canSetupTalonFX(&fxMotors[0],6);
+    canSetupTalonFX(&fxMotors[0], 6);
     ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
 }
 

@@ -25,10 +25,9 @@ static i2c_master_bus_handle_t aux_bus_handle;
 static const i2c_sensor_config_t INA219_PROFILE = {
     .name = "INA219",
     .address = INA219_SENSOR_ADDR,
-    .registers = (uint8_t[]) {INA219_REG_BUSVOLTAGE},
-    .register_count = 1
-};
-static i2c_sensor_t aux_voltage_sensor = { .config = &INA219_PROFILE };
+    .registers = (uint8_t[]){INA219_REG_BUSVOLTAGE},
+    .register_count = 1};
+static i2c_sensor_t aux_voltage_sensor = {.config = &INA219_PROFILE};
 static float aux_battery_voltage = 0.0f;
 
 // Initialize Talon "objects"
@@ -48,16 +47,16 @@ void initializeTalons()
     // potSetup((adc_channel_t[]){ADC_PIN_FRONT, ADC_PIN_BACK}, 2);
     // frontActuatorPot = potInit(90, 1260, ADC_PIN_FRONT);
     // backActuatorPot = potInit(90, 1260, ADC_PIN_BACK);
-    
+
     // position
     // frontActuatorPID = initPID(2, 0.15, 0.001);
     // backActuatorPID = initPID(2, 0.15, 0.001);
 
     // velocity
-    // frontActuatorPID = initPID(0.9, 0.5, 0); 
+    // frontActuatorPID = initPID(0.9, 0.5, 0);
     // backActuatorPID = initPID(0.9, 0.5, 0);
 
-    //canSetupTalons();
+    // canSetupTalons();
 
     hallEffectInit(HALL_PIN_FRONT, HALL_PIN_BACK);
 
@@ -156,51 +155,6 @@ TempPacket_OneRobot getTemperatureOneRobot()
     return packet;
 }
 
-bool robot_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx)
-{
-    uint8_t recv_buff[8];
-    twai_frame_t rx_frame = {
-        .buffer = recv_buff,
-        .buffer_len = sizeof(recv_buff)
-    };
-
-    if (ESP_OK != twai_node_receive_from_isr(handle, &rx_frame)) {
-        return false;
-    }
-
-    RobotRegistry *reg = (RobotRegistry *)user_ctx;
-    for (size_t i = 0; i < reg->count; i++) {
-        receiveCANTalonFX(reg->motors[i], &rx_frame, (uint64_t *)recv_buff);
-    }
-    receiveCANPDH(reg->pdh, &rx_frame, (uint64_t *)&recv_buff);
-    return false;
-}
-
-void canSetupRobot(PDH *pdh, TalonFX **motors, size_t count)
-{
-    static bool canInitialized = false;
-    if (!canInitialized) {
-        static RobotRegistry registry;
-        registry.pdh = pdh;
-        registry.motors = motors;
-        registry.count = count;
-        twai_onchip_node_config_t node_config = {
-            .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
-            .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
-            .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
-            .bit_timing.sp_permill = 800,
-            .tx_queue_depth = 32,                // Transmit queue depth set to 32
-        };
-        twai_event_callbacks_t can_cbs = {
-            .on_rx_done = robot_twai_rx_cb,
-        };
-        ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-        ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, &registry));
-        ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
-        canInitialized = true;
-    }
-}
-
 CurrVoltPacket_OneRobot getCurrentVoltageOneRobot(PDH *pdh)
 {
     CurrVoltPacket_OneRobot packet = Init_CurrVolt_Packet();
@@ -219,7 +173,64 @@ CurrVoltPacket_OneRobot getCurrentVoltageOneRobot(PDH *pdh)
     // FIXME: Get auxiliary battery voltage working
     // updateAuxVoltage();
     // packet.aux_battery = getAuxVoltage();
-    
-    return packet;
 
+    return packet;
+}
+
+/**
+ * @internal
+ * @brief Setups CAN for the PDH.
+ *
+ * @param handle    TWAI node handle for the on-chip TWAI peripheral.
+ * @param edata     Pointer to TWAI event data struct containing received frame data.
+ * @param user_ctx  Pointer to user context, which in this case is a RobotRegistry struct containing pointers to the PDH and TalonFX motors for callback access.
+ * @return true if a higher priority task was woken by this callback and a context switch is required, false otherwise
+ */
+static bool robot_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx)
+{
+    uint8_t recv_buff[8];
+    twai_frame_t rx_frame = {
+        .buffer = recv_buff,
+        .buffer_len = sizeof(recv_buff)};
+
+    if (ESP_OK != twai_node_receive_from_isr(handle, &rx_frame))
+    {
+        return false;
+    }
+
+    RobotRegistry *reg = (RobotRegistry *)user_ctx;
+    for (size_t i = 0; i < reg->count; i++)
+    {
+        receiveCANTalonFX(reg->motors[i], &rx_frame, (uint64_t *)recv_buff);
+    }
+    receiveCANPDH(reg->pdh, &rx_frame, (uint64_t *)&recv_buff);
+    return false;
+}
+
+void canSetupRobot(PDH *pdh, TalonFX **motors, size_t count)
+{
+    static bool canInitialized = false;
+    if (!canInitialized)
+    {
+        static RobotRegistry registry;
+        registry.pdh = pdh;
+        registry.motors = motors;
+        registry.count = count;
+        twai_onchip_node_config_t node_config = {
+            .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
+            .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
+            .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
+            .io_cfg.quanta_clk_out = -1,         // FIX: Disable clock out (prevents GPIO 0 conflict)
+            .io_cfg.bus_off_indicator = -1,      // FIX: Disable bus-off indicator
+            .bit_timing.sp_permill = 800,
+            .tx_queue_depth = 32, // Transmit queue depth set to 32
+        };
+        twai_event_callbacks_t can_cbs = {
+            .on_rx_done = robot_twai_rx_cb,
+        };
+        ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
+        ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, &registry));
+        ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
+        canInitialized = true;
+    }
 }

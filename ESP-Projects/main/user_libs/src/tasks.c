@@ -1,6 +1,5 @@
 #include "tasks.h"
 
-
 void UART_rx_task()
 {
     ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -55,7 +54,7 @@ void enable_task() {
 void current_voltage_update_task(PDH *pdh)
 {
     // Continuously read current/voltage data from the robot and update the current_voltage_queue
-    for(;;)
+    for (;;)
     {
         CurrVoltPacket_OneRobot current_voltage_packet = getCurrentVoltageOneRobot(pdh);
         xQueueOverwrite(current_voltage_queue, &current_voltage_packet);
@@ -66,7 +65,7 @@ void current_voltage_update_task(PDH *pdh)
 void position_update_task()
 {
     // Continuously read position data from the robot and update the position_queue
-    for(;;)
+    for (;;)
     {
         PositionPacket_OneRobot position_packet = calculatePulse(&frontActuator, &backActuator);
         xQueueOverwrite(position_queue, &position_packet);
@@ -101,7 +100,6 @@ void one_robot_control_can_task()
             motor_state = new_data;
         }
         directControl(motor_state);
-        ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); //DO NOT REMOVE OR I WILL SLIME YOU OUT
     }
 }
 
@@ -119,7 +117,7 @@ void motor_task()
 {
     for (;;)
     {
-        //sendEn();    
+        // sendEn();
         test_run_motor();
         vTaskDelay(pdMS_TO_TICKS(10));
     }

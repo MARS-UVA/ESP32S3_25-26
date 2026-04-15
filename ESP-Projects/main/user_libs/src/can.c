@@ -44,5 +44,5 @@ void sendMsg(can_id_t msg_id, uint8_t d_id, uint8_t *data_buff, size_t len)
         .buffer_len = len,
     };
     ESP_ERROR_CHECK(twai_node_transmit(g_node_hdl, &msg, TIMEOUT));
-    vTaskDelay(1);
+    ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(g_node_hdl, TIMEOUT)); // DO NOT REMOVE OR I WILL SLIME YOU OUT
 }

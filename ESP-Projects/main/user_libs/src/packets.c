@@ -16,13 +16,13 @@ CurrVoltPacket_OneRobot Init_CurrVolt_Packet()
     pkt.front_left_wheel = 0.0f;
     pkt.front_right_wheel = 0.0f;
     pkt.back_left_wheel = 0.0f;
-    pkt.back_right_wheel = 0.0f; 
+    pkt.back_right_wheel = 0.0f;
     pkt.front_drum = 0.0f;
-    pkt.back_drum = 0.0f; 
+    pkt.back_drum = 0.0f;
     pkt.front_actuator = 0.0f;
     pkt.back_actuator = 0.0f;
     pkt.main_battery = 0.0f;
-    pkt.aux_battery = 0.0f;    
+    pkt.aux_battery = 0.0f;
     return pkt;
 }
 
@@ -37,9 +37,9 @@ TempPacket_OneRobot Init_Temp_Packet()
     pkt.front_left_wheel_temp = 0;
     pkt.front_right_wheel_temp = 0;
     pkt.back_left_wheel_temp = 0;
-    pkt.back_right_wheel_temp = 0; 
+    pkt.back_right_wheel_temp = 0;
     pkt.front_drum_temp = 0;
-    pkt.back_drum_temp = 0; 
+    pkt.back_drum_temp = 0;
     return pkt;
 }
 
