@@ -37,18 +37,21 @@ void enable_task();
 void motor_task();
 
 /**
- * @brief Task that updates the temperature queue with the latest temperature readings from the robot.
+ * @brief Task that updates the temperature queue with the latest temperature readings from the robot
  */
 void temperature_update_task();
 
 /**
- * @brief Task that updates the current/voltage queue with the latest readings from the robot.
+ * @brief Task that updates the current/voltage queue with the latest readings from the robot
  */
 void current_voltage_update_task(PDH *pdh);
 
 /**
- * @brief Task that updates the position queue with the latest position readings from the robot.
+ * @brief Task that updates the position queue with the latest position readings from the robot
  */
 void position_update_task();
 
+/**
+ * @brief Task that sends the CAN enable frame for the TalonFX and TalonSRX motor controllers
+ */
 void CAN_enable_task();

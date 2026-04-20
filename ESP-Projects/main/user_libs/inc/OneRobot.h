@@ -46,8 +46,7 @@ extern QueueHandle_t uart_queue;
 void initializeTalons(void);
 void directControl(ControlPacket_OneRobot pkt);
 void initAuxVoltageSensor(void);
-void updateAuxVoltage(void);
-float getAuxVoltage(void);
+float updateAuxVoltage(void);
 
 
 /**

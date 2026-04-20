@@ -2,7 +2,7 @@ import serial # type: ignore
 from time import sleep
 import struct
 
-COM_Port = '/dev/tty.usbserial-10'  # Change this to your actual COM port
+COM_Port = '/dev/tty.usbserial-110'  # Change this to your actual COM port
 BAUD_Rate = 115200    # Set the baud rate
 
 # Open the serial port
@@ -27,7 +27,7 @@ try:
 
         if header == b'\xFF\x01\x00\x00': # Check if the header matches the expected value
             print(f"Read header: {header}")
-            feedback = list(struct.iter_unpack("f",ser.read(40))) # tuple of: fl, fr, bl, br, ldrum, rdrum, la, ra, potentiometer
+            feedback = list(struct.iter_unpack("f",ser.read(44))) # tuple of: fl, fr, bl, br, ldrum, rdrum, la, ra, potentiometer
             feedback = [i[0] for i in feedback]
             print(f"Header: {header}, Feedback: {feedback}")
             #print(f"Potentiometer reading: {feedback[8]}")

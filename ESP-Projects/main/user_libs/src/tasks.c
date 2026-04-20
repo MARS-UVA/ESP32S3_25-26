@@ -4,7 +4,7 @@ void UART_rx_task()
 {
     ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    while (1)
+    for (;;)
     {
         UART_read(&pkt);
         if (pkt.invalid == 0)
@@ -44,8 +44,10 @@ void UART_tx_task()
     }
 }
 
-void enable_task() {
-    while (1) {
+void enable_task() 
+{
+    for (;;) 
+    {
         sendEn();
         vTaskDelay(pdMS_TO_TICKS(5));
     }
@@ -92,7 +94,7 @@ void one_robot_control_can_task()
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t frequency = pdMS_TO_TICKS(15);
 
-    while (1)
+    for (;;)
     {
         vTaskDelayUntil(&xLastWakeTime, frequency);
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
@@ -108,17 +110,6 @@ void CAN_enable_task()
     for (;;)
     {
         sendEn();
-        vTaskDelay(pdMS_TO_TICKS(10));
-    }
-}
-
-// TODO: Remove this function after testing
-void motor_task()
-{
-    for (;;)
-    {
-        // sendEn();
-        test_run_motor();
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
