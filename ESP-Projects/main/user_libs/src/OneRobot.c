@@ -72,11 +72,11 @@ void directControl(ControlPacket_OneRobot pkt)
 {
     int8_t leftSpeed = pkt.front_left_wheel;
     setTargetFX(&frontLeft, ((int8_t)(leftSpeed - 127)) * -1);
-    setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)));
+    setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
     int8_t rightSpeed = pkt.front_right_wheel;
-    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)));
-    setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)));
 
     setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)) * -1);
     setTargetFX(&backBucketDrum, ((int8_t)(pkt.back_bucket_drum - 127)));
@@ -122,7 +122,8 @@ float updateAuxVoltage(void)
 {
     uint8_t data[2];
     I2C_Burst_Read_Register(&aux_voltage_sensor, 0, data, 2);
-    return ((((uint16_t)(data[0] << 8) | (uint16_t)(data[1])) >> 3) / 250.0f);
+
+    return (((uint16_t)(data[0] << 5) | (uint16_t)(data[1] >> 3)) / 250.0f);
 }
 
 TempPacket_OneRobot getTemperatureOneRobot()
@@ -154,7 +155,7 @@ CurrVoltPacket_OneRobot getCurrentVoltageOneRobot(PDH *pdh)
 
     // FIXME: Get auxiliary battery voltage working
     packet.aux_battery = updateAuxVoltage();
-    // printf("Aux: %f V\n", packet.aux_battery);
+    printf("Aux: %f V\n", packet.aux_battery);
 
     return packet;
 }
