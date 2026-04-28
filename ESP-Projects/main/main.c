@@ -17,12 +17,6 @@ void app_main()
     for (;;)
     {
         UART_read(&packet);
-
-        if (packet.invalid)
-        {
-            continue;
-        }
-
         directControl(packet);
     }
     return;
