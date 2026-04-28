@@ -16,7 +16,7 @@ void UART_rx_task()
     }
 }
 
-void UART_tx_task()
+void UART_tx_task(PDH *pdh)
 {
     // Declare packets that will be sent to the Jetson
     CurrVoltPacket_OneRobot current_voltage_packet;
@@ -26,7 +26,16 @@ void UART_tx_task()
     // Continuously check for new packets in the queues and send them over UART
     for (;;)
     {
-        if (xQueueReceive(current_voltage_queue, &current_voltage_packet, 0) == pdTRUE)
+        current_voltage_packet = getCurrentVoltageOneRobot(pdh);
+        UART_write(&current_voltage_packet, sizeof(CurrVoltPacket_OneRobot));
+        
+        position_packet = calculatePulse(&frontActuator, &backActuator);
+        UART_write(&position_packet, sizeof(PositionPacket_OneRobot));
+
+        temperature_packet = getTemperatureOneRobot();
+        UART_write(&temperature_packet, sizeof(TempPacket_OneRobot));
+
+        /*if (xQueueReceive(current_voltage_queue, &current_voltage_packet, 0) == pdTRUE)
         {
             UART_write(&current_voltage_packet, sizeof(CurrVoltPacket_OneRobot));
         }
@@ -39,8 +48,8 @@ void UART_tx_task()
         if (xQueueReceive(temperature_queue, &temperature_packet, 0) == pdTRUE)
         {
             UART_write(&temperature_packet, sizeof(TempPacket_OneRobot));
-        }
-        vTaskDelay(10);
+        }*/
+        vTaskDelay(100);
     }
 }
 
