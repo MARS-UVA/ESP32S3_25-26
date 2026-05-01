@@ -81,28 +81,28 @@ void directControl(ControlPacket_OneRobot pkt)
     setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)) * -1);
     setTargetFX(&backBucketDrum, ((int8_t)(pkt.back_bucket_drum - 127)));
 
-    float actuatorOutput = 0;
+    float actuatorOutput = (float)(pkt.back_actuator - 127) / 128;
     if (pkt.back_actuator > 127)
     {
-        actuatorOutput = 1;
+        //actuatorOutput = 1;
         *backActuator.direction = 1;
     }
     else if (pkt.back_actuator < 127)
     {
-        actuatorOutput = -1;
+        //actuatorOutput = -1;
         *backActuator.direction = -1;
     }
     setSRX(backActuator.controller, 1 * actuatorOutput);
 
-    actuatorOutput = 0;
+    actuatorOutput = (float)(pkt.front_actuator - 127) / 128;
     if (pkt.front_actuator > 127)
     {
-        actuatorOutput = 1;
+        //actuatorOutput = 1;
         *frontActuator.direction = 1;
     }
     else if (pkt.front_actuator < 127)
     {
-        actuatorOutput = -1;
+        //actuatorOutput = -1;
         *frontActuator.direction = -1;
     }
     setSRX(frontActuator.controller, -1 * actuatorOutput);
