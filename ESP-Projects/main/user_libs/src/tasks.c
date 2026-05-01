@@ -44,9 +44,9 @@ void UART_tx_task()
     }
 }
 
-void enable_task() 
+void enable_task()
 {
-    for (;;) 
+    for (;;)
     {
         sendEn();
         vTaskDelay(pdMS_TO_TICKS(5));
@@ -94,12 +94,24 @@ void one_robot_control_can_task()
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t frequency = pdMS_TO_TICKS(15);
 
+    uint8_t last_received_count = 0;
+
     for (;;)
     {
         vTaskDelayUntil(&xLastWakeTime, frequency);
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
             motor_state = new_data;
+            last_received_count = 0;
+        }
+        else
+        {
+            last_received_count++;
+        }
+
+        if (last_received_count >= 50)
+        {
+            motor_state = (ControlPacket_OneRobot){0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
         }
         directControl(motor_state);
     }
