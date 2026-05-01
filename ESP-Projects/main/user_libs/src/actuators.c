@@ -1,6 +1,24 @@
+/**
+ * @file actuators.c
+ * @brief Source file for actuator control functions.
+ * 
+ * This module provides functions to control and synchronize two actuators using PID control, as well
+ * as functions to read their positions using hall effect sensors. It includes initialization functions
+ * for the actuators and the hall effect sensors, as well as functions to move the actuators to a target
+ * position or velocity while keeping them synchronized.
+ * 
+ * @author Jingyi Li
+ * @date 2024-06-01
+ * @version 1.0
+ */
+
 #include "actuators.h"
 
-static double pulse_mm = 44; //printing gave a multiplier of 22.5
+/* Internal function prototypes for GPIO interrupt handlers for the hall effect sensors. These functions are defined as static and are not intended to be called outside of this source file. */
+static void IRAM_ATTR gpio_isr_handler_front(void* arg);
+static void IRAM_ATTR gpio_isr_handler_back(void* arg);
+
+static double pulse_mm = 44; // Printing gave a multiplier of 22.5
 
 volatile int pulseCountFront = 0;
 volatile int pulseCountBack = 0;
@@ -20,14 +38,6 @@ Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid, int *dir
         .velocity = 0,
         .direction = direction};
 };
-
-static void IRAM_ATTR gpio_isr_handler_front(void* arg) {
-    pulseCountFront-=frontDirection;
-}
-
-static void IRAM_ATTR gpio_isr_handler_back(void* arg) {
-    pulseCountBack-=backDirection;
-}
 
 void hallEffectInit(int pinFront, int pinBack) 
 {
@@ -160,4 +170,32 @@ void evaluatePot(Actuator *frontActuator, Actuator *backActuator)
 {
     readPot(frontActuator->pot);
     readPot(backActuator->pot);
+}
+
+/**
+ * @internal
+ * @brief GPIO interrupt handler for the front hall effect sensor.
+ * 
+ * This function is called when a rising edge is detected on the GPIO pin connected to the front hall effect sensor.
+ * It decrements the `pulseCountFront` variable based on the `frontDirection` variable, which indicates the direction
+ * of movement for the front actuator.
+ * 
+ * @param[in] arg Pointer to the GPIO pin number (not used in this handler).
+ */
+static void IRAM_ATTR gpio_isr_handler_front(void* arg) {
+    pulseCountFront-=frontDirection;
+}
+
+/**
+ * @internal
+ * @brief GPIO interrupt handler for the back hall effect sensor.
+ * 
+ * This function is called when a rising edge is detected on the GPIO pin connected to the back hall effect sensor.
+ * It decrements the `pulseCountBack` variable based on the `backDirection` variable, which indicates the direction
+ * of movement for the back actuator.
+ * 
+ * @param[in] arg Pointer to the GPIO pin number (not used in this handler).
+ */
+static void IRAM_ATTR gpio_isr_handler_back(void* arg) {
+    pulseCountBack-=backDirection;
 }
