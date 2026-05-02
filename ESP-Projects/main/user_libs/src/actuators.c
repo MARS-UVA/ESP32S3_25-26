@@ -1,6 +1,7 @@
 #include "actuators.h"
 
-static double pulse_mm = 44; //printing gave a multiplier of 22.5
+static double pulse_mm_back = 44; //printing gave a multiplier of 22.5
+static double pulse_mm_front = 37; //printing gave a multiplier of 22.5
 
 volatile int pulseCountFront = 0;
 volatile int pulseCountBack = 0;
@@ -143,11 +144,11 @@ void moveSyncActuatorsToVelocity(Actuator *frontActuator, Actuator *backActuator
 
 PositionPacket_OneRobot calculatePulse(Actuator *frontActuator, Actuator *backActuator) 
 {
-    pulseCountFront = fmax(fmin(pulseCountFront, (int)(pulse_mm*254)), 0);
-    frontActuator->prevPosition = map((int)(pulse_mm*254), 0, pulseCountFront);
+    pulseCountFront = fmax(fmin(pulseCountFront, (int)(pulse_mm_front*254)), 0);
+    frontActuator->prevPosition = map(0, (int)(pulse_mm_front*254),pulseCountFront);
 
-    pulseCountBack = fmax(fmin(pulseCountBack, (int)(pulse_mm*254)), 0);
-    backActuator->prevPosition = map((int)(pulse_mm*254), 0, pulseCountBack);
+    pulseCountBack = fmax(fmin(pulseCountBack, (int)(pulse_mm_back*254)), 0);
+    backActuator->prevPosition = map(0, (int)(pulse_mm_back*254), pulseCountBack);
 
     PositionPacket_OneRobot pkt = Init_Position_Packet();
     pkt.front_actuator_position = frontActuator->prevPosition;

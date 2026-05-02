@@ -78,7 +78,7 @@ void directControl(ControlPacket_OneRobot pkt)
     setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)));
 
-    setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)) * -1);
+    setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)));
     setTargetFX(&backBucketDrum, ((int8_t)(pkt.back_bucket_drum - 127)));
 
     float actuatorOutput = (float)(pkt.back_actuator - 127) / 128;
