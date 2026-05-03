@@ -40,9 +40,9 @@ void UART_setup()
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
     ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, S3_TX_PIN, S3_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE)); // used to be 43, 44, but those pins are used for CAN so changed to 23, 24
     control_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
-    temperature_queue = xQueueCreate(1, sizeof(TempPacket_OneRobot));
-    current_voltage_queue = xQueueCreate(1, sizeof(CurrVoltPacket_OneRobot));
-    position_queue = xQueueCreate(1, sizeof(PositionPacket_OneRobot));
+    //temperature_queue = xQueueCreate(1, sizeof(TempPacket_OneRobot));
+    //current_voltage_queue = xQueueCreate(1, sizeof(CurrVoltPacket_OneRobot));
+    //position_queue = xQueueCreate(1, sizeof(PositionPacket_OneRobot));
 }
 
 /*
