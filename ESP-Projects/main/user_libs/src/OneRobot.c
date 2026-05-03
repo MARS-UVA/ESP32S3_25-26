@@ -78,7 +78,7 @@ void directControl(ControlPacket_OneRobot pkt)
     setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)));
 
-    setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)) * -1);
+    setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)));
     setTargetFX(&backBucketDrum, ((int8_t)(pkt.back_bucket_drum - 127)));
 
     float actuatorOutput = 0;
@@ -117,7 +117,7 @@ void initAuxVoltageSensor(void)
     I2C_Add_Sensor(&aux_bus_handle, &aux_voltage_sensor);
 }
 
-//readapt the functions responsible for current updating and return
+// readapt the functions responsible for current updating and return
 float updateAuxVoltage(void)
 {
     uint8_t data[2];
