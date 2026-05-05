@@ -22,6 +22,14 @@ Actuator initActuator(TalonSRX *talonSrx, Pot *pot, PIDController *pid, int *dir
         .direction = direction};
 };
 
+static void IRAM_ATTR gpio_isr_handler_front(void* arg) {
+    pulseCountFront-=frontDirection;
+}
+
+static void IRAM_ATTR gpio_isr_handler_back(void* arg) {
+    pulseCountBack-=backDirection;
+}
+
 void hallEffectInit(int pinFront, int pinBack)
 {
     gpio_config_t io_conf_a = {

@@ -11,30 +11,30 @@
 #include "i2c.h"
 
 // Define CAN IDs of each motor/actuator
-#define FRONT_LEFT_WHEEL_ID 38 // 38
-#define BACK_LEFT_WHEEL_ID 13 // 13
+#define FRONT_LEFT_WHEEL_ID 38  // 38
+#define BACK_LEFT_WHEEL_ID 13   // 13
 #define FRONT_RIGHT_WHEEL_ID 36 // 36
 #define BACK_RIGHT_WHEEL_ID 37
-#define BACK_BUCKET_DRUM_ID 25  
+#define BACK_BUCKET_DRUM_ID 25
 #define FRONT_BUCKET_DRUM_ID 60
-#define FRONT_ACTUATOR_ID 55
-#define BACK_ACTUATOR_ID 16
+#define FRONT_ACTUATOR_ID 16
+#define BACK_ACTUATOR_ID 55
 
 // Define channel IDs of each motor/actuator
-#define FRONT_LEFT_WHEEL_CHANNEL_ID 12 // 16
-#define BACK_LEFT_WHEEL_CHANNEL_ID 11 //15 // 13
-#define FRONT_RIGHT_WHEEL_CHANNEL_ID 18 //13 // 3
-#define BACK_RIGHT_WHEEL_CHANNEL_ID 19 //14
-#define BACK_BUCKET_DRUM_CHANNEL_ID 15 //18
-#define FRONT_BUCKET_DRUM_CHANNEL_ID 17 //12
+#define FRONT_LEFT_WHEEL_CHANNEL_ID 12  // 16
+#define BACK_LEFT_WHEEL_CHANNEL_ID 11   // 15 // 13
+#define FRONT_RIGHT_WHEEL_CHANNEL_ID 18 // 13 // 3
+#define BACK_RIGHT_WHEEL_CHANNEL_ID 19  // 14
+#define BACK_BUCKET_DRUM_CHANNEL_ID 15  // 18
+#define FRONT_BUCKET_DRUM_CHANNEL_ID 17 // 12
 #define FRONT_ACTUATOR_CHANNEL_ID 13
-#define BACK_ACTUATOR_CHANNEL_ID 10 //10 //11
+#define BACK_ACTUATOR_CHANNEL_ID 10 // 10 //11
 // Define INA219
-#define INA219_SENSOR_ADDR      0x40
-#define INA219_REG_BUSVOLTAGE   0x02
+#define INA219_SENSOR_ADDR 0x40
+#define INA219_REG_BUSVOLTAGE 0x02
 
 #define HALL_PIN_FRONT 11
-#define HALL_PIN_BACK  12
+#define HALL_PIN_BACK 12
 
 #define ADC_PIN_FRONT ADC_CHANNEL_3
 #define ADC_PIN_BACK ADC_CHANNEL_4
@@ -48,15 +48,15 @@ void directControl(ControlPacket_OneRobot pkt);
 void initAuxVoltageSensor(void);
 float updateAuxVoltage(void);
 
-
 /**
  * @brief Representation of hardware across robot needed for callback func setup
  */
-typedef struct {
-    PDH* pdh;
-    TalonFX** motors;
+typedef struct
+{
+    PDH *pdh;
+    TalonFX **motors;
     size_t count;
-}RobotRegistry;
+} RobotRegistry;
 
 // TODO: Remove this function after testing
 void test_run_motor();
@@ -76,7 +76,7 @@ void canSetupRobot(PDH *pdh, TalonFX **motors, size_t count);
 
 /**
  * @brief Gets current/voltage data from the robot and stores it in a packet struct.
- * 
+ *
  * @param pdh   Pointer to PDH instance.
  * @return CurrVoltPacket_OneRobot struct containing current/voltage data.
  */
