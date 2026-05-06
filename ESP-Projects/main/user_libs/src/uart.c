@@ -98,6 +98,9 @@ void UART_read(ControlPacket_OneRobot *packet)
         packet->back_bucket_drum = RxBuffer[8];
         packet->back_actuator = RxBuffer[9];
     }
+    else {
+        packet->invalid = 0xFF;
+    }
 }
 
 void UART_write(void *packet, size_t size)

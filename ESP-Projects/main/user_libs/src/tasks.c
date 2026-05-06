@@ -3,7 +3,6 @@
 void UART_rx_task()
 {
     ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
     for (;;)
     {
         UART_read(&pkt);
@@ -98,7 +97,6 @@ void temperature_update_task()
 void one_robot_control_can_task()
 {
     ControlPacket_OneRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
-    // ControlPacket_OneRobot motor_state = {0, 0, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F, 0x7F, 0x7F, 0x7F}; // test packet with max speed forward and no actuator movement
     ControlPacket_OneRobot new_data;
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t frequency = pdMS_TO_TICKS(15);
@@ -113,15 +111,13 @@ void one_robot_control_can_task()
             motor_state = new_data;
             last_received_count = 0;
         }
-        else
-        {
+        else {
             last_received_count++;
         }
-
-        if (last_received_count >= 50)
-        {
+        if (last_received_count >=100) {
             motor_state = (ControlPacket_OneRobot){0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
         }
+
         directControl(motor_state);
     }
 }
