@@ -75,7 +75,7 @@ void directControl(ControlPacket_OneRobot pkt)
     setTargetFX(&backLeft, ((int8_t)(leftSpeed - 127)) * -1);
 
     int8_t rightSpeed = pkt.front_right_wheel;
-    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)) * -1);
+    setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)));
     setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)));
 
     setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)));
