@@ -76,10 +76,10 @@ void directControl(ControlPacket_OneRobot pkt)
 
     int8_t rightSpeed = pkt.front_right_wheel;
     setTargetFX(&frontRight, ((int8_t)(rightSpeed - 127)));
-    setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)));
+    setTargetFX(&backRight, ((int8_t)(rightSpeed - 127)) * -1);
 
-    setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)));
-    setTargetFX(&backBucketDrum, ((int8_t)(pkt.back_bucket_drum - 127)));
+    setTargetFX(&frontBucketDrum, ((int8_t)(pkt.front_bucket_drum - 127)) * -1);
+    setTargetFX(&backBucketDrum, ((int8_t)(pkt.back_bucket_drum - 127)) * -1);
 
     float actuatorOutput = (float)(pkt.back_actuator - 127) / 128;
     if (pkt.back_actuator > 127)
