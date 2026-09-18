@@ -125,8 +125,8 @@ void canSetupTalonFX(TalonFX **motors, size_t count)
         registry.count = count;
     
         twai_onchip_node_config_t node_config = {
-            .io_cfg.tx = TX_GPIO_NUM,            // TWAI TX GPIO pin
-            .io_cfg.rx = RX_GPIO_NUM,            // TWAI RX GPIO pin
+            .io_cfg.tx = RX_GPIO_NUM,            // TWAI TX GPIO pin
+            .io_cfg.rx = TX_GPIO_NUM,            // TWAI RX GPIO pin
             .bit_timing.bitrate = ROBOT_BITRATE, // 1Mbps bitrate
             .tx_queue_depth = 32,                // Transmit queue depth set to 32
         };
@@ -135,9 +135,9 @@ void canSetupTalonFX(TalonFX **motors, size_t count)
             .on_rx_done = talonfx_twai_rx_cb,
         };
     
-        //ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
-        ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, &registry));
-        //ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
+        ESP_ERROR_CHECK(twai_new_node_onchip(&node_config, &g_node_hdl));
+        // ESP_ERROR_CHECK(twai_node_register_event_callbacks(g_node_hdl, &can_cbs, &registry));
+        ESP_ERROR_CHECK(twai_node_enable(g_node_hdl));
         can_initialized = true;
     }
 }

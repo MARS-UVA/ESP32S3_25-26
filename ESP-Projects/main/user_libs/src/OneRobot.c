@@ -18,7 +18,8 @@ Actuator backActuator;
 Pot backActuatorPot;
 PIDController backActuatorPID;
 
-TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &frontBucketDrum, &backBucketDrum};
+// TalonFX *fxMotors[] = {&frontLeft, &backLeft, &frontRight, &backRight, &frontBucketDrum, &backBucketDrum};
+TalonFX *fxMotors[] = {&frontLeft}; // this is an example for the one motor test.
 TalonSRX *srxMotors[] = {&frontActuatorSRX, &backActuatorSRX};
 
 static i2c_master_bus_handle_t aux_bus_handle;
@@ -171,6 +172,7 @@ CurrVoltPacket_OneRobot getCurrentVoltageOneRobot(PDH *pdh)
  */
 static bool robot_twai_rx_cb(twai_node_handle_t handle, const twai_rx_done_event_data_t *edata, void *user_ctx)
 {
+    printf("can data recieved\n");
     uint8_t recv_buff[8];
     twai_frame_t rx_frame = {
         .buffer = recv_buff,
