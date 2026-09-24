@@ -11,6 +11,9 @@
 #include "tasks.h"
 #include "pdh.h"
 
+#define KRAKEN_CONTROL_PIN GPIO_NUM_4
+#define ACTUATOR_CONTROL_PIN GPIO_NUM_5
+
 // can_rx_context_t can;
 PDH pdh;
 
@@ -99,23 +102,38 @@ void app_main()
     // xTaskCreatePinnedToCore((void *)(CAN_enable_task), "can_enable", 4096, NULL, configMAX_PRIORITIES - 2, &can_enable_handle, 1);
 
 
-    TalonFX testmotor = talonFXInit(33, 3);
+    TalonFX testmotor = talonFXInit(25, 2);
     TalonFX* motors[1] = {&testmotor};
+
+    TalonSRX testactuator = talonSRXInit(4, 3, false);
+    TalonSRX* actuators[1] = {&testactuator};
     
     // PDHInit(&pdh, 62);
     // canSetupRobot(&pdh, &motors[0], 1);
     
     canSetupTalonFX(&motors[0], 1);
-
+    gpio_set_direction(KRAKEN_CONTROL_PIN, GPIO_MODE_INPUT);
+    gpio_set_direction(ACTUATOR_CONTROL_PIN, GPIO_MODE_INPUT);
     vTaskDelay(pdMS_TO_TICKS(10));
 
     for(;;) {
-        // vTaskDelay(pdMS_TO_TICKS(10));
-        sendEn();
-        setFX(&testmotor, 0.5);
+        vTaskDelay(pdMS_TO_TICKS(10));
 
-        printf("hi\n");
-        
+        float kraken_pot_reading = gpio_get_level(KRAKEN_CONTROL_PIN) / 3.3;
+        float actuator_pot_reading = gpio_get_level(ACTUATOR_CONTROL_PIN) / 3.3;
+
+        printf("Kraken pot reading: %f\n", kraken_pot_reading);
+        printf("Actuator pot reading: %f\n", actuator_pot_reading);
+
+        if(actuator_pot_reading > 0.5){
+            testactuator.inverted = false;
+        }
+        else{
+            testactuator.inverted = true;
+        }    
+        sendEn();
+        setFX(&testmotor, kraken_pot_reading);
+        setSRX(&testactuator, actuator_pot_reading);
     }
     
 }
