@@ -99,7 +99,7 @@ void app_main()
     // xTaskCreatePinnedToCore((void *)(CAN_enable_task), "can_enable", 4096, NULL, configMAX_PRIORITIES - 2, &can_enable_handle, 1);
 
 
-    TalonFX testmotor = talonFXInit(33, 3);
+    TalonFX testmotor = talonFXInit(36, 19);
     TalonFX* motors[1] = {&testmotor};
     
     // PDHInit(&pdh, 62);
@@ -112,7 +112,7 @@ void app_main()
     for(;;) {
         // vTaskDelay(pdMS_TO_TICKS(10));
         sendEn();
-        setFX(&testmotor, 0.5);
+        setFX(&testmotor, 0.3);
 
         printf("hi\n");
         
