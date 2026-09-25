@@ -269,7 +269,7 @@ void app_main(void)
     TickType_t wake = xTaskGetTickCount();
     uint32_t n = 0;
 
-    TalonFX testmotor = talonFXInit(25, 3);
+    TalonFX testmotor = talonFXInit(36, 19);
     TalonFX* motors[1] = {&testmotor};
     
     // PDHInit(&pdh, 62);

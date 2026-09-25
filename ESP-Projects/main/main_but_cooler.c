@@ -107,7 +107,7 @@ void app_main()
     
     canSetupTalonFX(&motors[0], 1);
 
-    vTaskDelay(pdMS_TO_TICKS(10));
+    //vTaskDelay(pdMS_TO_TICKS(10));
 
     for(;;) {
         // vTaskDelay(pdMS_TO_TICKS(10));
