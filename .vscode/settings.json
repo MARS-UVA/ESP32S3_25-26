@@ -25,7 +25,7 @@
     "--query-driver=**",
     "--compile-commands-dir=c:\\Users\\sokja\\ESP-IDF Projects\\f26_embedded_lecture\\build"
   ],
-  "idf.currentSetup": "/Users/anthonyvu/.espressif/v6.0/esp-idf",
+  "idf.currentSetup": "C:\\esp\\v6.1\\esp-idf",
   "idf.flashType": "UART",
   "idf.port": "COM14",
   "idf.monitorPort": "COM14",
