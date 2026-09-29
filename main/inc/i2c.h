@@ -10,8 +10,8 @@
 #include "esp_log.h"
 #include "driver/i2c_master.h"
 
-#define I2C_MASTER_SCL_IO       GPIO_NUM_0
-#define I2C_MASTER_SDA_IO       GPIO_NUM_1
+#define I2C_MASTER_SCL_IO       GPIO_NUM_5
+#define I2C_MASTER_SDA_IO       GPIO_NUM_6
 #define I2C_MASTER_NUM          I2C_NUM_0		/*!< I2C port number for master dev */
 #define I2C_MASTER_FREQ_HZ      100000			/*!< I2C master clock frequency */
 #define I2C_MASTER_TIMEOUT_MS   1000			/*!< I2C master timeout (ms) */
@@ -41,6 +41,7 @@ esp_err_t I2C_Remove_Sensor(i2c_sensor_t* sensor);
 esp_err_t I2C_Read_Register(i2c_sensor_t* sensor, size_t index, uint8_t* result);
 esp_err_t I2C_Read_Registers(i2c_sensor_t* sensor, uint8_t result[]);
 esp_err_t I2C_Burst_Read_Register(i2c_sensor_t* sensor, size_t index, uint8_t result[], size_t len);
+esp_err_t I2C_Write_Register(i2c_sensor_t* sensor, uint8_t reg_addr, const uint8_t *data, size_t len);
 
 esp_err_t _I2C_Read_Register_(i2c_master_dev_handle_t* handle, uint8_t reg_addr, uint8_t *data, size_t len);
 esp_err_t _I2C_Write_Register_(i2c_master_dev_handle_t* handle, uint8_t reg_addr, const uint8_t *data, size_t len);

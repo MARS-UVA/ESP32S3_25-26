@@ -70,6 +70,11 @@ esp_err_t I2C_Burst_Read_Register(i2c_sensor_t* sensor, size_t index, uint8_t re
 	return _I2C_Read_Register_(&sensor->handle, sensor->config->registers[index], result, len);
 }
 
+esp_err_t I2C_Write_Register(i2c_sensor_t* sensor, uint8_t reg_addr,
+                             const uint8_t *data, size_t len) {
+    return _I2C_Write_Register_(&sensor->handle, reg_addr, data, len);
+}
+
 //Direct read/write
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //This is used for the rare case you need to access a register that has an address larger than 8 bits.

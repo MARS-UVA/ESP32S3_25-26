@@ -19,21 +19,21 @@
       "inheritDefault": "hidden"
     }
   },
-  "clangd.path": "C:\\Espressif\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\bin\\clangd.exe",
+  "clangd.path": "C:\\Espressif\\tools\\esp-clangd\\esp-21.1.3_20260408\\esp-clangd\\bin\\clangd.exe",
   "clangd.arguments": [
     "--background-index",
     "--query-driver=**",
-    "--compile-commands-dir=c:\\Users\\sokja\\ESP-IDF Projects\\f26_embedded_lecture\\build"
+    "--compile-commands-dir=c:\\Users\\sokja\\GitHub\\ESP32S3_25-26\\build"
   ],
-  "idf.currentSetup": "C:\\esp\\v6.1\\esp-idf",
+  "idf.currentSetup": "/Users/lukeoliver/esp/v5.5.1/esp-idf",
   "idf.flashType": "UART",
-  "idf.port": "COM14",
-  "idf.monitorPort": "COM14",
+  "idf.port": "COM16",
+  "idf.monitorPort": "COM16",
   "idf.openOcdConfigs": [
-    "board/esp32c3-builtin.cfg"
+    "board/esp32s3-builtin.cfg"
   ],
   "idf.customExtraVars": {
-    "IDF_TARGET": "esp32c3"
+    "IDF_TARGET": "esp32s3"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }
