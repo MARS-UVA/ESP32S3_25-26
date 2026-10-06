@@ -30,14 +30,49 @@ TaskHandle_t can_enable_handle = NULL;
 #define ADC_CHANNEL_KRAKEN1 GPIO_NUM_4
 #define ADC_CHANNEL_KRAKEN2 GPIO_NUM_5
 #define ADC_CHANNEL_ACTUATOR GPIO_NUM_6
+#define ADC_CHANNEL_BUFFER_SIZE 512
 
 
-adc_continuous_handle_cfg_t kraken1_adc_config = {
-    .max_store_buf_size = (uint32_t)512,
-    .conv_frame_size = SOC_ADC_DIGI_DATA_BYTES_PER_CONV,
-    .flags = {
-        .flush_pool = true,
+// adc_continuous_handle_cfg_t kraken1_adc_config = {
+//     .max_store_buf_size = (uint32_t)512,
+//     .conv_frame_size = SOC_ADC_DIGI_DATA_BYTES_PER_CONV,
+//     .flags = {
+//         .flush_pool = true,
+//     },
+// };
+
+adc_digi_pattern_config_t adc_pattern[3] = {
+    {
+        .atten = ADC_ATTEN_DB_12,
+        .channel = 3,
+        .unit = ADC_UNIT_1,
+        .bit_width = ADC_BITWIDTH_12,
     },
+    {
+        .atten = ADC_ATTEN_DB_12,
+        .channel = 4,
+        .unit = ADC_UNIT_1,
+        .bit_width = ADC_BITWIDTH_12,
+    },
+    {
+        .atten = ADC_ATTEN_DB_12,
+        .channel = 5,
+        .unit = ADC_UNIT_1,
+        .bit_width = ADC_BITWIDTH_12,
+    },
+};
+
+adc_continuous_handle_t handle = NULL;
+adc_continuous_handle_cfg_t adc_config = {
+    .max_store_buf_size = 1024,
+    .conv_frame_size = 256,
+};
+adc_continuous_config_t adc_reading_config = {
+    .sample_freq_hz = 10000,
+    .conv_mode = ADC_CONV_SINGLE_UNIT_1,
+    .format = ADC_DIGI_OUTPUT_FORMAT_TYPE2,
+    .pattern_num = 3,
+    .adc_pattern = adc_pattern,
 };
 
 
@@ -53,38 +88,72 @@ void app_main()
     TalonSRX* actuators[1] = {&testactuator};
     
     // Initialize ADC pin
-    
-
-
-    gpio_set_direction(KRAKEN1_CONTROL_PIN, GPIO_MODE_INPUT);
-    gpio_set_direction(KRAKEN2_CONTROL_PIN, GPIO_MODE_INPUT);
-    gpio_set_direction(ACTUATOR_CONTROL_PIN, GPIO_MODE_INPUT);
-
-
-
+    esp_err_t err = ESP_ERROR_CHECK(adc_continuous_new_handle(&adc_config, &handle));
+    if(err != ESP_OK) {
+        printf("Failed to create ADC handle: %s\n", esp_err_to_name(err));
+        return;
+    }
+    err = adc_continuous_config(handle, &adc_reading_config);
+    if(err != ESP_OK) {
+        printf("Failed to configure ADC handle: %s\n", esp_err_to_name(err));
+        return;
+    }
+    err = adc_continuous_start(handle);
+    if(err != ESP_OK) {
+        printf("Failed to start ADC handle: %s\n", esp_err_to_name(err));
+        return;
+    }
+    printf("ADC continuous mode started successfully.\n");
     vTaskDelay(pdMS_TO_TICKS(10));
+
 
     for(;;) {
         vTaskDelay(pdMS_TO_TICKS(10));
 
-        float kraken1_pot_reading = gpio_get_level(KRAKEN1_CONTROL_PIN) / 3.3;
-        float kraken2_pot_reading = gpio_get_level(KRAKEN2_CONTROL_PIN) / 3.3;
-        float actuator_pot_reading = gpio_get_level(ACTUATOR_CONTROL_PIN) / 3.3;
+        uint8_t adc_data[ADC_CHANNEL_BUFFER_SIZE];
+        uint32_t num_converted = 0;
 
-        printf("Kraken1 pot reading: %f\n", kraken1_pot_reading);
-        printf("Kraken2 pot reading: %f\n", kraken2_pot_reading);
-        printf("Actuator pot reading: %f\n", actuator_pot_reading);
+        float kraken1_pot_reading = 0;
+        float kraken2_pot_reading = 0;
+        float actuator_pot_reading = 0;
 
-        if(actuator_pot_reading > 0.5){
-            testactuator.inverted = false;
+        err = adc_continuous_read(handle, adc_data, sizeof(adc_data), &num_converted, pdMS_TO_TICKS(100));
+        if(err == ESP_OK) {
+            for(int i = 0; i < num_converted; i += SOC_ADC_DIGI_RESULT_BYTES) {
+                adc_digi_output_data_t *result = (adc_digi_output_data_t *)&adc_data[i];
+                uint16_t raw = result->type2.data;
+                switch (result->type2.channel) {
+                    case 3:
+                        kraken1_pot_reading = raw / 4095.0f;
+                        break;
+
+                    case 4:
+                        kraken2_pot_reading = raw / 4095.0f;
+                        break;
+
+                    case 5:
+                        actuator_pot_reading = raw / 4095.0f;
+                        break;
+                }
+            }
+            printf("K1: %.2f | K2: %.2f | Actuator: %.2f \n", kraken1_pot_reading, kraken2_pot_reading, actuator_pot_reading);
         }
         else{
-            testactuator.inverted = true;
-        }    
+            printf("Failed to read ADC data: %s\n", esp_err_to_name(err));
+            continue;
+        }
+
         sendEn();
         setFX(&testMotor1, kraken1_pot_reading);
         setFX(&testMotor2, kraken2_pot_reading);
+        if(actuator_pot_reading > 0.5){
+            testactuator.inverted = false;
+            actuator_pot_reading = (actuator_pot_reading - 0.5f) * 2.0f;
+        }
+        else{
+            testactuator.inverted = true;
+            actuator_pot_reading = actuator_pot_reading * 2.0f;
+        }    
         setSRX(&testactuator, actuator_pot_reading);
     }
-    
 }
