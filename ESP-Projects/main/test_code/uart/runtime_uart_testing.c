@@ -1,8 +1,8 @@
-#include <driver/gpio.h>
+//#include <driver/gpio.h>
 // #include "./packs/uart/uart.h"
 // #include "./packs/can/can.h"
-#include "uart.h"
-#include "can.h"
+//#include "uart.h"
+//#include "can.h"
 
 
 //uart goals
@@ -153,17 +153,11 @@ void app_main(void)
 
     // 4. Assign UART0 TX/RX pins
     ESP_ERROR_CHECK(uart_set_pin(
-        UART_NUM_0, 43, 44,
+        UART_NUM_0, 36, 37,
         UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
 
-<<<<<<< HEAD
-    //ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, uart_buffer_size_rx, uart_buffer_size_tx, 0, NULL, 0));
-    //ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config));
-    uart_set_pin(UART_NUM_0, 37, 36, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-=======
     // 5. Define test packet
     uint8_t packet[] = {127, 127, 5, 72, 21, 104, 127, 62, 45, 127};
->>>>>>> refs/remotes/origin/boardtesting
 
     // 6. Transmit repeatedly
     while (1) {
