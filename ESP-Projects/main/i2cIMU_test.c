@@ -259,6 +259,9 @@ static esp_err_t imu_update(imu_data_t *d, float dt)
 
 void app_main(void)
 {
+    
+
+
     ESP_ERROR_CHECK(i2c_bus_init());
     ESP_ERROR_CHECK(icm_attach());
     ESP_ERROR_CHECK(icm_init());
