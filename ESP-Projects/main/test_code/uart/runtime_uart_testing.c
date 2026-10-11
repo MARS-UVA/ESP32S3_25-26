@@ -93,9 +93,9 @@ void app_main(){
     //10 is Tx, 11 is Rx for gpio UART
     uart_set_pin(UART_NUM_1, 10, 11, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
-    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, uart_buffer_size_rx, uart_buffer_size_tx, 0, NULL, 0));
+    //ESP_ERROR_CHECK(uart_driver_install(UART_NUM_0, uart_buffer_size_rx, uart_buffer_size_tx, 0, NULL, 0));
     //ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config));
-    //uart_set_pin(UART_NUM_0, 37, 36, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    uart_set_pin(UART_NUM_0, 37, 36, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
     /*uint8_t invalid;
     uint8_t header;
