@@ -70,7 +70,7 @@
 void app_main(){   
     
     const uart_config_t uart_config = {
-        .baud_rate = 2000000,
+        .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,
         .parity = 0,
         .stop_bits = 1,
@@ -93,7 +93,7 @@ void app_main(){
     //10 is Tx, 11 is Rx for gpio UART
     uart_set_pin(UART_NUM_1, 10, 11, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
-    uint8_t invalid;
+    /*uint8_t invalid;
     uint8_t header;
 
     uint8_t front_left_wheel;
@@ -103,16 +103,17 @@ void app_main(){
     uint8_t front_bucket_drum;
     uint8_t front_actuator;
     uint8_t back_bucket_drum;
-    uint8_t back_actuator;
+    uint8_t back_actuator;*/
 
     ControlPacket_OneRobot test_packet = {
-        
+        127, 127, 127, 127, 127, 127, 127, 127, 127, 127
     }
     
     // control_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
 
     while (true) {
-        UART_write(, 10);
+        //UART_write(, 10);
+        uart_write_bytes(UART_NUM_1, &test_packet, 10);
         //UART_callback(0x32, test_callback, 0, 0);
 
     }
