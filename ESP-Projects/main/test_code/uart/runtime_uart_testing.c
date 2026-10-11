@@ -146,26 +146,46 @@ void app_main(void)
 
     // 2. Install driver (only if not already installed)
     ESP_ERROR_CHECK(uart_driver_install(
-        UART_NUM_0, 2048, 2048, 0, NULL, 0));
+        UART_NUM_1, 2048, 2048, 0, NULL, 0));
 
     // 3. Apply configuration
-    ESP_ERROR_CHECK(uart_param_config(UART_NUM_0, &uart_config));
+    ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
 
-    // 4. Assign UART0 TX/RX pins
+    // 4. Assign UART0 TX/RX pins (36/37 for USB)
     ESP_ERROR_CHECK(uart_set_pin(
-        UART_NUM_0, 36, 37,
+        UART_NUM_1, 17, 18,
         UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
 
     // 5. Define test packet
-    uint8_t packet[] = {127, 127, 5, 72, 21, 104, 127, 62, 45, 127};
+    //uint8_t packet[] = "hello";
+
+    uint8_t buffer[11];
 
     // 6. Transmit repeatedly
     while (1) {
-        int bytes_sent = uart_write_bytes(
+        /*int bytes_sent = uart_write_bytes(
             UART_NUM_0, (const char *)packet, sizeof(packet));
 
         ESP_LOGI("UART_TEST", "Sent %d bytes", bytes_sent);
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(100));*/
+
+        // int bytes_sent = uart_write_bytes(
+        //     UART_NUM_1, (const char *)packet, sizeof(packet));
+        // ESP_LOGI("UART_TEST", "Sent %d bytes", bytes_sent);
+
+        int bytes_read = uart_read_bytes(
+            UART_NUM_1, (const char *)buffer, sizeof(buffer)-1, pdMS_TO_TICKS(100));
+
+        buffer[10] = '\0';
+        ESP_LOGI("UART_TEST", "Read %d bytes, output %s", bytes_read, buffer);
+
+        //printf("%d", buffer[0]);
+
+        // for (int i, i < sizeof(buffer), i++) {
+        // }
+        //ESP_LOGI("read", "output %c", buffer[0]);
+
+        //vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
