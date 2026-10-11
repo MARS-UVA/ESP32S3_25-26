@@ -68,8 +68,6 @@
 }*/
 
 void app_main(){   
-
-    puts("what");
     
     const uart_config_t uart_config = {
         .baud_rate = 2000000,
@@ -91,10 +89,10 @@ void app_main(){
     ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, uart_buffer_size_rx, uart_buffer_size_tx, 0, NULL, 0));
     ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
     //ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, S3_TX_PIN, S3_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE)); // used to be 43, 44, but those pins are used for CAN so changed to 23, 24
-    uart_set_pin(UART_NUM_1, 23, 24, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    
+    //10 is Tx, 11 is Rx for gpio UART
+    uart_set_pin(UART_NUM_1, 10, 11, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     // control_queue = xQueueCreate(1, sizeof(ControlPacket_OneRobot));
-
-    puts("testin");
 
     while (true) {
 
