@@ -18,7 +18,7 @@
 #define TX_GPIO_NUM GPIO_NUM_1
 #define RX_GPIO_NUM GPIO_NUM_2
 #define HALL_PIN GPIO_NUM_11    /* Original FRONT input; GPIO12 was BACK. */
-#define ACTUATOR_ID 16          /* Original front Talon, NOT confirmed hardware. */
+#define ACTUATOR_ID 4          /* Original front Talon, NOT confirmed hardware. */
 #define ACTUATOR_CHANNEL_ID 13  /* Stored metadata; not used in setSRX frames. */
 #define ACTUATOR_INVERTED false
 #define EXTEND_SIGN (-1)        /* Original front command convention; VERIFY. */
