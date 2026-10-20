@@ -14,7 +14,7 @@ void readHallEffect()
 {
     while (1)
     {
-        PositionPacket packet = calculatePulse(&leftActuator, &rightActuator);
+        PositionPacket_OneRobot packet = calculatePulse(&leftActuator, &rightActuator);
         //UART_write_position(&packet);
         vTaskDelay(pdMS_TO_TICKS(500));
     }
@@ -22,7 +22,7 @@ void readHallEffect()
 
 void moveActuators()
 {
-    ControlPacket packet = {0, 0x0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 200};
+    ControlPacket_OneRobot packet = {0, 0x0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 200};
     while (1)
     {
         vTaskDelay(pdMS_TO_TICKS(3000));
