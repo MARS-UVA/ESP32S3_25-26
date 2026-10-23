@@ -14,7 +14,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#define RUN_MOTION_TEST 0       /* Set to 1 only after checking README.md. */
+
+#define RUN_MOTION_TEST 1      /* Set to 1 only after checking README.md. */
 #define TX_GPIO_NUM GPIO_NUM_2  /* ESP32 -> TJA1051TK-3 TXD; user-confirmed wiring. */
 #define RX_GPIO_NUM GPIO_NUM_1  /* ESP32 <- TJA1051TK-3 RXD; user-confirmed wiring. */
 #define HALL_A_PIN GPIO_NUM_11  /* A2; user-confirmed wiring. */
@@ -25,11 +26,11 @@
 #define ACTUATOR_INVERTED false
 #define EXTEND_SIGN (-1)        /* Original front command convention; VERIFY. */
 #define TEST_OUTPUT 0.15
-#define MOTION_MS 250
-#define STOP_GAP_MS 2000
+#define MOTION_MS 1000
+#define STOP_GAP_MS 3000
 #define COMMAND_PERIOD_MS 10
 #define CAN_WAIT_MS 10
-#define CAN_ID_SET_SRX 0x2040200u
+#define CAN_ID_SET_SRX 0x2040200
 
 typedef struct {
     uint8_t id;
@@ -286,15 +287,24 @@ static void latch_fault(void)
 static void motion_task(void *argument)
 {
     (void)argument;
+
+    /* Start stopped. */
     if (!phase(0, STOP_GAP_MS, false)) goto fault;
-    if (RUN_MOTION_TEST) {
-        if (!phase(EXTEND_SIGN * TEST_OUTPUT, MOTION_MS, true)) goto fault;
-        if (!phase(0, STOP_GAP_MS, false)) goto fault;
-        if (!phase(-EXTEND_SIGN * TEST_OUTPUT, MOTION_MS, true)) goto fault;
-    }
+
     for (;;) {
-        if (!phase(0, 1000, false)) goto fault;
+        if (RUN_MOTION_TEST) {
+            if (!phase(EXTEND_SIGN * TEST_OUTPUT,
+                       MOTION_MS, true)) goto fault;
+
+            if (!phase(0, STOP_GAP_MS, false)) goto fault;
+
+            if (!phase(-EXTEND_SIGN * TEST_OUTPUT,
+                       MOTION_MS, true)) goto fault;
+        }
+
+        if (!phase(0, STOP_GAP_MS, false)) goto fault;
     }
+
 fault:
     latch_fault();
     vTaskDelete(NULL);
