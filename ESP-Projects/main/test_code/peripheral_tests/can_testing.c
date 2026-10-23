@@ -13,6 +13,7 @@
 #include "esp_twai_onchip.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "driver/uart.h"
 
 
 #define RUN_MOTION_TEST 1      /* Set to 1 only after checking README.md. */
@@ -25,8 +26,8 @@
 #define ACTUATOR_CHANNEL_ID 13  /* Stored metadata; not used in setSRX frames. */
 #define ACTUATOR_INVERTED false
 #define EXTEND_SIGN (-1)        /* Original front command convention; VERIFY. */
-#define TEST_OUTPUT 0.15
-#define MOTION_MS 1000
+#define TEST_OUTPUT 0.50
+#define MOTION_MS 5000
 #define STOP_GAP_MS 3000
 #define COMMAND_PERIOD_MS 10
 #define CAN_WAIT_MS 10
@@ -38,6 +39,15 @@ typedef struct {
     uint8_t channel;
     float current;
 } TalonSRX;
+
+const uart_config_t uart_config = {
+    .baud_rate = 115200,
+    .data_bits = UART_DATA_8_BITS,
+    .parity = UART_PARITY_DISABLE,
+    .stop_bits = UART_STOP_BITS_1,
+    .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+    .source_clk = UART_SCLK_DEFAULT,
+};
 
 static twai_node_handle_t g_node_hdl;
 static TalonSRX actuator;
@@ -230,7 +240,7 @@ static void hallEffectInit(void)
     ESP_ERROR_CHECK(gpio_intr_enable(HALL_B_PIN));
 }
 
-static void feedback_task(void *argument)
+/*static void feedback_task(void *argument)
 {
     (void)argument;
     for (;;) {
@@ -243,6 +253,36 @@ static void feedback_task(void *argument)
         printf("position_ticks=%" PRId64 " transitions=%" PRIu64
                " invalid_transitions=%" PRIu64 " command_dir=%d fault=%d\n",
                position, total, invalid, direction, fault);
+        vTaskDelay(ticks_ms(100));
+    }
+}*/
+
+static void feedback_task(void *argument)
+{
+    (void)argument;
+
+    char message[160];
+
+    for (;;) {
+        portENTER_CRITICAL(&lock);
+        int64_t position = position_ticks;
+        uint64_t total = transitions, invalid = invalid_transitions;
+        int direction = command_direction;
+        bool fault = faulted;
+        portEXIT_CRITICAL(&lock);
+
+        int len = snprintf(
+            message,
+            sizeof(message),
+            "position_ticks=%" PRId64 " transitions=%" PRIu64
+            " invalid_transitions=%" PRIu64 " command_dir=%d fault=%d\r\n",
+            position, total, invalid, direction, fault
+        );
+
+        if (len > 0) {
+            uart_write_bytes(UART_NUM_1, message, len);
+        }
+
         vTaskDelay(ticks_ms(100));
     }
 }
@@ -315,6 +355,14 @@ void app_main(void)
     /* SDK config routes printf to UART0, 115200 baud, TX43/RX44 on ESP32-S3.
      * Do not also run the original UART_setup(), which uses the same pins.
      */
+    
+    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, 1024, 0, 0, NULL, 0));
+    ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
+    ESP_ERROR_CHECK(uart_set_pin(
+        UART_NUM_1, 17, 18,
+        UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE
+    ));
+    
     actuator = talonSRXInit(ACTUATOR_ID, ACTUATOR_CHANNEL_ID, ACTUATOR_INVERTED);
     prepare_frames();
     hallEffectInit();
