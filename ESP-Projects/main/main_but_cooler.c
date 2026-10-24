@@ -79,7 +79,7 @@ adc_continuous_config_t adc_reading_config = {
 void app_main()
 {
     // TalonFX and TalonSRX Initialization
-    TalonFX testMotor1 = talonFXInit(25, 4);
+    TalonFX testMotor1 = talonFXInit(38, 4);
     TalonFX testMotor2 = talonFXInit(37, 3);
     TalonFX* motors[2] = {&testMotor1, &testMotor2};
     canSetupTalonFX(motors, 2);
@@ -144,8 +144,24 @@ void app_main()
         }
 
         sendEn();
+        if(kraken1_pot_reading == 0.5){
+            kraken1_pot_reading = (kraken1_pot_reading - 0.5f) * 2.0f;
+        }
+        else{
+            kraken1_pot_reading = (kraken1_pot_reading - 0.5f) * 2.0f;
+        }
         setFX(&testMotor1, kraken1_pot_reading);
+
+
+        if(kraken2_pot_reading == 0.5){
+            kraken2_pot_reading = 0.0f;
+        }
+        else{
+            kraken2_pot_reading = (kraken2_pot_reading - 0.5f) * 2.0f;
+        }
         setFX(&testMotor2, kraken2_pot_reading);
+
+
         if(actuator_pot_reading > 0.5){
             testactuator.inverted = false;
             actuator_pot_reading = (actuator_pot_reading - 0.5f) * 2.0f;
