@@ -2,16 +2,18 @@
 
 void UART_rx_task()
 {
-    ControlPacket_OneRobot pkt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    ControlPacket_OneRobot pkt = {1, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
     for (;;)
     {
         UART_read(&pkt);
-        if (pkt.invalid == 0)
+
+        if (pkt.invalid)
         {
-            xQueueOverwrite(control_queue, &pkt);
-            pkt.invalid = 1; // Mark invalid so packet is not reused
+            vTaskDelay(pdMS_TO_TICKS(1));
+            continue;
         }
-        vTaskDelay(1);
+
+        xQueueSend(control_queue, &pkt, pdMS_TO_TICKS(10));
     }
 }
 
@@ -27,7 +29,7 @@ void UART_tx_task(PDH *pdh)
     {
         current_voltage_packet = getCurrentVoltageOneRobot(pdh);
         UART_write(&current_voltage_packet, sizeof(CurrVoltPacket_OneRobot));
-        
+
         position_packet = calculatePulse(&frontActuator, &backActuator);
         UART_write(&position_packet, sizeof(PositionPacket_OneRobot));
 
@@ -98,23 +100,25 @@ void one_robot_control_can_task()
 {
     ControlPacket_OneRobot motor_state = {0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
     ControlPacket_OneRobot new_data;
-    TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t frequency = pdMS_TO_TICKS(15);
+    // TickType_t xLastWakeTime = xTaskGetTickCount();
+    // const TickType_t frequency = pdMS_TO_TICKS(15);
 
     uint8_t last_received_count = 0;
 
     for (;;)
     {
-        vTaskDelayUntil(&xLastWakeTime, frequency);
+        // vTaskDelayUntil(&xLastWakeTime, frequency);
         if (xQueueReceive(control_queue, &new_data, 0) == pdTRUE)
         {
             motor_state = new_data;
             last_received_count = 0;
         }
-        else {
+        else
+        {
             last_received_count++;
         }
-        if (last_received_count >=100) {
+        if (last_received_count >= 100)
+        {
             motor_state = (ControlPacket_OneRobot){0, 0, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
         }
 
